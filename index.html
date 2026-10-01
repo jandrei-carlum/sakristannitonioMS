@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ministry of Altar Servers</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600&family=Nunito:wght@400;600;700&display=swap">
+<style>
+:root{--pur:#6a5a9c;--pd:#5d4d8c;--purt:#f1edf8;--gold:#d4b277;--goldt:#faf3e3;--grn:#4f8f69;--grnt:#e8f3ec;--red:#c4636b;--redt:#fbeced;--bg:#faf8fc;--ink:#2f2a3a;--mut:#7a7387;--line:#ece7f2;--season:#5fa57c;--sh:0 6px 20px #5d4d8c12;box-sizing:border-box}
+*{box-sizing:inherit}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Nunito,"Segoe UI",system-ui,sans-serif;padding-bottom:80px}
+h1,h2{font-family:Lora,Georgia,serif;margin:0;font-weight:600}
+h3{display:flex;align-items:center;gap:.5rem;margin:0 0 .5rem;font-size:1rem}
+button,input,select{font:inherit;color:inherit}
+button,.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;border:1px solid var(--line);background:#fff;padding:.6rem 1rem;border-radius:12px;cursor:pointer;min-height:44px;text-decoration:none;color:inherit}
+button:hover,.btn:hover{border-color:var(--gold)}
+.pri{background:var(--pur);border-color:var(--pur);color:#fff}
+.pri:hover{background:var(--pd);border-color:var(--pd)}
+.del{border-color:transparent;background:none;color:var(--red);margin-right:auto}
+.lft{margin-right:auto}
+input,select{width:100%;min-height:44px;padding:.55rem .8rem;border:1px solid var(--line);border-radius:12px;background:#fff}
+:focus-visible{outline:3px solid #d4b27799;outline-offset:1px}
+.top{position:relative;background:#fff;border-bottom:2px solid #ead9b4;box-shadow:0 2px 12px #5d4d8c0d}
+.in{max-width:1000px;margin:auto;padding:.9rem 1rem .75rem;display:flex;align-items:center;gap:.8rem}
+.logo{height:50px;width:auto;flex:none}
+.brand{min-width:0}
+.brand h1{font-size:clamp(.95rem,4.4vw,1.3rem);line-height:1.15;color:var(--pd)}
+.brand p{margin:.2rem 0 0;font-size:.78rem;line-height:1.3;color:var(--mut)}
+.brand p i{font-style:normal}
+.top button{min-height:38px;padding:.3rem .8rem;font-size:.85rem}
+.rb{margin:-.9rem 0 0 auto;align-self:flex-start;filter:drop-shadow(0 0 1px #c9a86a) drop-shadow(0 2px 3px #5d4d8c33)}
+.rb i{display:grid;place-items:start center;padding-top:8px;width:26px;height:52px;background:var(--season);color:var(--gold);clip-path:polygon(0 0,100% 0,100% 100%,50% 84%,0 100%)}
+main{max-width:1000px;margin:auto;padding:1.25rem 1rem}
+.head{display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end;justify-content:space-between;margin-bottom:.9rem}
+.head h2{font-size:1.9rem;line-height:1.1}
+.head small{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-top:.3rem;color:var(--mut)}
+.chip{display:inline-flex;align-items:center;gap:.4rem;padding:.1rem .65rem;border:1px solid var(--line);border-radius:99px;background:#fff;font-size:.78rem;color:var(--ink)}
+.chip i{width:9px;height:9px;border-radius:50%;background:var(--season);border:1px solid #0002}
+.acts{display:flex;gap:.5rem}
+.tools{display:flex;gap:.5rem;margin-bottom:.6rem}
+.srch{position:relative;flex:1}
+.srch svg{position:absolute;left:.8rem;top:12px;color:var(--mut)}
+.srch input{padding-left:2.5rem}
+#fb{font-style:normal;background:var(--pur);color:#fff;border-radius:99px;min-width:1.3rem;height:1.3rem;display:inline-grid;place-items:center;font-size:.75rem}
+.fc{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.6rem}
+.fc:empty{display:none}
+.chs{display:flex;flex-wrap:wrap;gap:.45rem}
+.ch{min-height:38px;padding:.3rem .85rem;border-radius:99px;font-size:.88rem}
+.ch.on{background:var(--purt);border-color:var(--pur);color:var(--pd);font-weight:700}
+.fc .ch{min-height:32px;font-size:.8rem}
+.fc .ch::after{content:" ×"}
+#list{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:.7rem}
+.card{justify-content:flex-start;gap:.8rem;text-align:left;width:100%;border-radius:16px;padding:.85rem;box-shadow:var(--sh)}
+.card>span:last-child{min-width:0;flex:1}
+.av{position:relative;flex:none;width:46px;height:46px;border-radius:50%;background:var(--purt);color:var(--pur);display:grid;place-items:center;font:600 1.1rem Lora,Georgia,serif}
+.av i{position:absolute;right:-3px;bottom:-3px;width:19px;height:19px;border-radius:50%;background:var(--gold);color:#fff;font:700 .66rem Nunito,sans-serif;display:grid;place-items:center;border:2px solid #fff}
+.av.rd{background:var(--redt);color:var(--red);width:40px;height:40px;font-size:1rem}
+.card b,.card small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card b{font-weight:700}
+.card small{color:var(--mut)}
+.st{font-size:.78rem;color:var(--mut)}
+.st::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#aaa1b4;margin-right:.4rem}
+.st.Active::before{background:var(--grn)}
+.st.Inactive::before{background:var(--gold)}
+.st.Not-recommissioned::before{background:#8f77c4}
+.st.Not-member-anymore::before{background:var(--red)}
+.tag{display:inline-flex;align-items:center;gap:.3rem;font-size:.78rem;padding:.05rem .6rem;border-radius:99px;margin-left:.5rem}
+.tag.ok{background:var(--grnt);color:#3f7a58}.tag.no{background:var(--goldt);color:#8a6a1f}
+.pill{padding:.05rem .6rem;border-radius:99px;font-size:.78rem;font-weight:700;flex:none}
+.pill.r{background:var(--redt);color:var(--red)}.pill.g{background:var(--grnt);color:#3f7a58}.pill.y{background:var(--goldt);color:#8a6a1f}
+.none{color:var(--mut);margin:0;padding:.3rem 0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:.75rem}
+.stat,.box,.hero,.strip{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh)}
+.stat{display:flex;align-items:center;gap:.8rem;padding:1rem}
+.stat div{min-width:0}
+.stat b{display:block;font:600 1.8rem/1 Lora,Georgia,serif}
+.stat div span{color:var(--mut);font-size:.82rem}
+.box{padding:1rem}
+.box.rbx{border-top:3px solid var(--red)}
+.ic{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;flex:none}
+.stat .ic{width:44px;height:44px;border-radius:14px}
+.box h3 .ic{width:28px;height:28px;border-radius:9px}
+.p{background:var(--purt);color:var(--pur)}.g{background:var(--grnt);color:var(--grn)}.y{background:var(--goldt);color:#9a7a2f}.r{background:var(--redt);color:var(--red)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:.75rem}
+button.li{width:100%;justify-content:flex-start;text-align:left;gap:.75rem;border:0;border-top:1px solid var(--line);border-radius:0;background:none;padding:.5rem 0;min-height:56px}
+button.li.past{opacity:.55}
+.lt{flex:1;min-width:0}
+.lt b{display:block;font-weight:700;overflow-wrap:anywhere}
+.lt small{display:block;color:var(--mut)}
+.lt small.rl{color:var(--red);font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
+.db{flex:none;width:44px;height:48px;border-radius:12px;background:var(--goldt);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.db b{font:600 1.15rem Lora,Georgia,serif;color:#8a6a1f}
+.db small{font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:#9a7a2f;margin-top:3px}
+.more{width:100%;margin-top:.4rem;min-height:38px;font-size:.85rem;color:var(--pd)}
+.sh2{margin:.6rem 0 0;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.vac{margin:.5rem 0 0;padding-top:.5rem;border-top:1px dashed var(--line);font-size:.82rem;color:var(--mut)}
+.gr{display:grid;grid-template-columns:32px 1fr auto;gap:.75rem;align-items:center;padding:.4rem 0}
+.gb{width:32px;height:32px;border-radius:50%;background:var(--goldt);color:#8a6a1f;border:1px solid var(--gold);display:grid;place-items:center;font:700 .9rem Nunito,sans-serif}
+.gm{min-width:0}
+.gm span{font-size:.85rem;color:var(--mut)}
+.gt{height:10px;margin-top:.25rem;background:var(--purt);border-radius:9px;overflow:hidden}
+.gt i{display:block;height:100%;background:var(--pur);border-radius:9px}
+.gc{min-width:2.6rem;text-align:center;padding:.15rem .65rem;border-radius:99px;background:var(--purt);color:var(--pd);font-weight:700}
+.cp{display:flex;align-items:center;gap:.6rem}
+.cp .gt{flex:1;margin:0}
+.cp b{color:var(--pd)}
+.cps{margin:.2rem 0 .3rem;font-size:.82rem;color:var(--mut)}
+.ck{border-top:1px solid var(--line)}
+.ck summary,.ck.ok{display:flex;align-items:center;gap:.6rem;padding:.55rem 0;cursor:pointer;list-style:none}
+.ck.ok{cursor:default}
+.ck summary::-webkit-details-marker{display:none}
+.ck svg{flex:none;color:var(--red)}
+.ck.ok svg{color:var(--grn)}
+.ck span{flex:1;min-width:0}
+.mn{display:flex;flex-wrap:wrap;gap:.35rem;padding:0 0 .6rem 1.7rem}
+.mn button{min-height:32px;padding:.15rem .7rem;font-size:.82rem;border-radius:99px}
+.back{background:none;border:0;padding:.3rem .2rem;min-height:38px;color:var(--pur);font-weight:700;margin-bottom:.4rem}
+.hero{display:flex;flex-wrap:wrap;align-items:center;gap:1rem;border-top:4px solid var(--gold);padding:1.25rem;margin-bottom:.75rem}
+.av.big{width:84px;height:84px;font-size:2.1rem;border:3px solid var(--gold)}
+.hn{flex:1;min-width:0;flex-basis:200px}
+.hn h2{font-size:clamp(1.4rem,5vw,1.9rem);line-height:1.15;overflow-wrap:anywhere}
+.hn p{margin:.25rem 0 .4rem;color:var(--mut);overflow-wrap:anywhere}
+.strip{display:grid;grid-template-columns:1fr 1.9fr 1fr;margin-bottom:.75rem}
+.cell{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.3rem;padding:1rem .4rem;min-width:0}
+.cell+.cell{border-left:1px solid var(--line)}
+.cell b{font:600 clamp(1.1rem,4.6vw,1.6rem)/1.15 Lora,Georgia,serif}
+.cell span:last-child{color:var(--mut);font-size:.8rem}
+.aw{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.75rem}
+.medal{display:flex;align-items:center;gap:.9rem;padding:.9rem;border-radius:16px;border:1px solid var(--gold);background:var(--goldt);min-width:0}
+.medal.m2{border-color:#b9aee0;background:var(--purt)}
+.medal.off{border:1px dashed #d9d2e2;background:#fff;color:var(--mut)}
+.mdl{flex:none;display:grid;place-items:center;width:54px;height:54px;border-radius:50%;background:#fff;border:2px solid var(--gold);color:#9a7a2f;box-shadow:0 0 0 4px #d4b27733}
+.m2 .mdl{border-color:var(--pur);color:var(--pur);box-shadow:0 0 0 4px #6a5a9c22}
+.off .mdl{border:2px dashed #cfc7da;color:#b8aec4;box-shadow:none}
+.medal b{display:block;overflow-wrap:anywhere}
+.medal small{display:block;color:var(--mut)}
+.medal .dt{display:inline-block;margin-top:.25rem;font-size:.8rem;font-weight:700;color:#8a6a1f}
+.m2 .dt{color:var(--pd)}
+.f{padding:.5rem 0;border-top:1px solid var(--line);overflow-wrap:anywhere}
+.f small{display:block;color:var(--mut)}
+.f a{color:var(--pur);font-weight:700;text-decoration:none}
+.na{color:#aaa1b4}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;flex-direction:column;gap:2px;border:0;border-radius:0;background:none;min-height:58px;color:var(--mut);font-weight:700;font-size:.78rem}
+nav button.on{color:var(--pur);box-shadow:inset 0 3px var(--gold)}
+dialog{border:0;border-radius:20px;padding:0;width:min(660px,96vw);max-height:92vh;overflow:hidden}
+dialog::backdrop{background:#2a1f4599}
+dialog form,.fm{display:flex;flex-direction:column;max-height:92vh}
+.dh{padding:1.1rem 1.25rem .6rem;border-bottom:2px solid var(--gold)}
+.dh h2{font-size:1.6rem}
+.bd{padding:1rem 1.25rem;overflow:auto;flex:1}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.grid label{font-size:.82rem;color:var(--mut)}
+.grid .w{grid-column:1/-1}
+.sh{grid-column:1/-1;margin:.6rem 0 -.2rem;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9a7a2f}
+.sh:first-child{margin-top:0}
+.bd>.sh{margin:1rem 0 .5rem}
+.bd>.sh:first-child{margin-top:0}
+.foot{display:flex;gap:.5rem;justify-content:flex-end;padding:.8rem 1.25rem calc(.8rem + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fff}
+.lw{padding:6vh 1rem}
+.login{max-width:400px;margin:auto;padding:1.75rem;background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--sh)}
+.login .ic{margin-bottom:.8rem;width:44px;height:44px}
+.login h2{font-size:1.8rem}
+.login p{color:var(--mut);margin:.3rem 0 0}
+.login label{display:block;margin-top:1rem;color:var(--mut);font-size:.85rem}
+.login label input{margin-top:.25rem}
+.login button.pri{width:100%;margin-top:.5rem}
+.pw{position:relative;display:block}
+.pw input{padding-right:3rem}
+.pw button{position:absolute;right:2px;top:2px;min-height:40px;width:40px;padding:0;border:0;background:none;color:var(--mut)}
+.err{color:var(--red);min-height:1.5em;margin:.75rem 0 0!important;font-size:.9rem}
+#pr{display:none;font-family:Nunito,Arial,sans-serif;color:#222}
+.ph{display:flex;align-items:center;gap:12px;border-bottom:2px solid #d4b277;padding-bottom:8px}
+.ph img{height:56px}
+.ph h1{font-size:18pt;line-height:1.1;color:#5d4d8c}
+.ph p{margin:2px 0 0;font-size:9pt;color:#555}
+#pr h2{font-size:14pt;margin:12px 0 4px}
+#pr .pn{font:600 20pt Lora,Georgia,serif;margin:12px 0 2px}
+.pm{margin:0 0 8px;font-size:10pt}
+.pdt{width:100%;border-collapse:collapse;font-size:10pt}
+.pdt th,.pdt td{border:1px solid #888;padding:5px 6px;text-align:left;vertical-align:top;word-break:break-word}
+.pdt th{background:#efeaf6;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pdt.sm{font-size:7pt}
+.pdt.sm th,.pdt.sm td{padding:3px 4px}
+.kv td.k{width:32%;color:#555}
+.att td{height:11mm;vertical-align:middle}
+.att th:nth-child(1){width:6%}.att th:nth-child(2){width:34%}.att th:nth-child(3),.att th:nth-child(4){width:14%}
+tr{break-inside:avoid}
+@media print{body{background:#fff;padding:0}#app{display:none}#pr{display:block}}
+@media(min-width:721px){
+ body{padding-bottom:0}
+ nav{position:static;max-width:1000px;margin:1rem auto 0;padding:0 1rem;border:0;background:none;gap:.5rem}
+ nav button{flex:none;flex-direction:row;gap:.45rem;min-height:42px;padding:.4rem 1.1rem;border-radius:12px;font-size:.9rem}
+ nav button.on{background:#fff;box-shadow:none;border:1px solid var(--gold)}
+}
+@media(max-width:720px){
+ .stats{grid-template-columns:repeat(2,1fr)}
+ .addb{position:fixed;right:1rem;bottom:calc(72px + env(safe-area-inset-bottom));z-index:6;min-height:52px;padding:.5rem 1.2rem;border-radius:99px;box-shadow:0 8px 22px #5d4d8c55}
+ #list{padding-bottom:4.5rem}
+}
+@media(max-width:560px){
+ .grid{grid-template-columns:1fr}
+ .in{padding:.7rem .75rem .6rem;gap:.6rem}
+ .logo{height:40px}
+ .brand p{font-size:.68rem}
+ .brand p span{display:block}.brand p i{display:none}
+ .top button span,.ib span{display:none}
+ .rb{margin-top:-.7rem}.rb i{width:22px;height:46px;padding-top:7px}
+ main{padding:.75rem .75rem 1rem}
+ .head{margin-bottom:.6rem;gap:.4rem}.head h2{font-size:1.45rem}.head small{margin-top:.15rem}
+ .stats,.cols,#list{gap:.5rem}.stats{margin-bottom:.5rem}
+ .stat{padding:.7rem;gap:.6rem}.stat .ic{width:40px;height:40px}.stat b{font-size:1.55rem}
+ .box{padding:.8rem}.box h3{margin-bottom:.3rem}
+ .card{padding:.7rem}
+ .hero{padding:1rem;gap:.75rem;margin-bottom:.5rem}.hero .acts{width:100%}.hero .acts>*{flex:1}
+ .strip{margin-bottom:.5rem}.cell{padding:.75rem .3rem}
+ dialog{width:100%;max-width:100%;margin:auto 0 0;border-radius:22px 22px 0 0}
+ .foot .pri{flex:1}
+}
+</style></head>
+<body><div id="app"></div><div id="pr"></div><style id="pg"></style>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{getFirestore,collection,onSnapshot,doc,deleteDoc,writeBatch}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const cfg={apiKey:"AIzaSyDqtjhvtmAea9S9TKf94CIdd5BpbdpiZeA",authDomain:"moas-system.firebaseapp.com",projectId:"moas-system",appId:"1:302631045782:web:89769532d1cd1f4c0810b7"};
+
+const STATUS=["Active","Inactive","Not recommissioned","Not member anymore"];
+const ROLES=["President","Coordinator","Vice President","Secretary","Treasurer","Property custodian","Group 1 Lead","Group 2 Lead","Group 3 Lead","Group 4 Lead","Group 5 Lead"];
+const GROUPS=["1","2","3","4","5"];
+const SCHOOL=["Grade 4","Grade 5","Grade 6","Grade 7","Grade 8","Grade 9","Grade 10","Grade 11","Grade 12","Bachelor's degree (studying)","Graduate (bachelor's)","Masteral","Doctorate"];
+const AW=[{k:"dominic",n:"Saint Dominic Savio Award",c:"m1"},{k:"berchmans",n:"Saint John Berchmans Award",c:"m2"}];
+const F=[["lastName","Last name"],["firstName","First name"],["middleName","Middle name"],["status","Status",STATUS],["role","Role",ROLES],["group","Group",GROUPS],["start","Start of service","date"],["end","End of service","date"],["birthday","Birthday","date"],["gender","Gender",["Female","Male"]],["confirmation","Sacrament of Confirmation",["Confirmed","Not yet confirmed"]],["contact","Contact number"],["messenger","Messenger"],["address","Home address","w"],["guardian","Parent/guardian name"],["guardianContact","Parent/guardian contact"],["schoolLevel","School level",SCHOOL],["schoolName","School name"],["dominic","Saint Dominic Savio Award (date given)","date"],["berchmans","Saint John Berchmans Award (date given)","date"]];
+const SEC={lastName:"Name",status:"Service",birthday:"Personal",contact:"Contact",guardian:"Parent or guardian",schoolLevel:"School",dominic:"Awards (leave the date blank if not received)"};
+
+const key=s=>String(s??"").toLowerCase().replace(/[^a-z0-9]/g,"");
+const ALIAS={vicepresident:"Vice President",vicepres:"Vice President",vp:"Vice President",custodian:"Property custodian"};
+GROUPS.forEach(g=>ALIAS["groupleader"+g]=`Group ${g} Lead`);
+const canon=(v,list)=>{const k=key(v);if(!k)return"";return list.find(x=>key(x)===k)||ALIAS[k]||String(v).trim()};
+const norm=x=>({...x,role:canon(x.role,ROLES),status:canon(x.status,STATUS),group:String(x.group??"").trim()});
+
+const IC={
+ dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
+ users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.2c2.6 0 4.5 1.8 4.5 4.8"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/>',
+ search:'<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>',
+ filter:'<path d="M4 6h16M7 12h10M10 18h4"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ down:'<path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/>',
+ cake:'<path d="M4 20h16v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2zM12 12V8M12 3c1 1.2 1 2.2 0 3-1-.8-1-1.8 0-3z"/>',
+ cross:'<path d="M10 3h4v6h6v4h-6v8h-4v-8H4V9h6z"/>',
+ out:'<path d="M10 4H5v16h5M15 8l4 4-4 4M19 12H9"/>',
+ trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+ alert:'<path d="M12 4 3 20h18zM12 10v4M12 17v.5"/>',
+ check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+ pause:'<path d="M9 5v14M15 5v14"/>',
+ dots:'<circle cx="6" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/>',
+ back:'<path d="m15 5-7 7 7 7"/>',
+ edit:'<path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4"/>',
+ school:'<path d="m3 9 9-5 9 5-9 5zM7 12v5c2.5 2 7.5 2 10 0v-5"/>',
+ clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/>',
+ phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+ print:'<path d="M7 9V4h10v5M7 17H5a1 1 0 0 1-1-1v-5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1h-2M7 14h10v6H7z"/>',
+ medal:'<circle cx="12" cy="9" r="5.5"/><path d="m8.5 13.5-2 7 5.5-3 5.5 3-2-7M12 6.6v4.8M9.8 8.8h4.4"/>',
+ lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+ eye:'<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'
+};
+const ic=(n,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
+
+const easter=y=>{const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),n=h+l-7*m+114;return new Date(y,Math.floor(n/31)-1,n%31+1)};
+function season(){
+  const d=new Date(),y=d.getFullYear(),t=new Date(y,d.getMonth(),d.getDate()),o=Math.round((t-easter(y))/864e5);
+  const A=new Date(y,11,25);A.setDate(4-(A.getDay()||7));
+  const P=n=>({n,c:"#8f77c4"}),W=n=>({n,c:"#fbf6ea"}),R=n=>({n,c:"#d0655b"});
+  if(t>=new Date(y,11,25))return W("Christmas");
+  if(t>=A)return P("Advent");
+  if(t<=new Date(y,0,12))return W("Christmas");
+  if(o>=-46&&o<0)return o==-7?R("Palm Sunday"):o==-3?W("Holy Thursday"):o==-2?R("Good Friday"):o>-7?P("Holy Week"):P("Lent");
+  if(o>=0&&o<49)return W("Easter");
+  return o==49?R("Pentecost"):{n:"Ordinary Time",c:"#5fa57c"};
+}
+const S=season();
+document.documentElement.style.setProperty("--season",S.c);
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const D=d=>new Date(d+"T00:00:00");
+const today=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const fmtL=d=>d?D(d).toLocaleDateString("en",{month:"long",day:"numeric",year:"numeric"}):"";
+const age=b=>{if(!b)return"";const d=D(b),n=new Date();let a=n.getFullYear()-d.getFullYear();if(n<new Date(n.getFullYear(),d.getMonth(),d.getDate()))a--;return a};
+const span=(s,e)=>{if(!s)return"";const a=D(s),b=e?D(e):new Date();let m=(b.getFullYear()-a.getFullYear())*12+b.getMonth()-a.getMonth();if(m<0)return"";const y=Math.floor(m/12);m%=12;return[y&&y+(y>1?" yrs":" yr"),m&&m+(m>1?" mos":" mo")].filter(Boolean).join(" ")||"New"};
+const nm=m=>`${m.lastName||""}, ${m.firstName||""}${m.middleName?" "+m.middleName[0]+".":""}`;
+const full=m=>[m.firstName,m.middleName,m.lastName].filter(Boolean).join(" ");
+const ini=m=>esc(((m.firstName||"")[0]||"")+((m.lastName||"")[0]||"")).toUpperCase();
+const day=m=>(m.birthday||"").slice(5);
+const stc=s=>esc(s).replace(/ /g,"-");
+const stat=(v,l,i,c)=>`<div class="stat"><span class="ic ${c}">${ic(i,22)}</span><div><b>${v}</b><span>${l}</span></div></div>`;
+const LOGO='<img class="logo" src="logos/Origin.png" alt="" onerror="this.remove()">';
+const ribbon=`<span class="rb" title="${S.n}" role="img" aria-label="Liturgical season: ${S.n}"><i>${ic("cross",14)}</i></span>`;
+const brand=`${LOGO}<div class="brand"><h1>Ministry of Altar Servers</h1><p><span>St. Anthony Ma. Zaccaria Parish</span><i> | </i><span>Silangan San Mateo Rizal</span></p></div>${ribbon}`;
+let unsub,members=[],view="dash",pid=null,bdAll=false,shown=0;
+const st={q:"",g:"",s:"",r:"",sort:"name"};
+
+const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
+onAuthStateChanged(auth,u=>{if(unsub){unsub();unsub=null}u?showApp():showLogin()});
+addEventListener("popstate",()=>{if(view==="profile")go("members")});
+
+const ERR={"auth/invalid-credential":"Wrong email or password. Check both and try again.","auth/invalid-email":"Please enter a valid email address.","auth/user-disabled":"This account has been disabled.","auth/too-many-requests":"Too many attempts. Please wait a few minutes and try again.","auth/network-request-failed":"No internet connection. Check your connection and try again.","auth/unauthorized-domain":"This website address is not authorized in Firebase. Add it under Authentication > Settings > Authorized domains.","auth/operation-not-allowed":"Email/password sign-in is turned off in Firebase. Turn it on under Authentication > Sign-in method."};
+ERR["auth/wrong-password"]=ERR["auth/user-not-found"]=ERR["auth/invalid-credential"];
+
+function showLogin(){
+  $("#app").innerHTML=`<div class="top"><div class="in">${brand}</div></div>
+  <div class="lw"><form class="login" id="lf"><span class="ic p">${ic("lock")}</span><h2>Admin sign in</h2><p>Sign in to view and update member records.</p>
+  <label>Email<input id="em" type="email" required autocomplete="username" inputmode="email"></label>
+  <label>Password<span class="pw"><input id="pw" type="password" required autocomplete="current-password"><button type="button" id="tg" aria-label="Show or hide password">${ic("eye",18)}</button></span></label>
+  <p class="err" id="err" role="alert"></p><button class="pri" id="sb">Sign in</button></form></div>`;
+  $("#tg").onclick=()=>{const p=$("#pw");p.type=p.type==="password"?"text":"password"};
+  $("#lf").onsubmit=async e=>{e.preventDefault();const b=$("#sb");b.disabled=true;b.textContent="Signing in…";$("#err").textContent="";
+    try{await signInWithEmailAndPassword(auth,$("#em").value.trim(),$("#pw").value)}
+    catch(x){$("#err").textContent=ERR[x.code]||`Could not sign in (${x.code||"unknown error"}). Please try again.`;b.disabled=false;b.textContent="Sign in"}};
+}
+
+function showApp(){
+  $("#app").innerHTML=`<div class="top"><div class="in">${brand}<button id="so" aria-label="Sign out">${ic("out",18)}<span>Sign out</span></button></div></div>
+  <nav><button data-v="dash">${ic("dash")}Dashboard</button><button data-v="members">${ic("users")}Members</button></nav>
+  <main id="v"></main><dialog id="dlg"></dialog>`;
+  $("#so").onclick=()=>signOut(auth);
+  $("nav").onclick=e=>{const b=e.target.closest("button");if(b)go(b.dataset.v)};
+  $("#v").onclick=e=>{if(view!=="dash")return;
+    const b=e.target.closest("[data-id]");if(b)return go("profile",b.dataset.id);
+    if(e.target.closest("#bdt")){bdAll=!bdAll;dash()}};
+  unsub=onSnapshot(collection(db,"members"),s=>{members=s.docs.map(d=>norm({id:d.id,...d.data()}));fill()},
+    ()=>{$("#v").innerHTML='<p class="none">This account does not have access to the member records.</p>'});
+  go("dash");
+}
+
+function go(v,id){
+  view=v;pid=id||null;Object.assign(st,{q:"",g:"",s:"",r:"",sort:"name"});
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===(v==="profile"?"members":v)));
+  if(v==="members")shell();
+  if(v==="profile")history.pushState(null,"");
+  fill();scrollTo(0,0);
+}
+const fill=()=>view==="dash"?dash():view==="profile"?prof():draw();
+
+function dash(){
+  const n=s=>members.filter(m=>m.status===s).length,A=n("Active"),I=n("Inactive");
+  const now=new Date(),mo=String(now.getMonth()+1).padStart(2,"0"),dn=now.getDate(),yr=now.getFullYear();
+  const box=(t,i,c,body,x="")=>`<div class="box ${x}"><h3><span class="ic ${c}">${ic(i,16)}</span>${t}</h3>${body}</div>`;
+
+  const gc=GROUPS.map(g=>members.filter(m=>m.group===g).length),mx=Math.max(1,...gc),ng=members.length-gc.reduce((a,b)=>a+b,0);
+  const grp=gc.map((c,i)=>`<div class="gr" title="Group ${i+1}: ${c} members"><span class="gb">${i+1}</span><div class="gm"><span>Group ${i+1}</span><div class="gt"><i style="width:${c?Math.max(c/mx*100,6):0}%"></i></div></div><b class="gc">${c}</b></div>`).join("")+(ng?`<p class="none">${ng} member${ng>1?"s are":" is"} not assigned to a group.</p>`:"");
+
+  const bd=members.filter(m=>(m.birthday||"").slice(5,7)===mo).sort((x,y)=>day(x).localeCompare(day(y)));
+  const bdh=bd.length?(bdAll?bd:bd.slice(0,5)).map(m=>{const dd=+m.birthday.slice(8,10);
+    return `<button class="li${dd<dn?" past":""}" data-id="${m.id}"><span class="db"><b>${dd}</b><small>${D(m.birthday).toLocaleDateString("en",{month:"short"})}</small></span><span class="lt"><b>${esc(nm(m))}</b><small>Turns ${yr-+m.birthday.slice(0,4)}${m.group?" · Group "+esc(m.group):""}</small></span>${dd===dn?'<span class="pill y">Today</span>':""}</button>`}).join("")
+    +(bd.length>5?`<button class="more" id="bdt">${bdAll?"Show less":"Show all "+bd.length}</button>`:""):'<p class="none">No birthdays this month.</p>';
+
+  const holder=r=>members.find(m=>m.role===r);
+  const rb=(m,r)=>`<button class="li" data-id="${m.id}"><span class="av rd">${ini(m)}</span><span class="lt"><b>${esc(nm(m))}</b><small class="rl">${esc(r)}</small></span></button>`;
+  const rr=r=>{const m=holder(r);return m?rb(m,r):""};
+  const other=members.filter(m=>m.role&&!ROLES.includes(m.role));
+  const vac=ROLES.filter(r=>!holder(r)),filled=ROLES.length-vac.length+other.length;
+  const offh=filled?`<div class="sh2">Officers</div>${ROLES.slice(0,6).map(rr).join("")||'<p class="none">None assigned.</p>'}<div class="sh2">Group leaders</div>${ROLES.slice(6).map(rr).join("")||'<p class="none">None assigned.</p>'}${other.length?`<div class="sh2">Other roles</div>${other.map(m=>rb(m,m.role)).join("")}`:""}`:'<p class="none">No roles assigned yet.</p>';
+
+  const act=members.filter(m=>m.status==="Active");
+  const chk=[["Contact number",m=>!m.contact],["Birthday",m=>!m.birthday],["Group",m=>!m.group],["Confirmation record",m=>!m.confirmation],["Guardian contact (under 18)",m=>(!m.birthday||age(m.birthday)<18)&&!m.guardianContact]];
+  const res=chk.map(([l,f])=>[l,act.filter(f)]),gaps=res.reduce((s,r)=>s+r[1].length,0);
+  const pct=act.length?Math.round(100-gaps/(act.length*chk.length)*100):0;
+  const rec=`<div class="cp"><div class="gt"><i style="width:${pct}%"></i></div><b>${pct}%</b></div><p class="cps">${act.length?"Active member records are "+pct+"% complete.":"No active members yet."}</p>`
+    +res.map(([l,a])=>a.length?`<details class="ck"><summary>${ic("alert",16)}<span>${l}</span><b class="pill r">${a.length}</b></summary><div class="mn">${a.map(m=>`<button data-id="${m.id}">${esc(nm(m))}</button>`).join("")}</div></details>`
+      :`<div class="ck ok">${ic("check",16)}<span>${l}</span><b class="pill g">Complete</b></div>`).join("");
+
+  $("#v").innerHTML=`<div class="head"><div><h2>Dashboard</h2><small>${now.toLocaleDateString("en",{weekday:"long",month:"long",day:"numeric"})}<span class="chip"><i></i>${S.n}</span></small></div></div>
+  <div class="stats">${stat(members.length,"Total members","users","p")}${stat(A,"Active","check","g")}${stat(I,"Inactive","pause","y")}${stat(members.length-A-I,"Other status","dots","r")}</div>
+  <div class="cols">
+  ${box("Members per group","users","p",grp)}
+  ${box("Birthdays this month","cake","y",bdh)}
+  ${box("Officers and leaders","cross","r",offh+(vac.length&&filled?`<p class="vac">Vacant: ${vac.join(", ")}</p>`:""),"rbx")}
+  ${box("Records to complete","alert","r",rec)}
+  </div>`;
+}
+
+function shell(){
+  $("#v").innerHTML=`<div class="head"><div><h2>Members</h2><small id="cnt"></small></div>
+  <div class="acts"><button id="ex" class="ib" aria-label="Export">${ic("down",18)}<span>Export</span></button><button id="add" class="pri addb" aria-label="Add member">${ic("plus",18)}<span>Add member</span></button></div></div>
+  <div class="tools"><div class="srch">${ic("search",18)}<input id="q" type="search" placeholder="Search by name"></div><button id="ft">${ic("filter",18)}Filters<em id="fb" hidden></em></button></div>
+  <div class="fc" id="fc"></div><div id="list"></div>`;
+  $("#q").oninput=e=>{st.q=e.target.value;draw()};
+  $("#ft").onclick=openFilters;
+  $("#fc").onclick=e=>{const b=e.target.closest("[data-x]");if(b){st[b.dataset.x]=b.dataset.x==="sort"?"name":"";draw()}};
+  $("#ex").onclick=openExport;
+  $("#add").onclick=()=>openForm(null);
+  $("#list").onclick=e=>{const c=e.target.closest(".card");if(c)go("profile",c.dataset.id)};
+}
+
+function draw(){
+  const q=st.q.trim().toLowerCase();
+  const a=members.filter(m=>(!q||`${m.firstName} ${m.middleName} ${m.lastName}`.toLowerCase().includes(q))&&
+    (!st.g||m.group===st.g)&&(!st.s||m.status===st.s)&&(!st.r||m.role===st.r));
+  a.sort((x,y)=>st.sort==="bday"?(day(x)||"99").localeCompare(day(y)||"99"):nm(x).localeCompare(nm(y)));
+  shown=a.length;
+  $("#cnt").textContent=a.length===members.length?`${a.length} members`:`${a.length} of ${members.length} members`;
+  const lab={s:st.s,g:"Group "+st.g,r:st.r,sort:"Sorted by birthday"};
+  const act=["s","g","r"].filter(k=>st[k]);if(st.sort!=="name")act.push("sort");
+  $("#fb").hidden=!act.length;$("#fb").textContent=act.length;
+  $("#fc").innerHTML=act.map(k=>`<button class="ch on" data-x="${k}">${esc(lab[k])}</button>`).join("");
+  if($("#fok"))$("#fok").textContent=`Show ${a.length} member${a.length===1?"":"s"}`;
+  $("#list").innerHTML=a.length?a.map(m=>`<button class="card" data-id="${m.id}">
+    <span class="av">${ini(m)}${m.group?`<i>${esc(m.group)}</i>`:""}</span>
+    <span><b>${esc(nm(m))}</b><small>${esc(m.role||"No role")}${m.contact?" · "+esc(m.contact):""}</small>
+    ${m.status?`<span class="st ${stc(m.status)}">${esc(m.status)}</span>`:""}</span></button>`).join(""):
+    `<p class="none">${members.length?"No members match your search or filters.":"No members yet. Select Add member to get started."}</p>`;
+}
+
+function openFilters(){
+  const grp=(t,k,arr,lb=x=>x)=>`<div class="sh">${t}</div><div class="chs">${arr.map(v=>`<button type="button" class="ch" data-k="${k}" data-v="${esc(v)}">${esc(lb(v))}</button>`).join("")}</div>`;
+  $("#dlg").innerHTML=`<div class="fm"><div class="dh"><h2>Filters</h2></div><div class="bd">
+  ${grp("Status","s",STATUS)}${grp("Group","g",GROUPS,x=>"Group "+x)}${grp("Role","r",ROLES)}${grp("Sort by","sort",["name","bday"],x=>x==="name"?"Last name":"Birthday")}</div>
+  <div class="foot"><button type="button" class="lft" id="fclr">Clear all</button><button type="button" class="pri" id="fok"></button></div></div>`;
+  const sync=()=>{document.querySelectorAll("#dlg .ch").forEach(c=>c.classList.toggle("on",st[c.dataset.k]===c.dataset.v));draw()};
+  $("#dlg .bd").onclick=e=>{const c=e.target.closest(".ch");if(!c)return;
+    const k=c.dataset.k,v=c.dataset.v;st[k]=k==="sort"?v:(st[k]===v?"":v);sync()};
+  $("#fclr").onclick=()=>{Object.assign(st,{g:"",s:"",r:"",sort:"name"});sync()};
+  $("#fok").onclick=()=>$("#dlg").close();
+  sync();$("#dlg").showModal();
+}
+
+function prof(){
+  const m=members.find(x=>x.id===pid);
+  if(!m){if(members.length)go("members");return}
+  const v=(x,tel)=>x?(tel?`<a href="tel:${esc(x)}">${esc(x)}</a>`:esc(x)):'<span class="na">Not provided</span>';
+  const f=(l,x,tel)=>`<div class="f"><small>${l}</small>${v(x,tel)}</div>`;
+  const sec=(t,i,c,body)=>`<div class="box"><h3><span class="ic ${c}">${ic(i,16)}</span>${t}</h3>${body}</div>`;
+  const cell=(x,l,i,c)=>`<div class="cell"><span class="ic ${c}">${ic(i,18)}</span><b>${x}</b><span>${l}</span></div>`;
+  const awards=AW.map(a=>m[a.k]?`<div class="medal ${a.c}"><span class="mdl">${ic("medal",26)}</span><div><b>${a.n}</b><small>Exemplary altar server</small><span class="dt">Given ${fmtL(m[a.k])}</span></div></div>`
+    :`<div class="medal off"><span class="mdl">${ic("medal",26)}</span><div><b>${a.n}</b><small>Not yet received</small></div></div>`).join("");
+  $("#v").innerHTML=`<button class="back" id="bk">${ic("back",18)}Members</button>
+  <div class="hero"><span class="av big">${ini(m)}</span>
+  <div class="hn"><h2>${esc(full(m))}</h2><p>${esc(m.role||"No role assigned")}${m.group?" · Group "+esc(m.group):""}</p>${m.status?`<span class="st ${stc(m.status)}">${esc(m.status)}</span>`:""}${m.confirmation?`<span class="tag ${m.confirmation==="Confirmed"?"ok":"no"}">${m.confirmation==="Confirmed"?ic("check",14):""}${esc(m.confirmation)}</span>`:""}</div>
+  <div class="acts"><button id="pp">${ic("print",18)}Print profile</button><button class="pri" id="ed">${ic("edit",18)}Edit</button></div></div>
+  <div class="strip">${cell(m.birthday?age(m.birthday):"—","Age","cake","y")}${cell(span(m.start,m.end)||"—","In service","clock","g")}${cell(m.group||"—","Group","users","p")}</div>
+  <div class="box" style="margin-bottom:.75rem"><h3><span class="ic y">${ic("medal",16)}</span>Awards and recognition</h3><div class="aw">${awards}</div></div>
+  <div class="cols">
+  ${sec("Personal","user","p",f("Gender",m.gender)+f("Birthday",fmtL(m.birthday))+f("Sacrament of Confirmation",m.confirmation))}
+  ${sec("Contact","phone","g",f("Contact number",m.contact,1)+f("Messenger",m.messenger)+f("Home address",m.address))}
+  ${sec("Parent or guardian","users","r",f("Name",m.guardian)+f("Contact number",m.guardianContact,1))}
+  ${sec("School","school","y",f("Level",m.schoolLevel)+f("School name",m.schoolName))}
+  ${sec("Service","cross","p",f("Role",m.role)+f("Started",fmtL(m.start))+f("Ended",m.end?fmtL(m.end):m.start?"Ongoing":""))}
+  </div>`;
+  $("#bk").onclick=()=>history.back();
+  $("#ed").onclick=()=>openForm(m.id);
+  $("#pp").onclick=()=>printProfile(m);
+}
+
+function openForm(id){
+  const m=members.find(x=>x.id===id)||{};
+  const field=([k,l,t])=>{
+    let inp;
+    if(Array.isArray(t)){const o=m[k]&&!t.includes(m[k])?[...t,m[k]]:t;
+      inp=`<select name="${k}"><option value="">Not set</option>${o.map(x=>`<option${m[k]===x?" selected":""}>${esc(x)}</option>`).join("")}</select>`}
+    else inp=`<input name="${k}" type="${t==="date"?"date":"text"}" value="${esc(m[k])}"${k==="lastName"||k==="firstName"?" required":""}>`;
+    return (SEC[k]?`<div class="sh">${SEC[k]}</div>`:"")+`<label class="${t==="w"?"w":""}">${l}${inp}</label>`};
+  $("#dlg").innerHTML=`<form id="mf"><div class="dh"><h2>${id?"Edit member":"New member"}</h2></div>
+  <div class="bd"><div class="grid">${F.map(field).join("")}</div></div>
+  <div class="foot">${id?`<button type="button" class="del" id="dl">${ic("trash",18)}Delete</button>`:""}
+  <button type="button" id="cx">Cancel</button><button class="pri">Save member</button></div></form>`;
+  $("#cx").onclick=()=>$("#dlg").close();
+  if(id)$("#dl").onclick=async()=>{
+    if(!confirm("Delete this member? This cannot be undone."))return;
+    try{await deleteDoc(doc(db,"members",id));$("#dlg").close();if(view==="profile")go("members")}catch{alert("Could not delete. Check your connection and try again.")}};
+  $("#mf").onsubmit=async e=>{e.preventDefault();
+    const d={};F.forEach(([k])=>d[k]=e.target.elements[k].value.trim());
+    const prev=d.role?members.filter(o=>o.id!==id&&o.role===d.role):[];
+    if(prev.length){const names=prev.map(full).join(" and ");
+      if(!confirm(`${names} currently ${prev.length>1?"hold":"holds"} the role of ${d.role}.\n\nIf you continue, ${names} will become ${prev.length>1?"regular members":"a regular member"} with no role. Continue?`))return}
+    try{const b=writeBatch(db);
+      prev.forEach(o=>b.update(doc(db,"members",o.id),{role:""}));
+      b.set(id?doc(db,"members",id):doc(collection(db,"members")),d);
+      await b.commit();$("#dlg").close()}
+    catch{alert("Could not save. Check your connection and try again.")}};
+  $("#dlg").showModal();
+}
+
+function openExport(){
+  const opts=(a,all)=>`<option value="">${all}</option>`+a.map(x=>`<option>${x}</option>`).join("");
+  $("#dlg").innerHTML=`<form id="xf"><div class="dh"><h2>Export</h2></div><div class="bd"><div class="grid">
+  <label class="w">What do you want to export?<select name="type"><option value="att">Attendance sheet (PDF)</option><option value="pdf">All member details (PDF)</option><option value="csv">All member details (CSV)</option></select></label>
+  <label class="w a">Event name<input name="title" placeholder="For example, Sunday Mass"></label>
+  <label class="a">Date<input name="date" type="date" value="${today}"></label>
+  <label>Group<select name="g">${opts(GROUPS,"All groups")}</select></label>
+  <label>Status<select name="s">${opts(STATUS,"All statuses")}</select></label></div></div>
+  <div class="foot"><button type="button" id="cx">Cancel</button><button class="pri">${ic("down",18)}Export</button></div></form>`;
+  const f=$("#xf"),e=f.elements;
+  const sync=()=>{const att=e.type.value==="att";f.querySelectorAll(".a").forEach(x=>x.hidden=!att);e.s.value=att?"Active":""};
+  e.type.onchange=sync;sync();
+  $("#cx").onclick=()=>$("#dlg").close();
+  f.onsubmit=ev=>{ev.preventDefault();
+    const a=members.filter(m=>(!e.g.value||m.group===e.g.value)&&(!e.s.value||m.status===e.s.value)).sort((x,y)=>nm(x).localeCompare(nm(y)));
+    if(!a.length){alert("No members match these filters.");return}
+    $("#dlg").close();
+    e.type.value==="csv"?exportCsv(a):e.type.value==="pdf"?printDetails(a):printAtt(a,e.title.value.trim(),e.date.value)};
+  $("#dlg").showModal();
+}
+
+async function printDoc(html,land){
+  $("#pr").innerHTML=html;
+  $("#pg").textContent=`@page{size:A4 ${land?"landscape":"portrait"};margin:12mm}`;
+  await Promise.all([...document.images].filter(i=>$("#pr").contains(i)).map(i=>i.complete?1:new Promise(r=>{i.onload=i.onerror=r})));
+  const done=()=>{$("#pr").innerHTML="";removeEventListener("afterprint",done)};
+  addEventListener("afterprint",done);
+  setTimeout(()=>print(),100);
+}
+const phead=t=>`<div class="ph"><img src="logos/Origin.png" alt="" onerror="this.remove()"><div><h1>Ministry of Altar Servers</h1><p>St. Anthony Ma. Zaccaria Parish | Silangan San Mateo Rizal</p></div></div><h2>${t}</h2>`;
+
+function printAtt(a,t,d){
+  printDoc(`${phead("Attendance sheet")}<p class="pm"><b>Event:</b> ${esc(t)||"______________________"} &nbsp;&nbsp; <b>Date:</b> ${d?fmtL(d):"______________"}</p>
+  <table class="pdt att"><thead><tr><th>No.</th><th>Full name</th><th>Time in</th><th>Time out</th><th>Signature</th></tr></thead>
+  <tbody>${a.map((m,i)=>`<tr><td>${i+1}</td><td>${esc(full(m))}</td><td></td><td></td><td></td></tr>`).join("")}</tbody></table>`,0);
+}
+
+function printDetails(a){
+  const cols=F.slice(3);
+  printDoc(`${phead("Member details")}<p class="pm">${a.length} members · Generated ${fmtL(today)}</p>
+  <table class="pdt sm"><thead><tr><th>No.</th><th>Name</th>${cols.map(c=>`<th>${c[1]}</th>`).join("")}</tr></thead>
+  <tbody>${a.map((m,i)=>`<tr><td>${i+1}</td><td>${esc(nm(m))}</td>${cols.map(([k])=>`<td>${esc(m[k])}</td>`).join("")}</tr>`).join("")}</tbody></table>`,1);
+}
+
+function printProfile(m){
+  const rows=[["Personal",[["Gender",m.gender],["Birthday",fmtL(m.birthday)],["Age",m.birthday?age(m.birthday):""],["Sacrament of Confirmation",m.confirmation]]],
+   ["Contact",[["Contact number",m.contact],["Messenger",m.messenger],["Home address",m.address]]],
+   ["Parent or guardian",[["Name",m.guardian],["Contact number",m.guardianContact]]],
+   ["School",[["Level",m.schoolLevel],["School name",m.schoolName]]],
+   ["Service",[["Role",m.role],["Group",m.group],["Status",m.status],["Started",fmtL(m.start)],["Ended",m.end?fmtL(m.end):m.start?"Ongoing":""],["Time in service",span(m.start,m.end)]]],
+   ["Awards",AW.map(a=>[a.n,m[a.k]?"Given "+fmtL(m[a.k]):"Not yet received"])]];
+  printDoc(`${phead("Member profile")}<h3 class="pn">${esc(full(m))}</h3>
+  <p class="pm">${esc([m.role,m.group&&"Group "+m.group,m.status].filter(Boolean).join(" · "))}</p>
+  <table class="pdt kv">${rows.map(([t,r])=>`<tr><th colspan="2">${t}</th></tr>`+r.map(([k,x])=>`<tr><td class="k">${k}</td><td>${esc(x)||"—"}</td></tr>`).join("")).join("")}</table>
+  <p class="pm" style="margin-top:10px;color:#777">Printed ${fmtL(today)}</p>`,0);
+}
+
+function exportCsv(a){
+  const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;
+  const rows=[F.map(f=>q(f[1])).join(",")].concat(a.map(m=>F.map(f=>q(m[f[0]])).join(",")));
+  const l=document.createElement("a");
+  l.href=URL.createObjectURL(new Blob(["\ufeff"+rows.join("\r\n")],{type:"text/csv"}));
+  l.download="members-"+today+".csv";l.click();
+}
+</script></body></html>
