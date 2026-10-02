@@ -48,6 +48,8 @@ main{max-width:1000px;margin:auto;padding:1.25rem 1rem}
 .ch.on{background:var(--purt);border-color:var(--pur);color:var(--pd);font-weight:700}
 .fc .ch{min-height:32px;font-size:.8rem}
 .fc .ch::after{content:" ×"}
+.ri{display:inline-block;vertical-align:-2px;margin-right:.3rem;color:var(--pur)}
+.ch .ri{color:inherit;margin-right:.35rem}
 #list{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:.7rem}
 .card{justify-content:flex-start;gap:.8rem;text-align:left;width:100%;border-radius:16px;padding:.85rem;box-shadow:var(--sh)}
 .card>span:last-child{min-width:0;flex:1}
@@ -57,12 +59,8 @@ main{max-width:1000px;margin:auto;padding:1.25rem 1rem}
 .card b,.card small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .card b{font-weight:700}
 .card small{color:var(--mut)}
-.st{font-size:.78rem;color:var(--mut)}
-.st::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#aaa1b4;margin-right:.4rem}
-.st.Active::before{background:var(--grn)}
-.st.Inactive::before{background:var(--gold)}
-.st.Not-recommissioned::before{background:#8f77c4}
-.st.Not-member-anymore::before{background:var(--red)}
+.st{font-size:.8rem;color:var(--mut)}
+.hint{display:block;margin-top:.25rem;color:var(--mut);font-size:.78rem}
 .tag{display:inline-flex;align-items:center;gap:.3rem;font-size:.78rem;padding:.05rem .6rem;border-radius:99px;margin-left:.5rem}
 .tag.ok{background:var(--grnt);color:#3f7a58}.tag.no{background:var(--goldt);color:#8a6a1f}
 .pill{padding:.05rem .6rem;border-radius:99px;font-size:.78rem;font-weight:700;flex:none}
@@ -225,19 +223,36 @@ import{getFirestore,collection,onSnapshot,doc,deleteDoc,writeBatch}from"https://
 
 const cfg={apiKey:"AIzaSyDqtjhvtmAea9S9TKf94CIdd5BpbdpiZeA",authDomain:"moas-system.firebaseapp.com",projectId:"moas-system",appId:"1:302631045782:web:89769532d1cd1f4c0810b7"};
 
-const STATUS=["Active","Inactive","Not recommissioned","Not member anymore"];
-const ROLES=["President","Coordinator","Vice President","Secretary","Treasurer","Property custodian","Group 1 Lead","Group 2 Lead","Group 3 Lead","Group 4 Lead","Group 5 Lead"];
+const STATUS=["Active","Inactive","Probationary","On Leave","Suspended","Graduated","Deceased","Transferred","Honorary / Alumni","Not recommissioned","Not member anymore"];
+const SI={"Active":"🟢","Inactive":"🟡","Probationary":"🔵","On Leave":"🟣","Suspended":"⚫","Graduated":"🎓","Deceased":"🕊️","Transferred":"🔄","Honorary / Alumni":"📜"};
+const SD={"Active":"Currently serving in the ministry","Inactive":"Still a member, but currently not serving","Probationary":"New member undergoing formation/training","On Leave":"Temporarily unable to serve","Suspended":"Temporarily restricted from serving","Graduated":"Completed/finished their time in the ministry","Deceased":"Member who has passed away","Transferred":"Continued their ministry/service elsewhere","Honorary / Alumni":"Former member who remains part of the ministry's historical community"};
+const sl=s=>(SI[s]||"⚪")+" "+s;
+const ROLES=["President","Coordinator","Vice President","Secretary","Treasurer","Property custodian","Group 1 leader","Group 2 leader","Group 3 leader","Group 4 leader","Group 5 leader"];
 const GROUPS=["1","2","3","4","5"];
-const SCHOOL=["Grade 4","Grade 5","Grade 6","Grade 7","Grade 8","Grade 9","Grade 10","Grade 11","Grade 12","Bachelor's degree (studying)","Graduate (bachelor's)","Masteral","Doctorate"];
-const AW=[{k:"dominic",n:"Saint Dominic Savio Award",c:"m1"},{k:"berchmans",n:"Saint John Berchmans Award",c:"m2"}];
+const SCHOOL=["Grade 4","Grade 5","Grade 6","Grade 7","Grade 8","Grade 9","Grade 10","Grade 11","Grade 12","Bachelor's - Year 1","Bachelor's - Year 2","Bachelor's - Year 3","Bachelor's - Year 4","Bachelor's - Year 5","Graduate (bachelor's)","Masteral","Doctorate"];
+const AW=[{k:"dominic",n:"Saint Dominic Savio Award",c:"m1",d:"Exemplary performance, the epitome of an altar server"},{k:"berchmans",n:"Saint John Berchmans Award",c:"m2",d:"More than a decade of faithful dedication and service"}];
 const F=[["lastName","Last name"],["firstName","First name"],["middleName","Middle name"],["status","Status",STATUS],["role","Role",ROLES],["group","Group",GROUPS],["start","Start of service","date"],["end","End of service","date"],["birthday","Birthday","date"],["gender","Gender",["Female","Male"]],["confirmation","Sacrament of Confirmation",["Confirmed","Not yet confirmed"]],["contact","Contact number"],["messenger","Messenger"],["address","Home address","w"],["guardian","Parent/guardian name"],["guardianContact","Parent/guardian contact"],["schoolLevel","School level",SCHOOL],["schoolName","School name"],["dominic","Saint Dominic Savio Award (date given)","date"],["berchmans","Saint John Berchmans Award (date given)","date"]];
 const SEC={lastName:"Name",status:"Service",birthday:"Personal",contact:"Contact",guardian:"Parent or guardian",schoolLevel:"School",dominic:"Awards (leave the date blank if not received)"};
 
 const key=s=>String(s??"").toLowerCase().replace(/[^a-z0-9]/g,"");
-const ALIAS={vicepresident:"Vice President",vicepres:"Vice President",vp:"Vice President",custodian:"Property custodian"};
-GROUPS.forEach(g=>ALIAS["groupleader"+g]=`Group ${g} Lead`);
+const ALIAS={vicepresident:"Vice President",vicepres:"Vice President",vp:"Vice President",custodian:"Property custodian",alumni:"Honorary / Alumni",honorary:"Honorary / Alumni"};
+GROUPS.forEach(g=>ALIAS["groupleader"+g]=`Group ${g} leader`);
 const canon=(v,list)=>{const k=key(v);if(!k)return"";return list.find(x=>key(x)===k)||ALIAS[k]||String(v).trim()};
-const norm=x=>({...x,role:canon(x.role,ROLES),status:canon(x.status,STATUS),group:String(x.group??"").trim()});
+const pick=(x,ns)=>{for(const n of ns)if(x[n]!=null&&x[n]!=="")return x[n];return""};
+const iso=d=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+function dt(v){
+  if(!v)return"";
+  if(v.toDate)return iso(v.toDate());
+  if(v instanceof Date)return iso(v);
+  const s=String(v).trim();
+  let m=s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/);
+  if(m)return`${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`;
+  m=s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/);
+  if(m){let a=+m[1],b=+m[2];if(a>12)[a,b]=[b,a];return`${m[3]}-${String(a).padStart(2,"0")}-${String(b).padStart(2,"0")}`}
+  const t=new Date(s+" 12:00");return isNaN(t)?"":iso(t);
+}
+const norm=x=>({...x,role:canon(pick(x,["role","position"]),ROLES),status:canon(x.status,STATUS),group:String(x.group??"").trim(),
+  birthday:dt(pick(x,["birthday","birthDate","birthdate","dob","dateOfBirth","bday"])),start:dt(x.start),end:dt(x.end),dominic:dt(x.dominic),berchmans:dt(x.berchmans)});
 
 const IC={
  dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
@@ -263,9 +278,19 @@ const IC={
  print:'<path d="M7 9V4h10v5M7 17H5a1 1 0 0 1-1-1v-5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1h-2M7 14h10v6H7z"/>',
  medal:'<circle cx="12" cy="9" r="5.5"/><path d="m8.5 13.5-2 7 5.5-3 5.5 3-2-7M12 6.6v4.8M9.8 8.8h4.4"/>',
  lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
- eye:'<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'
+ eye:'<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+ crown:'<path d="m3 8 4.5 4L12 5l4.5 7L21 8l-2 10H5z"/>',
+ compass:'<circle cx="12" cy="12" r="8.5"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>',
+ shield:'<path d="M12 3 4.5 6v5.5c0 4.5 3 7.7 7.5 9.5 4.5-1.8 7.5-5 7.5-9.5V6z"/>',
+ note:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',
+ wallet:'<path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM4 7l2-3h10l2 3M16 14h2"/>',
+ key:'<circle cx="8" cy="15" r="4"/><path d="m11 12 8-8m-3 3 3 3m-6-1 2 2"/>',
+ flag:'<path d="M5 21V4M5 5h11l-2 4 2 4H5"/>'
 };
 const ic=(n,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
+const RIC={"President":"crown","Coordinator":"compass","Vice President":"shield","Secretary":"note","Treasurer":"wallet","Property custodian":"key"};
+const ri=r=>RIC[r]||(/^Group \d leader$/.test(r)?"flag":"user");
+const rbadge=(r,s=14)=>r?`<span class="ri">${ic(ri(r),s)}</span>`:"";
 
 const easter=y=>{const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),n=h+l-7*m+114;return new Date(y,Math.floor(n/31)-1,n%31+1)};
 function season(){
@@ -285,7 +310,7 @@ document.documentElement.style.setProperty("--season",S.c);
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const D=d=>new Date(d+"T00:00:00");
-const today=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const today=iso(new Date());
 const fmtL=d=>d?D(d).toLocaleDateString("en",{month:"long",day:"numeric",year:"numeric"}):"";
 const age=b=>{if(!b)return"";const d=D(b),n=new Date();let a=n.getFullYear()-d.getFullYear();if(n<new Date(n.getFullYear(),d.getMonth(),d.getDate()))a--;return a};
 const span=(s,e)=>{if(!s)return"";const a=D(s),b=e?D(e):new Date();let m=(b.getFullYear()-a.getFullYear())*12+b.getMonth()-a.getMonth();if(m<0)return"";const y=Math.floor(m/12);m%=12;return[y&&y+(y>1?" yrs":" yr"),m&&m+(m>1?" mos":" mo")].filter(Boolean).join(" ")||"New"};
@@ -293,7 +318,6 @@ const nm=m=>`${m.lastName||""}, ${m.firstName||""}${m.middleName?" "+m.middleNam
 const full=m=>[m.firstName,m.middleName,m.lastName].filter(Boolean).join(" ");
 const ini=m=>esc(((m.firstName||"")[0]||"")+((m.lastName||"")[0]||"")).toUpperCase();
 const day=m=>(m.birthday||"").slice(5);
-const stc=s=>esc(s).replace(/ /g,"-");
 const stat=(v,l,i,c)=>`<div class="stat"><span class="ic ${c}">${ic(i,22)}</span><div><b>${v}</b><span>${l}</span></div></div>`;
 const LOGO='<img class="logo" src="logos/Origin.png" alt="" onerror="this.remove()">';
 const ribbon=`<span class="rb" title="${S.n}" role="img" aria-label="Liturgical season: ${S.n}"><i>${ic("cross",14)}</i></span>`;
@@ -345,19 +369,25 @@ const fill=()=>view==="dash"?dash():view==="profile"?prof():draw();
 
 function dash(){
   const n=s=>members.filter(m=>m.status===s).length,A=n("Active"),I=n("Inactive");
-  const now=new Date(),mo=String(now.getMonth()+1).padStart(2,"0"),dn=now.getDate(),yr=now.getFullYear();
+  const now=new Date(),mo=String(now.getMonth()+1).padStart(2,"0"),dn=now.getDate(),yr=now.getFullYear(),tdy=new Date(yr,now.getMonth(),dn);
   const box=(t,i,c,body,x="")=>`<div class="box ${x}"><h3><span class="ic ${c}">${ic(i,16)}</span>${t}</h3>${body}</div>`;
 
   const gc=GROUPS.map(g=>members.filter(m=>m.group===g).length),mx=Math.max(1,...gc),ng=members.length-gc.reduce((a,b)=>a+b,0);
   const grp=gc.map((c,i)=>`<div class="gr" title="Group ${i+1}: ${c} members"><span class="gb">${i+1}</span><div class="gm"><span>Group ${i+1}</span><div class="gt"><i style="width:${c?Math.max(c/mx*100,6):0}%"></i></div></div><b class="gc">${c}</b></div>`).join("")+(ng?`<p class="none">${ng} member${ng>1?"s are":" is"} not assigned to a group.</p>`:"");
 
-  const bd=members.filter(m=>(m.birthday||"").slice(5,7)===mo).sort((x,y)=>day(x).localeCompare(day(y)));
-  const bdh=bd.length?(bdAll?bd:bd.slice(0,5)).map(m=>{const dd=+m.birthday.slice(8,10);
-    return `<button class="li${dd<dn?" past":""}" data-id="${m.id}"><span class="db"><b>${dd}</b><small>${D(m.birthday).toLocaleDateString("en",{month:"short"})}</small></span><span class="lt"><b>${esc(nm(m))}</b><small>Turns ${yr-+m.birthday.slice(0,4)}${m.group?" · Group "+esc(m.group):""}</small></span>${dd===dn?'<span class="pill y">Today</span>':""}</button>`}).join("")
-    +(bd.length>5?`<button class="more" id="bdt">${bdAll?"Show less":"Show all "+bd.length}</button>`:""):'<p class="none">No birthdays this month.</p>';
+  const hasB=members.filter(m=>m.status!=="Deceased"&&m.birthday);
+  const bd=hasB.filter(m=>m.birthday.slice(5,7)===mo).sort((x,y)=>day(x).localeCompare(day(y)));
+  const brow=(m,sub,cls="",pill="")=>{const b=D(m.birthday);return `<button class="li${cls}" data-id="${m.id}"><span class="db"><b>${b.getDate()}</b><small>${b.toLocaleDateString("en",{month:"short"})}</small></span><span class="lt"><b>${esc(nm(m))}</b><small>${sub}</small></span>${pill}</button>`};
+  const up=hasB.map(m=>{const[,mm,dd]=m.birthday.split("-");let d=new Date(yr,+mm-1,+dd);if(d<tdy)d=new Date(yr+1,+mm-1,+dd);return{m,d,n:Math.round((d-tdy)/864e5)}}).sort((a,b)=>a.n-b.n).slice(0,3);
+  const showUp=hasB.length&&(!bd.length||bd.every(m=>+m.birthday.slice(8,10)<dn));
+  const bdh=(bd.length?(bdAll?bd:bd.slice(0,5)).map(m=>{const dd=+m.birthday.slice(8,10);
+      return brow(m,`Turns ${yr-+m.birthday.slice(0,4)}${m.group?" · Group "+esc(m.group):""}`,dd<dn?" past":"",dd===dn?'<span class="pill y">Today</span>':"")}).join("")
+      +(bd.length>5?`<button class="more" id="bdt">${bdAll?"Show less":"Show all "+bd.length}</button>`:"")
+    :`<p class="none">${hasB.length?"No birthdays this month.":"No birthdays recorded yet. Add them in each member's profile."}</p>`)
+    +(showUp?`<div class="sh2">Coming up</div>`+up.map(u=>brow(u.m,`${u.n===0?"Today":u.n===1?"Tomorrow":"In "+u.n+" days"} · Turns ${u.d.getFullYear()-+u.m.birthday.slice(0,4)}`)).join(""):"");
 
   const holder=r=>members.find(m=>m.role===r);
-  const rb=(m,r)=>`<button class="li" data-id="${m.id}"><span class="av rd">${ini(m)}</span><span class="lt"><b>${esc(nm(m))}</b><small class="rl">${esc(r)}</small></span></button>`;
+  const rb=(m,r)=>`<button class="li" data-id="${m.id}"><span class="av rd">${ic(ri(r),20)}</span><span class="lt"><b>${esc(nm(m))}</b><small class="rl">${esc(r)}</small></span></button>`;
   const rr=r=>{const m=holder(r);return m?rb(m,r):""};
   const other=members.filter(m=>m.role&&!ROLES.includes(m.role));
   const vac=ROLES.filter(r=>!holder(r)),filled=ROLES.length-vac.length+other.length;
@@ -401,22 +431,22 @@ function draw(){
   a.sort((x,y)=>st.sort==="bday"?(day(x)||"99").localeCompare(day(y)||"99"):nm(x).localeCompare(nm(y)));
   shown=a.length;
   $("#cnt").textContent=a.length===members.length?`${a.length} members`:`${a.length} of ${members.length} members`;
-  const lab={s:st.s,g:"Group "+st.g,r:st.r,sort:"Sorted by birthday"};
+  const lab={s:esc(sl(st.s)),g:"Group "+esc(st.g),r:rbadge(st.r)+esc(st.r),sort:"Sorted by birthday"};
   const act=["s","g","r"].filter(k=>st[k]);if(st.sort!=="name")act.push("sort");
   $("#fb").hidden=!act.length;$("#fb").textContent=act.length;
-  $("#fc").innerHTML=act.map(k=>`<button class="ch on" data-x="${k}">${esc(lab[k])}</button>`).join("");
+  $("#fc").innerHTML=act.map(k=>`<button class="ch on" data-x="${k}">${lab[k]}</button>`).join("");
   if($("#fok"))$("#fok").textContent=`Show ${a.length} member${a.length===1?"":"s"}`;
   $("#list").innerHTML=a.length?a.map(m=>`<button class="card" data-id="${m.id}">
     <span class="av">${ini(m)}${m.group?`<i>${esc(m.group)}</i>`:""}</span>
-    <span><b>${esc(nm(m))}</b><small>${esc(m.role||"No role")}${m.contact?" · "+esc(m.contact):""}</small>
-    ${m.status?`<span class="st ${stc(m.status)}">${esc(m.status)}</span>`:""}</span></button>`).join(""):
+    <span><b>${esc(nm(m))}</b><small>${rbadge(m.role)}${esc(m.role||"No role")}${m.contact?" · "+esc(m.contact):""}</small>
+    ${m.status?`<span class="st">${esc(sl(m.status))}</span>`:""}</span></button>`).join(""):
     `<p class="none">${members.length?"No members match your search or filters.":"No members yet. Select Add member to get started."}</p>`;
 }
 
 function openFilters(){
-  const grp=(t,k,arr,lb=x=>x)=>`<div class="sh">${t}</div><div class="chs">${arr.map(v=>`<button type="button" class="ch" data-k="${k}" data-v="${esc(v)}">${esc(lb(v))}</button>`).join("")}</div>`;
+  const grp=(t,k,arr,lb=x=>esc(x))=>`<div class="sh">${t}</div><div class="chs">${arr.map(v=>`<button type="button" class="ch" data-k="${k}" data-v="${esc(v)}" title="${esc(SD[v]||"")}">${lb(v)}</button>`).join("")}</div>`;
   $("#dlg").innerHTML=`<div class="fm"><div class="dh"><h2>Filters</h2></div><div class="bd">
-  ${grp("Status","s",STATUS)}${grp("Group","g",GROUPS,x=>"Group "+x)}${grp("Role","r",ROLES)}${grp("Sort by","sort",["name","bday"],x=>x==="name"?"Last name":"Birthday")}</div>
+  ${grp("Status","s",STATUS,x=>esc(sl(x)))}${grp("Group","g",GROUPS,x=>"Group "+x)}${grp("Role","r",ROLES,x=>rbadge(x)+esc(x))}${grp("Sort by","sort",["name","bday"],x=>x==="name"?"Last name":"Birthday")}</div>
   <div class="foot"><button type="button" class="lft" id="fclr">Clear all</button><button type="button" class="pri" id="fok"></button></div></div>`;
   const sync=()=>{document.querySelectorAll("#dlg .ch").forEach(c=>c.classList.toggle("on",st[c.dataset.k]===c.dataset.v));draw()};
   $("#dlg .bd").onclick=e=>{const c=e.target.closest(".ch");if(!c)return;
@@ -433,20 +463,20 @@ function prof(){
   const f=(l,x,tel)=>`<div class="f"><small>${l}</small>${v(x,tel)}</div>`;
   const sec=(t,i,c,body)=>`<div class="box"><h3><span class="ic ${c}">${ic(i,16)}</span>${t}</h3>${body}</div>`;
   const cell=(x,l,i,c)=>`<div class="cell"><span class="ic ${c}">${ic(i,18)}</span><b>${x}</b><span>${l}</span></div>`;
-  const awards=AW.map(a=>m[a.k]?`<div class="medal ${a.c}"><span class="mdl">${ic("medal",26)}</span><div><b>${a.n}</b><small>Exemplary altar server</small><span class="dt">Given ${fmtL(m[a.k])}</span></div></div>`
-    :`<div class="medal off"><span class="mdl">${ic("medal",26)}</span><div><b>${a.n}</b><small>Not yet received</small></div></div>`).join("");
+  const awards=AW.map(a=>m[a.k]?`<div class="medal ${a.c}"><span class="mdl">${ic("medal",26)}</span><div><b>${a.n}</b><small>${a.d}</small><span class="dt">Given ${fmtL(m[a.k])}</span></div></div>`
+    :`<div class="medal off"><span class="mdl">${ic("medal",26)}</span><div><b>${a.n}</b><small>${a.d}</small><small>Not yet received</small></div></div>`).join("");
   $("#v").innerHTML=`<button class="back" id="bk">${ic("back",18)}Members</button>
   <div class="hero"><span class="av big">${ini(m)}</span>
-  <div class="hn"><h2>${esc(full(m))}</h2><p>${esc(m.role||"No role assigned")}${m.group?" · Group "+esc(m.group):""}</p>${m.status?`<span class="st ${stc(m.status)}">${esc(m.status)}</span>`:""}${m.confirmation?`<span class="tag ${m.confirmation==="Confirmed"?"ok":"no"}">${m.confirmation==="Confirmed"?ic("check",14):""}${esc(m.confirmation)}</span>`:""}</div>
+  <div class="hn"><h2>${esc(full(m))}</h2><p>${rbadge(m.role,16)}${esc(m.role||"No role assigned")}${m.group?" · Group "+esc(m.group):""}</p>${m.status?`<span class="st" title="${esc(SD[m.status]||"")}">${esc(sl(m.status))}</span>`:""}${m.confirmation?`<span class="tag ${m.confirmation==="Confirmed"?"ok":"no"}">${m.confirmation==="Confirmed"?ic("check",14):""}${esc(m.confirmation)}</span>`:""}</div>
   <div class="acts"><button id="pp">${ic("print",18)}Print profile</button><button class="pri" id="ed">${ic("edit",18)}Edit</button></div></div>
-  <div class="strip">${cell(m.birthday?age(m.birthday):"—","Age","cake","y")}${cell(span(m.start,m.end)||"—","In service","clock","g")}${cell(m.group||"—","Group","users","p")}</div>
+  <div class="strip">${cell(m.birthday?age(m.birthday):"—","Age","cake","y")}${cell(span(m.start,m.end)||"—","In Service","clock","g")}${cell(m.group||"—","Group","users","p")}</div>
   <div class="box" style="margin-bottom:.75rem"><h3><span class="ic y">${ic("medal",16)}</span>Awards and recognition</h3><div class="aw">${awards}</div></div>
   <div class="cols">
   ${sec("Personal","user","p",f("Gender",m.gender)+f("Birthday",fmtL(m.birthday))+f("Sacrament of Confirmation",m.confirmation))}
   ${sec("Contact","phone","g",f("Contact number",m.contact,1)+f("Messenger",m.messenger)+f("Home address",m.address))}
   ${sec("Parent or guardian","users","r",f("Name",m.guardian)+f("Contact number",m.guardianContact,1))}
   ${sec("School","school","y",f("Level",m.schoolLevel)+f("School name",m.schoolName))}
-  ${sec("Service","cross","p",f("Role",m.role)+f("Started",fmtL(m.start))+f("Ended",m.end?fmtL(m.end):m.start?"Ongoing":""))}
+  ${sec("Service","cross","p",f("Status",m.status?sl(m.status):"")+f("Role",m.role)+f("Started",fmtL(m.start))+f("Ended",m.end?fmtL(m.end):m.start?"Ongoing":""))}
   </div>`;
   $("#bk").onclick=()=>history.back();
   $("#ed").onclick=()=>openForm(m.id);
@@ -457,14 +487,16 @@ function openForm(id){
   const m=members.find(x=>x.id===id)||{};
   const field=([k,l,t])=>{
     let inp;
-    if(Array.isArray(t)){const o=m[k]&&!t.includes(m[k])?[...t,m[k]]:t;
-      inp=`<select name="${k}"><option value="">Not set</option>${o.map(x=>`<option${m[k]===x?" selected":""}>${esc(x)}</option>`).join("")}</select>`}
+    if(Array.isArray(t)){const o=m[k]&&!t.includes(m[k])?[...t,m[k]]:t,lb=k==="status"?sl:x=>x;
+      inp=`<select name="${k}"><option value="">Not set</option>${o.map(x=>`<option value="${esc(x)}"${m[k]===x?" selected":""}>${esc(lb(x))}</option>`).join("")}</select>`
+        +(k==="status"?`<small class="hint" id="sth">${esc(SD[m.status]||"")}</small>`:"")}
     else inp=`<input name="${k}" type="${t==="date"?"date":"text"}" value="${esc(m[k])}"${k==="lastName"||k==="firstName"?" required":""}>`;
     return (SEC[k]?`<div class="sh">${SEC[k]}</div>`:"")+`<label class="${t==="w"?"w":""}">${l}${inp}</label>`};
   $("#dlg").innerHTML=`<form id="mf"><div class="dh"><h2>${id?"Edit member":"New member"}</h2></div>
   <div class="bd"><div class="grid">${F.map(field).join("")}</div></div>
   <div class="foot">${id?`<button type="button" class="del" id="dl">${ic("trash",18)}Delete</button>`:""}
   <button type="button" id="cx">Cancel</button><button class="pri">Save member</button></div></form>`;
+  $("#mf").elements.status.onchange=e=>{$("#sth").textContent=SD[e.target.value]||""};
   $("#cx").onclick=()=>$("#dlg").close();
   if(id)$("#dl").onclick=async()=>{
     if(!confirm("Delete this member? This cannot be undone."))return;
@@ -483,13 +515,13 @@ function openForm(id){
 }
 
 function openExport(){
-  const opts=(a,all)=>`<option value="">${all}</option>`+a.map(x=>`<option>${x}</option>`).join("");
+  const opts=(a,all,lb=x=>x)=>`<option value="">${all}</option>`+a.map(x=>`<option value="${esc(x)}">${esc(lb(x))}</option>`).join("");
   $("#dlg").innerHTML=`<form id="xf"><div class="dh"><h2>Export</h2></div><div class="bd"><div class="grid">
   <label class="w">What do you want to export?<select name="type"><option value="att">Attendance sheet (PDF)</option><option value="pdf">All member details (PDF)</option><option value="csv">All member details (CSV)</option></select></label>
   <label class="w a">Event name<input name="title" placeholder="For example, Sunday Mass"></label>
   <label class="a">Date<input name="date" type="date" value="${today}"></label>
-  <label>Group<select name="g">${opts(GROUPS,"All groups")}</select></label>
-  <label>Status<select name="s">${opts(STATUS,"All statuses")}</select></label></div></div>
+  <label>Group<select name="g">${opts(GROUPS,"All groups",x=>"Group "+x)}</select></label>
+  <label>Status<select name="s">${opts(STATUS,"All statuses",sl)}</select></label></div></div>
   <div class="foot"><button type="button" id="cx">Cancel</button><button class="pri">${ic("down",18)}Export</button></div></form>`;
   const f=$("#xf"),e=f.elements;
   const sync=()=>{const att=e.type.value==="att";f.querySelectorAll(".a").forEach(x=>x.hidden=!att);e.s.value=att?"Active":""};
@@ -532,7 +564,7 @@ function printProfile(m){
    ["Parent or guardian",[["Name",m.guardian],["Contact number",m.guardianContact]]],
    ["School",[["Level",m.schoolLevel],["School name",m.schoolName]]],
    ["Service",[["Role",m.role],["Group",m.group],["Status",m.status],["Started",fmtL(m.start)],["Ended",m.end?fmtL(m.end):m.start?"Ongoing":""],["Time in service",span(m.start,m.end)]]],
-   ["Awards",AW.map(a=>[a.n,m[a.k]?"Given "+fmtL(m[a.k]):"Not yet received"])]];
+   ["Awards",AW.map(a=>[a.n,(m[a.k]?"Given "+fmtL(m[a.k]):"Not yet received")+" - "+a.d])]];
   printDoc(`${phead("Member profile")}<h3 class="pn">${esc(full(m))}</h3>
   <p class="pm">${esc([m.role,m.group&&"Group "+m.group,m.status].filter(Boolean).join(" · "))}</p>
   <table class="pdt kv">${rows.map(([t,r])=>`<tr><th colspan="2">${t}</th></tr>`+r.map(([k,x])=>`<tr><td class="k">${k}</td><td>${esc(x)||"—"}</td></tr>`).join("")).join("")}</table>
