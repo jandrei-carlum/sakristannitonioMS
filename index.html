@@ -30,9 +30,12 @@ input,select{width:100%;min-height:44px;padding:.55rem .8rem;border:1px solid va
 .rb{margin:-.9rem 0 0 auto;align-self:flex-start;filter:drop-shadow(0 0 1px #c9a86a) drop-shadow(0 2px 3px #5d4d8c33)}
 .rb i{display:grid;place-items:start center;padding-top:8px;width:26px;height:52px;background:var(--season);color:var(--gold);clip-path:polygon(0 0,100% 0,100% 100%,50% 84%,0 100%)}
 main{max-width:1000px;margin:auto;padding:1.25rem 1rem}
-.head{display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end;justify-content:space-between;margin-bottom:.9rem}
-.head h2{font-size:1.9rem;line-height:1.1}
-.head small{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-top:.3rem;color:var(--mut)}
+.ph2{display:flex;flex-wrap:wrap;gap:.6rem 1rem;align-items:flex-end;justify-content:space-between;margin-bottom:.9rem}
+.ptl .eb{display:flex;align-items:center;gap:.5rem;font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#9a7a2f}
+.ptl .eb::before{content:"";width:22px;height:2px;border-radius:2px;background:var(--gold)}
+.ptl h2{font-size:2rem;line-height:1.1;margin:.25rem 0 .2rem}
+.ptl p{margin:0;color:var(--mut);font-size:.92rem}
+.pmeta{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;color:var(--mut);font-size:.85rem}
 .chip{display:inline-flex;align-items:center;gap:.4rem;padding:.1rem .65rem;border:1px solid var(--line);border-radius:99px;background:#fff;font-size:.78rem;color:var(--ink)}
 .chip i{width:9px;height:9px;border-radius:50%;background:var(--season);border:1px solid #0002}
 .acts{display:flex;gap:.5rem}
@@ -64,23 +67,39 @@ main{max-width:1000px;margin:auto;padding:1.25rem 1rem}
 .tag{display:inline-flex;align-items:center;gap:.3rem;font-size:.78rem;padding:.05rem .6rem;border-radius:99px;margin-left:.5rem}
 .tag.ok{background:var(--grnt);color:#3f7a58}.tag.no{background:var(--goldt);color:#8a6a1f}
 .pill{padding:.05rem .6rem;border-radius:99px;font-size:.78rem;font-weight:700;flex:none}
-.pill.r{background:var(--redt);color:var(--red)}.pill.g{background:var(--grnt);color:#3f7a58}.pill.y{background:var(--goldt);color:#8a6a1f}
+.pill.r{background:var(--redt);color:var(--red)}.pill.g{background:var(--grnt);color:#3f7a58}.pill.y{background:var(--goldt);color:#8a6a1f}.pill.n{background:var(--purt);color:var(--pd)}
 .none{color:var(--mut);margin:0;padding:.3rem 0}
+.wel{display:grid;gap:.9rem;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);padding:1rem 1.1rem;margin-bottom:.75rem}
+.wm .wh{font:600 1.5rem Lora,Georgia,serif;color:var(--pd)}
+.wm p{margin:.2rem 0 0;color:var(--mut)}
+.vs{margin:0;padding-left:.9rem;border-left:3px solid var(--gold)}
+.vs figcaption{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#9a7a2f;margin-bottom:.25rem}
+.vs blockquote{margin:0;font:italic 500 1rem/1.5 Lora,Georgia,serif}
+.vs cite{display:block;margin-top:.3rem;font-style:normal;font-size:.8rem;color:var(--mut)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:.75rem}
-.stat,.box,.hero,.strip{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh)}
+.stat,.box,.hero,.strip,.oth{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh)}
 .stat{display:flex;align-items:center;gap:.8rem;padding:1rem}
+button.stat{width:100%;justify-content:flex-start;text-align:left;min-height:0;cursor:pointer}
+button.stat:hover{border-color:var(--gold)}
+.stat .cv{margin-left:auto;color:var(--mut);transition:transform .2s;display:grid}
+.stat[aria-expanded=true] .cv{transform:rotate(180deg)}
 .stat div{min-width:0}
 .stat b{display:block;font:600 1.8rem/1 Lora,Georgia,serif}
 .stat div span{color:var(--mut);font-size:.82rem}
+.oth{padding:.85rem 1rem;margin-bottom:.75rem}
+.og{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.4rem}
+.oc{display:flex;align-items:center;gap:.5rem;padding:.45rem .65rem;border:1px solid var(--line);border-radius:12px;font-size:.85rem}
+.oc b{margin-left:auto;font-weight:700}
+.oc.z{opacity:.5}
 .box{padding:1rem}
 .box.rbx{border-top:3px solid var(--red)}
+.tl{margin-left:auto}
 .ic{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;flex:none}
 .stat .ic{width:44px;height:44px;border-radius:14px}
 .box h3 .ic{width:28px;height:28px;border-radius:9px}
 .p{background:var(--purt);color:var(--pur)}.g{background:var(--grnt);color:var(--grn)}.y{background:var(--goldt);color:#9a7a2f}.r{background:var(--redt);color:var(--red)}
 .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:.75rem}
 button.li{width:100%;justify-content:flex-start;text-align:left;gap:.75rem;border:0;border-top:1px solid var(--line);border-radius:0;background:none;padding:.5rem 0;min-height:56px}
-button.li.past{opacity:.55}
 .lt{flex:1;min-width:0}
 .lt b{display:block;font-weight:700;overflow-wrap:anywhere}
 .lt small{display:block;color:var(--mut)}
@@ -88,13 +107,22 @@ button.li.past{opacity:.55}
 .db{flex:none;width:44px;height:48px;border-radius:12px;background:var(--goldt);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
 .db b{font:600 1.15rem Lora,Georgia,serif;color:#8a6a1f}
 .db small{font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:#9a7a2f;margin-top:3px}
-.more{width:100%;margin-top:.4rem;min-height:38px;font-size:.85rem;color:var(--pd)}
+.bl button.li{min-height:44px;padding:.3rem 0;gap:.6rem}
+.bl .db{width:36px;height:38px;border-radius:10px}
+.bl .db b{font-size:1rem}
+.bl .db small{font-size:.55rem;margin-top:2px}
+.bl .lt b{font-size:.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bl .lt small{font-size:.76rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.more{width:100%;margin-top:.4rem;min-height:40px;font-size:.85rem;color:var(--pd)}
 .sh2{margin:.6rem 0 0;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
 .vac{margin:.5rem 0 0;padding-top:.5rem;border-top:1px dashed var(--line);font-size:.82rem;color:var(--mut)}
-.gr{display:grid;grid-template-columns:32px 1fr auto;gap:.75rem;align-items:center;padding:.4rem 0}
+.gr{display:grid;grid-template-columns:32px 1fr auto;gap:.75rem;align-items:center;padding:.55rem 0}
+.gr+.gr{border-top:1px solid var(--line)}
 .gb{width:32px;height:32px;border-radius:50%;background:var(--goldt);color:#8a6a1f;border:1px solid var(--gold);display:grid;place-items:center;font:700 .9rem Nunito,sans-serif}
 .gm{min-width:0}
-.gm span{font-size:.85rem;color:var(--mut)}
+.gm>span{font-size:.85rem;color:var(--mut)}
+.sb2{display:flex;flex-wrap:wrap;gap:.1rem .65rem;margin-top:.3rem;font-size:.74rem;color:var(--mut)}
+.sb2 span{white-space:nowrap}
 .gt{height:10px;margin-top:.25rem;background:var(--purt);border-radius:9px;overflow:hidden}
 .gt i{display:block;height:100%;background:var(--pur);border-radius:9px}
 .gc{min-width:2.6rem;text-align:center;padding:.15rem .65rem;border-radius:99px;background:var(--purt);color:var(--pd);font-weight:700}
@@ -154,6 +182,13 @@ dialog form,.fm{display:flex;flex-direction:column;max-height:92vh}
 .bd>.sh{margin:1rem 0 .5rem}
 .bd>.sh:first-child{margin-top:0}
 .foot{display:flex;gap:.5rem;justify-content:flex-end;padding:.8rem 1.25rem calc(.8rem + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fff}
+.ld{width:auto;max-height:none;margin:auto;border-radius:22px;padding:1.6rem 2.2rem;text-align:center;box-shadow:0 20px 50px #2a1f4566}
+.ld::backdrop{background:#2a1f45b3;backdrop-filter:blur(2px)}
+.ld p{margin:.8rem 0 0;font-weight:700;color:var(--pd)}
+.spin{display:inline-block;width:44px;height:44px;border:4px solid var(--purt);border-top-color:var(--pur);border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ts{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--pd);color:#fff;padding:.6rem 1.1rem;border-radius:99px;font-weight:700;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:9;box-shadow:var(--sh)}
+.ts.show{opacity:1;transform:translate(-50%,0)}
 .lw{padding:6vh 1rem}
 .login{max-width:400px;margin:auto;padding:1.75rem;background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--sh)}
 .login .ic{margin-bottom:.8rem;width:44px;height:44px}
@@ -186,12 +221,14 @@ dialog form,.fm{display:flex;flex-direction:column;max-height:92vh}
 .att th:nth-child(1){width:5%}.att th:nth-child(2){width:33%}.att th:nth-child(3),.att th:nth-child(4){width:14%}
 .att td:nth-child(2){white-space:nowrap}
 tr{break-inside:avoid}
-@media print{body{background:#fff;padding:0}#app{display:none}#pr{display:block}}
+@media print{body{background:#fff;padding:0}#app,#ts,#ld{display:none}#pr{display:block}}
 @media(min-width:721px){
  body{padding-bottom:0}
  nav{position:static;max-width:1000px;margin:1rem auto 0;padding:0 1rem;border:0;background:none;gap:.5rem}
  nav button{flex:none;flex-direction:row;gap:.45rem;min-height:42px;padding:.4rem 1.1rem;border-radius:12px;font-size:.9rem}
  nav button.on{background:#fff;box-shadow:none;border:1px solid var(--gold)}
+ .wel{grid-template-columns:.8fr 1.2fr;align-items:center}
+ .ts{bottom:1.5rem}
 }
 @media(max-width:720px){
  .stats{grid-template-columns:repeat(2,1fr)}
@@ -207,7 +244,8 @@ tr{break-inside:avoid}
  .top button span,.ib span{display:none}
  .rb{margin-top:-.7rem}.rb i{width:22px;height:46px;padding-top:7px}
  main{padding:.75rem .75rem 1rem}
- .head{margin-bottom:.6rem;gap:.4rem}.head h2{font-size:1.45rem}.head small{margin-top:.15rem}
+ .ph2{margin-bottom:.6rem;gap:.4rem}.ptl h2{font-size:1.55rem}.ptl p{font-size:.85rem}
+ .wel{padding:.85rem .9rem;gap:.7rem}.wm .wh{font-size:1.35rem}
  .stats,.cols,#list{gap:.5rem}.stats{margin-bottom:.5rem}
  .stat{padding:.7rem;gap:.6rem}.stat .ic{width:40px;height:40px}.stat b{font-size:1.55rem}
  .box{padding:.8rem}.box h3{margin-bottom:.3rem}
@@ -219,6 +257,8 @@ tr{break-inside:avoid}
 }
 </style></head>
 <body><div id="app"></div><div id="pr"></div><style id="pg"></style>
+<dialog id="ld" class="ld" aria-labelledby="ldm"><span class="spin" aria-hidden="true"></span><p id="ldm">Saving…</p></dialog>
+<div id="ts" class="ts" role="status" aria-live="polite"></div>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -226,7 +266,7 @@ import{getFirestore,collection,onSnapshot,doc,deleteDoc,writeBatch}from"https://
 
 const cfg={apiKey:"AIzaSyDqtjhvtmAea9S9TKf94CIdd5BpbdpiZeA",authDomain:"moas-system.firebaseapp.com",projectId:"moas-system",appId:"1:302631045782:web:89769532d1cd1f4c0810b7"};
 
-const STATUS=["Active","Inactive","Probationary","On Leave","Suspended","Graduated","Deceased","Transferred","Honorary / Alumni"];
+const STATUS=["Active","Inactive","Probationary","On Leave","Suspended","Graduated","Deceased","Transferred","Honorary / Alumni","Not Recommissioned","No Longer a Member"];
 const SI={"Active":"🟢","Inactive":"🟡","Probationary":"🔵","On Leave":"🟣","Suspended":"⚫","Graduated":"🎓","Deceased":"🕊️","Transferred":"🔄","Honorary / Alumni":"📜"};
 const SD={"Active":"Currently serving in the ministry","Inactive":"Still a member, but currently not serving","Probationary":"New member undergoing formation/training","On Leave":"Temporarily unable to serve","Suspended":"Temporarily restricted from serving","Graduated":"Completed/finished their time in the ministry","Deceased":"Member who has passed away","Transferred":"Continued their ministry/service elsewhere","Honorary / Alumni":"Former member who remains part of the ministry's historical community"};
 const sl=s=>(SI[s]||"⚪")+" "+s;
@@ -237,6 +277,39 @@ const SCHOOL=["Grade 4","Grade 5","Grade 6","Grade 7","Grade 8","Grade 9","Grade
 const AW=[{k:"dominic",n:"Saint Dominic Savio Award",c:"m1",d:"Exemplary performance, the epitome of an altar server"},{k:"berchmans",n:"Saint John Berchmans Award",c:"m2",d:"More than a decade of faithful dedication and service"}];
 const F=[["lastName","Last Name"],["firstName","First Name"],["middleName","Middle Name"],["status","Status",STATUS],["role","Role",ROLES],["group","Group",GROUPS],["start","Start of Service","date"],["end","End of Service","date"],["birthday","Birthday","date"],["gender","Gender",["Female","Male"]],["confirmation","Sacrament of Confirmation",CONF],["contact","Contact Number"],["messenger","Messenger"],["address","Home Address","w"],["guardian","Parent/Guardian Name"],["guardianContact","Parent/Guardian Contact"],["schoolLevel","School Level",SCHOOL],["schoolName","School Name"],["dominic","Saint Dominic Savio Award (Date Given)","date"],["berchmans","Saint John Berchmans Award (Date Given)","date"]];
 const SEC={lastName:"Name",status:"Service",birthday:"Personal",contact:"Contact",guardian:"Parent or Guardian",schoolLevel:"School",dominic:"Awards · Leave the date blank if not received"};
+
+/* Daily verses: Douay-Rheims (public domain). One verse per day, rotating. */
+const VERSES=[
+["I rejoiced at the things that were said to me: We shall go into the house of the Lord.","Psalm 122 (121):1"],
+["Serve ye the Lord with gladness. Come in before his presence with exceeding great joy.","Psalm 100 (99):2"],
+["The Lord ruleth me: and I shall want nothing.","Psalm 23 (22):1"],
+["The Lord is my light and my salvation, whom shall I fear? The Lord is the protector of my life: of whom shall I be afraid?","Psalm 27 (26):1"],
+["O taste, and see that the Lord is sweet: blessed is the man that hopeth in him.","Psalm 34 (33):9"],
+["Commit thy way to the Lord, and trust in him, and he will do it.","Psalm 37 (36):5"],
+["Thy word is a lamp to my feet, and a light to my paths.","Psalm 119 (118):105"],
+["Come let us adore and fall down: and weep before the Lord that made us.","Psalm 95 (94):6"],
+["This is the day which the Lord hath made: let us be glad and rejoice therein.","Psalm 118 (117):24"],
+["For better is one day in thy courts above thousands. I have chosen to be an abject in the house of my God, rather than to dwell in the tabernacles of sinners.","Psalm 84 (83):11"],
+["But as for me and my house, we will serve the Lord.","Joshua 24:15"],
+["Behold I command thee, take courage, and be strong. Fear not, and be not dismayed: because the Lord thy God is with thee in all things whatsoever thou shalt go to.","Joshua 1:9"],
+["Speak, Lord, for thy servant heareth.","1 Samuel 3:10"],
+["Lo, here am I, send me.","Isaiah 6:8"],
+["Have confidence in the Lord with all thy heart, and lean not upon thy own prudence.","Proverbs 3:5"],
+["So let your light shine before men, that they may see your good works, and glorify your Father who is in heaven.","Matthew 5:16"],
+["Seek ye therefore first the kingdom of God, and his justice, and all these things shall be added unto you.","Matthew 6:33"],
+["Come to me, all you that labour, and are burdened, and I will refresh you.","Matthew 11:28"],
+["Even as the Son of man is not come to be ministered unto, but to minister, and to give his life a redemption for many.","Matthew 20:28"],
+["Well done, good and faithful servant, because thou hast been faithful over a few things, I will place thee over many things: enter thou into the joy of thy lord.","Matthew 25:21"],
+["Behold the handmaid of the Lord; be it done to me according to thy word.","Luke 1:38"],
+["He that is faithful in that which is least, is faithful also in that which is greater.","Luke 16:10"],
+["I am the light of the world: he that followeth me, walketh not in darkness, but shall have the light of life.","John 8:12"],
+["This is my commandment, that you love one another, as I have loved you.","John 15:12"],
+["Therefore, my beloved brethren, be ye steadfast and immoveable: always abounding in the work of the Lord, knowing that your labour is not in vain in the Lord.","1 Corinthians 15:58"],
+["And in doing good, let us not fail. For in due time we shall reap, not failing.","Galatians 6:9"],
+["I can do all things in him who strengtheneth me.","Philippians 4:13"],
+["Whatsoever you do, do it from the heart, as to the Lord, and not to men.","Colossians 3:23"],
+["Always rejoice. Pray without ceasing. In all things give thanks: for this is the will of God in Christ Jesus concerning you all.","1 Thessalonians 5:16-18"],
+["For God hath not given us the spirit of fear: but of power, and of love, and of sobriety.","2 Timothy 1:7"]];
 
 const key=s=>String(s??"").toLowerCase().replace(/[^a-z0-9]/g,"");
 const ALIAS={vicepresident:"Vice President",vicepres:"Vice President",vp:"Vice President",custodian:"Property Custodian",alumni:"Honorary / Alumni",honorary:"Honorary / Alumni",notmemberanymore:"No Longer a Member"};
@@ -296,7 +369,9 @@ const IC={
  drop:'<path d="M12 3s6 6.2 6 10.5A6 6 0 0 1 6 13.5C6 9.2 12 3 12 3z"/>',
  pin:'<path d="M12 21s6.5-5.7 6.5-11A6.5 6.5 0 0 0 5.5 10C5.5 15.3 12 21 12 21z"/><circle cx="12" cy="10" r="2.2"/>',
  chat:'<path d="M4 5h16v11H9l-5 4z"/>',
- cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>'
+ cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+ chev:'<path d="m6 9 6 6 6-6"/>',
+ expand:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'
 };
 const ic=(n,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
 const RIC={"President":"crown","Coordinator":"compass","Vice President":"shield","Secretary":"note","Treasurer":"wallet","Property Custodian":"key"};
@@ -334,8 +409,16 @@ const stat=(v,l,i,c)=>`<div class="stat"><span class="ic ${c}">${ic(i,22)}</span
 const LOGO='<img class="logo" src="logos/Origin.png" alt="" onerror="this.remove()">';
 const ribbon=`<span class="rb" title="${S.n}" role="img" aria-label="Liturgical season: ${S.n}"><i>${ic("cross",14)}</i></span>`;
 const brand=`${LOGO}<div class="brand"><h1>Ministry of Altar Servers</h1><p><span>St. Anthony Ma. Zaccaria Parish</span><i> | </i><span>Silangan San Mateo Rizal</span></p></div>${ribbon}`;
-let unsub,members=[],view="dash",pid=null,bdAll=false,shown=0;
+let unsub,members=[],view="dash",pid=null,othOpen=false,bdFull="",bdCount=0,shown=0;
 const st={q:"",g:"",s:"",r:"",sort:"name"};
+
+/* loading screen, confirmation message, and timeout */
+const busy=m=>{$("#ldm").textContent=m;if(!$("#ld").open)$("#ld").showModal()};
+const busyEnd=()=>{if($("#ld").open)$("#ld").close()};
+$("#ld").addEventListener("cancel",e=>e.preventDefault());
+function toast(m){const t=$("#ts");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("show"),2600)}
+const withTimeout=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error("timeout")),ms))]);
+const slowMsg="This is taking longer than expected. Check your connection. The change will save automatically once you are back online.";
 
 const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
 onAuthStateChanged(auth,u=>{if(unsub){unsub();unsub=null}u?showApp():showLogin()});
@@ -363,8 +446,9 @@ function showApp(){
   $("#so").onclick=()=>signOut(auth);
   $("nav").onclick=e=>{const b=e.target.closest("button");if(b)go(b.dataset.v)};
   $("#v").onclick=e=>{if(view!=="dash")return;
-    const b=e.target.closest("[data-id]");if(b)return go("profile",b.dataset.id);
-    if(e.target.closest("#bdt")){bdAll=!bdAll;dash()}};
+    if(e.target.closest("#oth")){othOpen=!othOpen;dash();return}
+    if(e.target.closest("#bdv")){openBirthdays();return}
+    const b=e.target.closest("[data-id]");if(b)go("profile",b.dataset.id)};
   unsub=onSnapshot(collection(db,"members"),s=>{members=s.docs.map(d=>norm({id:d.id,...d.data()}));fill()},
     ()=>{$("#v").innerHTML='<p class="none">This account does not have access to the member records.</p>'});
   go("dash");
@@ -381,22 +465,36 @@ const fill=()=>view==="dash"?dash():view==="profile"?prof():draw();
 
 function dash(){
   const n=s=>members.filter(m=>m.status===s).length,A=n("Active"),I=n("Inactive");
-  const now=new Date(),mo=String(now.getMonth()+1).padStart(2,"0"),dn=now.getDate(),yr=now.getFullYear(),tdy=new Date(yr,now.getMonth(),dn);
-  const box=(t,i,c,body,x="")=>`<div class="box ${x}"><h3><span class="ic ${c}">${ic(i,16)}</span>${t}</h3>${body}</div>`;
+  const now=new Date(),yr=now.getFullYear(),tdy=new Date(yr,now.getMonth(),now.getDate());
+  const box=(t,i,c,body,x="",tail="")=>`<div class="box ${x}"><h3><span class="ic ${c}">${ic(i,16)}</span>${t}${tail?`<span class="tl">${tail}</span>`:""}</h3>${body}</div>`;
+
+  const hr=now.getHours(),greet=hr<12?"Good morning":hr<18?"Good afternoon":"Good evening";
+  const doy=Math.floor((tdy-new Date(yr,0,0))/864e5),vs=VERSES[doy%VERSES.length];
+  const wel=`<section class="wel" aria-label="Welcome"><div class="wm"><span class="wh">Shalom!</span><p>${greet}. Welcome back to the ministry dashboard, and thank you for your service.</p></div><figure class="vs"><figcaption>Verse of the Day</figcaption><blockquote>“${esc(vs[0])}”</blockquote>${esc(vs[1])} · Douay-Rheims</figure></section>`;
+
+  const sc={};members.forEach(m=>{const s=m.status||"";sc[s]=(sc[s]||0)+1});
+  const others=STATUS.filter(s=>s!=="Active"&&s!=="Inactive");
+  const extra=Object.keys(sc).filter(k=>k&&!STATUS.includes(k));
+  const oc=(s,e,c)=>`<div class="oc${c?"":" z"}"><span>${e}</span><span>${esc(s)}</span><b>${c}</b></div>`;
+  const othp=othOpen?`<div class="oth" id="othp"><p class="cps" style="margin:0 0 .5rem">Members who are not Active or Inactive, shown by status.</p><div class="og">${others.map(s=>oc(s,SI[s]||"⚪",sc[s]||0)).join("")}${extra.map(s=>oc(s,"⚪",sc[s])).join("")}${sc[""]?oc("No Status","⚪",sc[""]):""}</div></div>`:"";
+  const othT=`<button class="stat" id="oth" aria-expanded="${othOpen}" aria-controls="othp" title="Show or hide every other status"><span class="ic r">${ic("dots",22)}</span><div><b>${members.length-A-I}</b><span>Other Status</span></div><span class="cv">${ic("chev",18)}</span></button>`;
 
   const gc=GROUPS.map(g=>members.filter(m=>m.group===g).length),mx=Math.max(1,...gc),ng=members.length-gc.reduce((a,b)=>a+b,0);
-  const grp=gc.map((c,i)=>`<div class="gr" title="Group ${i+1}: ${c} members"><span class="gb">${i+1}</span><div class="gm"><span>Group ${i+1}</span><div class="gt"><i style="width:${c?Math.max(c/mx*100,6):0}%"></i></div></div><b class="gc">${c}</b></div>`).join("")+(ng?`<p class="none">${ng} member${ng>1?"s are":" is"} not assigned to a group.</p>`:"");
+  const ord=s=>{const i=STATUS.indexOf(s);return i<0?99:i};
+  const gsb=g=>{const c={};members.filter(m=>m.group===g).forEach(m=>{const s=m.status||"No Status";c[s]=(c[s]||0)+1});return Object.entries(c).sort((a,b)=>ord(a[0])-ord(b[0]))};
+  const grp=`<p class="cps">Members in each group, with a count for every status.</p>`+GROUPS.map((g,i)=>{const e=gsb(g);return `<div class="gr" title="Group ${g}: ${gc[i]} members"><span class="gb">${g}</span><div class="gm"><span>Group ${g}</span><div class="gt"><i style="width:${gc[i]?Math.max(gc[i]/mx*100,6):0}%"></i></div><div class="sb2">${e.length?e.map(([s,k])=>`<span>${SI[s]||"⚪"} ${k} ${esc(s)}</span>`).join(""):"<span>No members yet</span>"}</div></div><b class="gc">${gc[i]}</b></div>`}).join("")+(ng?`<p class="none">${ng} member${ng>1?"s are":" is"} not assigned to a group.</p>`:"");
 
+  const SHOW=5;
   const hasB=members.filter(m=>m.status!=="Deceased"&&m.birthday);
-  const bd=hasB.filter(m=>m.birthday.slice(5,7)===mo).sort((x,y)=>day(x).localeCompare(day(y)));
-  const brow=(m,sub,cls="",pill="")=>{const b=D(m.birthday);return `<button class="li${cls}" data-id="${m.id}"><span class="db"><b>${b.getDate()}</b><small>${b.toLocaleDateString("en",{month:"short"})}</small></span><span class="lt"><b>${esc(nm(m))}</b><small>${sub}</small></span>${pill}</button>`};
-  const up=hasB.map(m=>{const[,mm,dd]=m.birthday.split("-");let d=new Date(yr,+mm-1,+dd);if(d<tdy)d=new Date(yr+1,+mm-1,+dd);return{m,d,n:Math.round((d-tdy)/864e5)}}).sort((a,b)=>a.n-b.n).slice(0,3);
-  const showUp=hasB.length&&(!bd.length||bd.every(m=>+m.birthday.slice(8,10)<dn));
-  const bdh=(bd.length?(bdAll?bd:bd.slice(0,5)).map(m=>{const dd=+m.birthday.slice(8,10);
-      return brow(m,`Turns ${yr-+m.birthday.slice(0,4)}${m.group?" · Group "+esc(m.group):""}`,dd<dn?" past":"",dd===dn?'<span class="pill y">Today</span>':"")}).join("")
-      +(bd.length>5?`<button class="more" id="bdt">${bdAll?"Show Less":"Show All "+bd.length}</button>`:"")
-    :`<p class="none">${hasB.length?"No birthdays this month.":"No birthdays recorded yet. Add them in each member's profile."}</p>`)
-    +(showUp?`<div class="sh2">Coming Up</div>`+up.map(u=>brow(u.m,`${u.n===0?"Today":u.n===1?"Tomorrow":"In "+u.n+" days"} · Turns ${u.d.getFullYear()-+u.m.birthday.slice(0,4)}`)).join(""):"");
+  const up=hasB.map(m=>{const[,mm,dd]=m.birthday.split("-");let d=new Date(yr,+mm-1,+dd);if(d<tdy)d=new Date(yr+1,+mm-1,+dd);return{m,d,n:Math.round((d-tdy)/864e5)}}).sort((a,b)=>a.n-b.n||nm(a.m).localeCompare(nm(b.m)));
+  const soon=up.filter(u=>u.n<=14);
+  const when=k=>k===0?"Today":k===1?"Tomorrow":"In "+k+" days";
+  const brow=u=>`<button class="li" data-id="${u.m.id}"><span class="db"><b>${u.d.getDate()}</b><small>${u.d.toLocaleDateString("en",{month:"short"})}</small></span><span class="lt"><b>${esc(nm(u.m))}</b><small>Turns ${u.d.getFullYear()-+u.m.birthday.slice(0,4)}${u.m.group?" · Group "+esc(u.m.group):""}</small></span><span class="pill ${u.n===0?"y":"n"}">${when(u.n)}</span></button>`;
+  const rows=soon.map(brow);bdFull=rows.join("");bdCount=soon.length;
+  const bdh=soon.length
+    ?`<div class="bl">${rows.slice(0,SHOW).join("")}</div>`+(soon.length>SHOW?`<button class="more" id="bdv">${ic("expand",16)} View All ${soon.length}</button>`:"")
+    :`<p class="none">${hasB.length?"No birthdays in the next 2 weeks.":"No birthdays recorded yet. Add them in each member's profile."}</p>`+(hasB.length?`<div class="sh2">Next Birthday</div><div class="bl">${brow(up[0])}</div>`:"");
+  const bdc=soon.length?`<span class="pill y" title="Birthdays in the next 2 weeks">${soon.length}</span>`:"";
 
   const holder=r=>members.find(m=>m.role===r);
   const rb=(m,r)=>`<button class="li" data-id="${m.id}"><span class="av rd">${ic(ri(r),20)}</span><span class="lt"><b>${esc(nm(m))}</b><small class="rl">${esc(r)}</small></span></button>`;
@@ -413,18 +511,29 @@ function dash(){
     +res.map(([l,a])=>a.length?`<details class="ck"><summary>${ic("alert",16)}<span>${l}</span><b class="pill r">${a.length}</b></summary><div class="mn">${a.map(m=>`<button data-id="${m.id}">${esc(nm(m))}</button>`).join("")}</div></details>`
       :`<div class="ck ok">${ic("check",16)}<span>${l}</span><b class="pill g">Complete</b></div>`).join("");
 
-  $("#v").innerHTML=`<div class="head"><div><h2>Dashboard</h2><small>${now.toLocaleDateString("en",{weekday:"long",month:"long",day:"numeric"})}<span class="chip"><i></i>${S.n}</span></small></div></div>
-  <div class="stats">${stat(members.length,"Total Members","users","p")}${stat(A,"Active","check","g")}${stat(I,"Inactive","pause","y")}${stat(members.length-A-I,"Other Status","dots","r")}</div>
+  $("#v").innerHTML=`<div class="ph2"><div class="ptl"><span class="eb">Ministry Overview</span><h2>Dashboard</h2><p>Membership, birthdays, and records at a glance.</p></div><div class="pmeta">${now.toLocaleDateString("en",{weekday:"long",month:"long",day:"numeric"})}<span class="chip"><i></i>${S.n}</span></div></div>
+  ${wel}
+  <div class="stats">${stat(members.length,"Total Members","users","p")}${stat(A,"Active","check","g")}${stat(I,"Inactive","pause","y")}${othT}</div>
+  ${othp}
   <div class="cols">
   ${box("Members per Group","users","p",grp)}
-  ${box("Birthdays This Month","cake","y",bdh)}
+  ${box("Birthdays in the Next 2 Weeks","cake","y",bdh,"",bdc)}
   ${box("Officers and Leaders","cross","r",offh+(vac.length&&filled?`<p class="vac">Vacant: ${vac.join(", ")}</p>`:""),"rbx")}
   ${box("Records to Complete","alert","r",rec)}
   </div>`;
 }
 
+function openBirthdays(){
+  const end=new Date();end.setDate(end.getDate()+14);
+  $("#dlg").innerHTML=`<div class="fm"><div class="dh"><h2>Upcoming Birthdays</h2><small class="hint">${bdCount} birthday${bdCount>1?"s":""} through ${end.toLocaleDateString("en",{month:"long",day:"numeric"})}. Tap a name to open the profile.</small></div>
+  <div class="bd bl" id="bdl">${bdFull}</div><div class="foot"><button type="button" class="pri" id="cx">Close</button></div></div>`;
+  $("#cx").onclick=()=>$("#dlg").close();
+  $("#bdl").onclick=e=>{const b=e.target.closest("[data-id]");if(b){$("#dlg").close();go("profile",b.dataset.id)}};
+  $("#dlg").showModal();
+}
+
 function shell(){
-  $("#v").innerHTML=`<div class="head"><div><h2>Members</h2><small id="cnt"></small></div>
+  $("#v").innerHTML=`<div class="ph2"><div class="ptl"><span class="eb">Member Directory</span><h2>Members</h2><p>Search, filter, and manage every member record.</p><span class="chip" id="cnt" style="margin-top:.45rem"></span></div>
   <div class="acts"><button id="ex" class="ib" aria-label="Export">${ic("down",18)}<span>Export</span></button><button id="add" class="pri addb" aria-label="Add Member">${ic("plus",18)}<span>Add Member</span></button></div></div>
   <div class="tools"><div class="srch">${ic("search",18)}<input id="q" type="search" placeholder="Search by name"></div><button id="ft">${ic("filter",18)}Filters<em id="fb" hidden></em></button></div>
   <div class="fc" id="fc"></div><div id="list"></div>`;
@@ -512,17 +621,20 @@ function openForm(id){
   $("#cx").onclick=()=>$("#dlg").close();
   if(id)$("#dl").onclick=async()=>{
     if(!confirm("Delete this member? This cannot be undone."))return;
-    try{await deleteDoc(doc(db,"members",id));$("#dlg").close();if(view==="profile")go("members")}catch{alert("Could not delete. Check your connection and try again.")}};
+    busy("Deleting member…");
+    try{await withTimeout(deleteDoc(doc(db,"members",id)),20000);busyEnd();$("#dlg").close();toast("Member deleted.");if(view==="profile")go("members")}
+    catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not delete. Check your connection and try again.")}};
   $("#mf").onsubmit=async e=>{e.preventDefault();
     const d={};F.forEach(([k])=>d[k]=e.target.elements[k].value.trim());
     const prev=d.role?members.filter(o=>o.id!==id&&o.role===d.role):[];
     if(prev.length){const names=prev.map(full).join(" and ");
       if(!confirm(`${names} currently ${prev.length>1?"hold":"holds"} the role of ${d.role}.\n\nIf you continue, ${names} will become ${prev.length>1?"regular members":"a regular member"} with no role. Continue?`))return}
+    busy(id?"Saving changes…":"Adding member…");
     try{const b=writeBatch(db);
       prev.forEach(o=>b.update(doc(db,"members",o.id),{role:""}));
       b.set(id?doc(db,"members",id):doc(collection(db,"members")),d);
-      await b.commit();$("#dlg").close()}
-    catch{alert("Could not save. Check your connection and try again.")}};
+      await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast(id?"Changes saved.":"Member added.")}
+    catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not save. Check your connection and try again.")}};
   $("#dlg").showModal();
 }
 
