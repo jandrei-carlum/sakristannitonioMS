@@ -307,10 +307,11 @@ import{getFirestore,collection,onSnapshot,doc,deleteDoc,writeBatch}from"https://
 
 const cfg={apiKey:"AIzaSyDqtjhvtmAea9S9TKf94CIdd5BpbdpiZeA",authDomain:"moas-system.firebaseapp.com",projectId:"moas-system",appId:"1:302631045782:web:89769532d1cd1f4c0810b7"};
 
-const STATUS=["Active","Inactive","Probationary","On Leave","Suspended","Graduated","Deceased","Transferred","Honorary / Alumni","Not Recommissioned","No Longer a Member"];
-const SI={"Active":"🟢","Inactive":"🟡","Probationary":"🔵","On Leave":"🟣","Suspended":"⚫","Graduated":"🎓","Deceased":"🕊️","Transferred":"🔄","Honorary / Alumni":"📜"};
-const SD={"Active":"Currently serving in the ministry","Inactive":"Still a member, but currently not serving","Probationary":"New member undergoing formation/training","On Leave":"Temporarily unable to serve","Suspended":"Temporarily restricted from serving","Graduated":"Completed/finished their time in the ministry","Deceased":"Member who has passed away","Transferred":"Continued their ministry/service elsewhere","Honorary / Alumni":"Former member who remains part of the ministry's historical community"};
-const SCOL={"Active":"#4f8f69","Inactive":"#d4b277","Probationary":"#6a8fd8","On Leave":"#8f77c4","Suspended":"#4a4452","Graduated":"#4aa3a3","Deceased":"#a9a2b3","Transferred":"#d98f5f","Honorary / Alumni":"#c58ab5","Not Recommissioned":"#c9c1d3","No Longer a Member":"#bdb5c8","No Status":"#e0dbe6"};
+const REMOVED="Removed (Disciplinary)";
+const STATUS=["Active","Inactive","Probationary","On Leave","Suspended","Graduated","Deceased","Transferred","Honorary / Alumni",REMOVED];
+const SI={"Active":"🟢","Inactive":"🟡","Probationary":"🔵","On Leave":"🟣","Suspended":"⚫","Graduated":"🎓","Deceased":"🕊️","Transferred":"🔄","Honorary / Alumni":"📜",[REMOVED]:"🚫"};
+const SD={"Active":"Currently serving in the ministry","Inactive":"Still a member, but currently not serving","Probationary":"New member undergoing formation/training","On Leave":"Temporarily unable to serve","Suspended":"Temporarily restricted from serving","Graduated":"Completed/finished their time in the ministry","Deceased":"Member who has passed away","Transferred":"Continued their ministry/service elsewhere","Honorary / Alumni":"Former member who remains part of the ministry's historical community",[REMOVED]:"Removed from the ministry for disciplinary reasons"};
+const SCOL={"Active":"#4f8f69","Inactive":"#d4b277","Probationary":"#6a8fd8","On Leave":"#8f77c4","Suspended":"#4a4452","Graduated":"#4aa3a3","Deceased":"#a9a2b3","Transferred":"#d98f5f","Honorary / Alumni":"#c58ab5",[REMOVED]:"#9b4a52","No Status":"#e0dbe6"};
 const scol=s=>SCOL[s]||"#c9c1d3";
 const sl=s=>(SI[s]||"⚪")+" "+s;
 const ROLES=["President","Coordinator","Vice President","Secretary","Treasurer","Property Custodian","Group 1 Lead","Group 2 Lead","Group 3 Lead","Group 4 Lead","Group 5 Lead"];
@@ -357,7 +358,7 @@ const VERSES=[
 ["For God hath not given us the spirit of fear: but of power, and of love, and of sobriety.","2 Timothy 1:7"]];
 
 const key=s=>String(s??"").toLowerCase().replace(/[^a-z0-9]/g,"");
-const ALIAS={vicepresident:"Vice President",vicepres:"Vice President",vp:"Vice President",custodian:"Property Custodian",alumni:"Honorary / Alumni",honorary:"Honorary / Alumni",notmemberanymore:"No Longer a Member"};
+const ALIAS={vicepresident:"Vice President",vicepres:"Vice President",vp:"Vice President",custodian:"Property Custodian",alumni:"Honorary / Alumni",honorary:"Honorary / Alumni",notmemberanymore:REMOVED,nolongeramember:REMOVED,removed:REMOVED,disciplinary:REMOVED};
 GROUPS.forEach(g=>ALIAS["groupleader"+g]=`Group ${g} Lead`);
 const canon=(v,list)=>{const k=key(v);if(!k)return"";return list.find(x=>key(x)===k)||ALIAS[k]||String(v).trim()};
 const tc=s=>{s=String(s??"").trim();return s&&(s===s.toLowerCase()||s===s.toUpperCase())?s.toLowerCase().replace(/(^|[\s\-(\/.])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase()):s};
@@ -550,7 +551,7 @@ function dash(){
   const grp=`<p class="cps">Colors show each member's status. Tap a group to see its members.</p>${lgd?`<div class="lg">${lgd}</div>`:""}${rowsG}${ng?`<p class="none">${ng} member${ng>1?"s are":" is"} not assigned to a group.</p>`:""}`;
 
   const SHOW=5;
-  const hasB=members.filter(m=>m.status!=="Deceased"&&m.birthday);
+  const hasB=members.filter(m=>m.status!=="Deceased"&&m.status!==REMOVED&&m.birthday);
   const up=hasB.map(m=>{const[,mm,dd]=m.birthday.split("-");let d=new Date(yr,+mm-1,+dd);if(d<tdy)d=new Date(yr+1,+mm-1,+dd);return{m,d,n:Math.round((d-tdy)/864e5)}}).sort((a,b)=>a.n-b.n||nm(a.m).localeCompare(nm(b.m)));
   const soon=up.filter(u=>u.n<=14);
   const when=k=>k===0?"Today":k===1?"Tomorrow":"In "+k+" days";
