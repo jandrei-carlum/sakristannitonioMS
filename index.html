@@ -10,7 +10,7 @@
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Nunito,"Segoe UI",system-ui,sans-serif;padding-bottom:80px}
 h1,h2{font-family:Lora,Georgia,serif;margin:0;font-weight:600}
 h3{display:flex;align-items:center;gap:.5rem;margin:0 0 .5rem;font-size:1rem}
-button,input,select{font:inherit;color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
 button,.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;border:1px solid var(--line);background:#fff;padding:.6rem 1rem;border-radius:12px;cursor:pointer;min-height:44px;text-decoration:none;color:inherit}
 button:hover,.btn:hover{border-color:var(--gold)}
 .pri{background:var(--pur);border-color:var(--pur);color:#fff}
@@ -22,6 +22,7 @@ button:hover,.btn:hover{border-color:var(--gold)}
 .gh{background:none;border:0;min-height:32px;padding:.2rem .55rem;font-size:.8rem;color:var(--mut);border-radius:8px;gap:.3rem}
 .gh:hover{color:var(--pd);background:var(--purt);border-color:transparent}
 input,select{width:100%;min-height:44px;padding:.55rem .8rem;border:1px solid var(--line);border-radius:12px;background:#fff}
+textarea{width:100%;min-height:84px;padding:.55rem .8rem;border:1px solid var(--line);border-radius:12px;background:#fff;resize:vertical}
 :focus-visible{outline:3px solid #d4b27799;outline-offset:1px}
 .top{position:relative;background:#fff;border-bottom:2px solid #ead9b4;box-shadow:0 2px 12px #5d4d8c0d}
 .in{max-width:1000px;margin:auto;padding:.9rem 1rem .75rem;display:flex;align-items:center;gap:.8rem}
@@ -57,9 +58,10 @@ main{max-width:1000px;margin:auto;padding:1.25rem 1rem}
 .fc .ch::after{content:" ×"}
 .ri{display:inline-block;vertical-align:-2px;margin-right:.3rem;color:var(--pur)}
 .ch .ri{color:inherit;margin-right:.35rem}
-#list{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:.7rem}
+#list,#alist{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:.7rem}
 .card{justify-content:flex-start;gap:.8rem;text-align:left;width:100%;border-radius:16px;padding:.85rem;box-shadow:var(--sh)}
 .card>span:last-child{min-width:0;flex:1}
+.am .pill{display:inline-block;margin-top:.3rem}
 .av{position:relative;flex:none;width:46px;height:46px;border-radius:50%;background:var(--purt);color:var(--pur);display:grid;place-items:center;font:600 1.1rem Lora,Georgia,serif}
 .av i{position:absolute;right:-3px;bottom:-3px;width:19px;height:19px;border-radius:50%;background:var(--gold);color:#fff;font:700 .66rem Nunito,sans-serif;display:grid;place-items:center;border:2px solid #fff}
 .av.rd{background:var(--redt);color:var(--red);width:40px;height:40px;font-size:1rem}
@@ -182,7 +184,7 @@ dialog{border:0;border-radius:20px;padding:0;width:min(660px,96vw);max-height:92
 dialog::backdrop{background:#2a1f4599}
 dialog form,.fm{display:flex;flex-direction:column;max-height:92vh}
 .dh{padding:1.1rem 1.25rem .6rem;border-bottom:2px solid var(--gold)}
-.dh h2{font-size:1.6rem}
+.dh h2{font-size:1.6rem;overflow-wrap:anywhere}
 .bd{padding:1rem 1.25rem;overflow:auto;flex:1}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
 .grid label{font-size:.82rem;color:var(--mut)}
@@ -191,15 +193,16 @@ dialog form,.fm{display:flex;flex-direction:column;max-height:92vh}
 .sh:first-child{margin-top:0}
 .bd>.sh{margin:1rem 0 .5rem}
 .bd>.sh:first-child{margin-top:0}
-.foot{display:flex;gap:.5rem;justify-content:flex-end;padding:.8rem 1.25rem calc(.8rem + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fff}
+.foot{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:flex-end;padding:.8rem 1.25rem calc(.8rem + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fff}
 .cf{width:min(420px,92vw);margin:auto;border-radius:22px}
 .cfb{padding:1.4rem 1.4rem 1.2rem;text-align:center}
 .cfi{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;margin:0 auto .8rem}
-.cfi.r{background:var(--redt);color:var(--red)}.cfi.p{background:var(--purt);color:var(--pur)}
+.cfi.r{background:var(--redt);color:var(--red)}.cfi.p{background:var(--purt);color:var(--pur)}.cfi.y{background:var(--goldt);color:#9a7a2f}
 .cfb h2{font-size:1.45rem;line-height:1.2;overflow-wrap:anywhere}
 .cft{margin-top:.6rem;color:var(--mut);font-size:.92rem}
 .cft p{margin:.5rem 0 0}
 .cft b{color:var(--ink)}
+.nl{max-height:42vh;overflow:auto;margin-top:.7rem;text-align:left}
 .cfn{display:flex;align-items:center;gap:.7rem;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:.6rem .8rem}
 .cfn .av{width:42px;height:42px;flex:none}
 .cfn span:last-child{min-width:0;overflow-wrap:anywhere}
@@ -259,7 +262,7 @@ dialog form,.fm{display:flex;flex-direction:column;max-height:92vh}
 .sgn div{flex:1;border-top:1px solid #555;padding-top:3px;font-size:9pt;color:#444}
 .rnote{margin-top:14px;font-size:8pt;color:#777}
 tr{break-inside:avoid}
-@media print{body{background:#fff;padding:0}#app,#ts,#ld,#cf{display:none}#pr{display:block}}
+@media print{body{background:#fff;padding:0}#app,#ts,#ld,#cf,#nt{display:none}#pr{display:block}}
 @media(min-width:721px){
  body{padding-bottom:0}
  nav{position:static;max-width:1000px;margin:1rem auto 0;padding:0 1rem;border:0;background:none;gap:.5rem}
@@ -271,7 +274,7 @@ tr{break-inside:avoid}
 @media(max-width:720px){
  .stats{grid-template-columns:repeat(2,1fr)}
  .addb{position:fixed;right:1rem;bottom:calc(72px + env(safe-area-inset-bottom));z-index:6;min-height:52px;padding:.5rem 1.2rem;border-radius:99px;box-shadow:0 8px 22px #5d4d8c55}
- #list{padding-bottom:4.5rem}
+ #list,#alist{padding-bottom:4.5rem}
 }
 @media(max-width:560px){
  .grid{grid-template-columns:1fr}
@@ -284,7 +287,7 @@ tr{break-inside:avoid}
  main{padding:.75rem .75rem 1rem}
  .ph2{margin-bottom:.6rem;gap:.4rem}.ptl h2{font-size:1.55rem}.ptl p{font-size:.85rem}
  .wel{padding:.85rem .9rem;gap:.7rem}.wm .wh{font-size:1.35rem}
- .stats,.cols,#list{gap:.5rem}.stats{margin-bottom:.5rem}
+ .stats,.cols,#list,#alist{gap:.5rem}.stats{margin-bottom:.5rem}
  .stat{padding:.7rem;gap:.6rem}.stat .ic{width:40px;height:40px}.stat b{font-size:1.55rem}
  .box{padding:.8rem}.box h3{margin-bottom:.3rem}
  .card{padding:.7rem}
@@ -298,6 +301,7 @@ tr{break-inside:avoid}
 </style></head>
 <body><div id="app"></div><div id="pr"></div><style id="pg"></style>
 <dialog id="cf" class="cf"></dialog>
+<dialog id="nt" class="cf" aria-label="Activity reminder"></dialog>
 <dialog id="ld" class="ld" aria-labelledby="ldm"><span class="spin" aria-hidden="true"></span><p id="ldm">Saving…</p></dialog>
 <div id="ts" class="ts" role="status" aria-live="polite"></div>
 <script type="module">
@@ -323,6 +327,11 @@ const SCHOOL=["Grade 4","Grade 5","Grade 6","Grade 7","Grade 8","Grade 9","Grade
 const AW=[{k:"dominic",n:"Saint Dominic Savio Award",c:"m1",d:"Exemplary performance, the epitome of an altar server"},{k:"berchmans",n:"Saint John Berchmans Award",c:"m2",d:"More than a decade of faithful dedication and service"}];
 const F=[["lastName","Last Name"],["firstName","First Name"],["middleName","Middle Name"],["status","Status",STATUS],["role","Role",ROLES],["group","Group",GROUPS],["start","Start of Service","date"],["end","End of Service","date"],["birthday","Birthday","date"],["gender","Gender",["Female","Male"]],["confirmation","Sacrament of Confirmation",CONF],["contact","Contact Number"],["messenger","Messenger"],["address","Home Address","w"],["guardian","Parent/Guardian Name"],["guardianContact","Parent/Guardian Contact"],["schoolLevel","School Level",SCHOOL],["schoolName","School Name"],["dominic","Saint Dominic Savio Award (Date Given)","date"],["berchmans","Saint John Berchmans Award (Date Given)","date"]];
 const SEC={lastName:"Name",status:"Service",birthday:"Personal",contact:"Contact",guardian:"Parent or Guardian",schoolLevel:"School",dominic:"Awards · Leave the date blank if not received"};
+
+/* Ministry activities. Edit the type list or the reminder window here. */
+const ASTAT=["Scheduled","Done","Not Done"];
+const ATYPES=["Mass / Liturgy","Meeting","Formation / Seminar","Training","Recollection / Retreat","Outreach / Service","Fellowship / Social","Fundraising","Other"];
+const NOTIFY_DAYS=3; /* pop-up reminder for activities happening within this many days */
 
 /* Daily verses: Douay-Rheims (public domain). One verse per day, rotating. */
 const VERSES=[
@@ -379,6 +388,7 @@ const norm=x=>({...x,role:canon(pick(x,["role","position"]),ROLES),status:canon(
   confirmation:canon(x.confirmation,CONF),schoolLevel:canon(x.schoolLevel,SCHOOL),
   firstName:tc(x.firstName),middleName:tc(x.middleName),lastName:tc(x.lastName),guardian:tc(x.guardian),schoolName:tc(x.schoolName),address:tc(x.address),
   birthday:dt(pick(x,["birthday","birthDate","birthdate","dob","dateOfBirth","bday"])),start:dt(x.start),end:dt(x.end),dominic:dt(x.dominic),berchmans:dt(x.berchmans)});
+const normA=x=>({...x,title:String(x.title??"").trim(),date:dt(x.date),time:String(x.time??"").trim(),status:ASTAT.includes(x.status)?x.status:"Scheduled"});
 
 const IC={
  dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
@@ -418,7 +428,8 @@ const IC={
  cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
  chev:'<path d="m6 9 6 6 6-6"/>',
  expand:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
- doc:'<path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/>'
+ doc:'<path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/>',
+ bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 20.5a2 2 0 0 0 4 0"/>'
 };
 const ic=(n,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
 const RIC={"President":"crown","Coordinator":"compass","Vice President":"shield","Secretary":"note","Treasurer":"wallet","Property Custodian":"key"};
@@ -446,6 +457,7 @@ const D=d=>new Date(d+"T00:00:00");
 const today=iso(new Date());
 const fmtL=d=>d?D(d).toLocaleDateString("en",{month:"long",day:"numeric",year:"numeric"}):"";
 const fmtS=d=>d?D(d).toLocaleDateString("en",{month:"short",day:"numeric",year:"numeric"}):"";
+const fmtT=t=>{if(!t)return"";const[h,m]=String(t).split(":").map(Number);return isNaN(h)?String(t):`${h%12||12}:${String(m||0).padStart(2,"0")} ${h<12?"AM":"PM"}`};
 const age=b=>{if(!b)return"";const d=D(b),n=new Date();let a=n.getFullYear()-d.getFullYear();if(n<new Date(n.getFullYear(),d.getMonth(),d.getDate()))a--;return a};
 const span=(s,e)=>{if(!s)return"";const a=D(s),b=e?D(e):new Date();let m=(b.getFullYear()-a.getFullYear())*12+b.getMonth()-a.getMonth();if(m<0)return"";const y=Math.floor(m/12);m%=12;return[y&&y+(y>1?" yrs":" yr"),m&&m+(m>1?" mos":" mo")].filter(Boolean).join(" ")||"New"};
 const nm=m=>`${m.lastName||""}, ${m.firstName||""}${m.middleName?" "+m.middleName[0]+".":""}`;
@@ -459,7 +471,19 @@ const LOGO='<img class="logo" src="logos/Origin.png" alt="" onerror="this.remove
 const ribbon=`<span class="rb" title="${S.n}" role="img" aria-label="Liturgical season: ${S.n}"><i>${ic("cross",14)}</i></span>`;
 const brand=`${LOGO}<div class="brand"><h1>Ministry of Altar Servers</h1><p><span>St. Anthony Ma. Zaccaria Parish</span><i> | </i><span>Silangan San Mateo Rizal</span></p></div>${ribbon}`;
 let unsub,members=[],view="dash",pid=null,othOpen=false,bdFull="",bdCount=0,shown=0;
+let acts=[],actErr=false,notified=false;
 const st={q:"",g:"",s:"",r:"",sort:"name"};
+const sa={q:"",f:"all"};
+
+/* activity helpers */
+const dd=d=>Math.round((D(d)-D(iso(new Date())))/864e5);
+const late=a=>a.status==="Scheduled"&&!!a.date&&dd(a.date)<0;
+const aKey=a=>(a.date||"9999-99-99")+" "+(a.time||"");
+const ASC=(x,y)=>aKey(x).localeCompare(aKey(y));
+const whenA=n=>n===0?"Today":n===1?"Tomorrow":n===-1?"1 day ago":n<0?Math.abs(n)+" days ago":"In "+n+" days";
+const apill=a=>late(a)?'<span class="pill r">Needs Update</span>':a.status==="Done"?'<span class="pill g">Done</span>':a.status==="Not Done"?'<span class="pill r">Not Done</span>':'<span class="pill n">Scheduled</span>';
+const dblk=d=>{if(!d)return'<span class="db"></span>';const x=D(d);return`<span class="db"><b>${x.getDate()}</b><small>${x.toLocaleDateString("en",{month:"short"})}</small></span>`};
+const asub=a=>esc([fmtT(a.time),a.venue].filter(Boolean).join(" · ")||a.type||"");
 
 /* loading screen, confirmation message, and timeout */
 const busy=m=>{$("#ldm").textContent=m;if(!$("#ld").open)$("#ld").showModal()};
@@ -487,6 +511,8 @@ const ERR={"auth/invalid-credential":"Wrong email or password. Check both and tr
 ERR["auth/wrong-password"]=ERR["auth/user-not-found"]=ERR["auth/invalid-credential"];
 
 function showLogin(){
+  acts=[];actErr=false;notified=false;
+  if($("#nt").open)$("#nt").close();
   $("#app").innerHTML=`<div class="top"><div class="in">${brand}</div></div>
   <div class="lw"><form class="login" id="lf"><span class="ic p">${ic("lock")}</span><h2>Admin Sign In</h2><p>Sign in to view and update member records.</p>
   <label>Email<input id="em" type="email" required autocomplete="username" inputmode="email"></label>
@@ -500,7 +526,7 @@ function showLogin(){
 
 function showApp(){
   $("#app").innerHTML=`<div class="top"><div class="in">${brand}<button id="so" aria-label="Sign Out">${ic("out",18)}<span>Sign Out</span></button></div></div>
-  <nav><button data-v="dash">${ic("dash")}Dashboard</button><button data-v="members">${ic("users")}Members</button></nav>
+  <nav><button data-v="dash">${ic("dash")}Dashboard</button><button data-v="members">${ic("users")}Members</button><button data-v="acts">${ic("cal")}Activities</button></nav>
   <main id="v"></main><dialog id="dlg"></dialog>`;
   $("#so").onclick=()=>signOut(auth);
   $("nav").onclick=e=>{const b=e.target.closest("button");if(b)go(b.dataset.v)};
@@ -508,21 +534,27 @@ function showApp(){
     if(e.target.closest("#rpt")){openReport();return}
     if(e.target.closest("#oth")){othOpen=!othOpen;dash();return}
     if(e.target.closest("#bdv")){openBirthdays();return}
+    if(e.target.closest("#gA")){go("acts");return}
+    const ab=e.target.closest("[data-aid]");if(ab){openAct(ab.dataset.aid);return}
     const g=e.target.closest("[data-grp]");if(g){go("members");st.g=g.dataset.grp;draw();return}
     const b=e.target.closest("[data-id]");if(b)go("profile",b.dataset.id)};
-  unsub=onSnapshot(collection(db,"members"),s=>{members=s.docs.map(d=>norm({id:d.id,...d.data()}));fill()},
+  const u1=onSnapshot(collection(db,"members"),s=>{members=s.docs.map(d=>norm({id:d.id,...d.data()}));fill()},
     ()=>{$("#v").innerHTML='<p class="none">This account does not have access to the member records.</p>'});
+  const u2=onSnapshot(collection(db,"activities"),s=>{actErr=false;acts=s.docs.map(d=>normA({id:d.id,...d.data()}));fill();notify()},
+    ()=>{actErr=true;acts=[];fill()});
+  unsub=()=>{u1();u2()};
   go("dash");
 }
 
 function go(v,id){
-  view=v;pid=id||null;Object.assign(st,{q:"",g:"",s:"",r:"",sort:"name"});
+  view=v;pid=id||null;Object.assign(st,{q:"",g:"",s:"",r:"",sort:"name"});Object.assign(sa,{q:"",f:"all"});
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===(v==="profile"?"members":v)));
   if(v==="members")shell();
+  if(v==="acts")shellA();
   if(v==="profile")history.pushState(null,"");
   fill();scrollTo(0,0);
 }
-const fill=()=>view==="dash"?dash():view==="profile"?prof():draw();
+const fill=()=>view==="dash"?dash():view==="profile"?prof():view==="acts"?drawActs():draw();
 
 function dash(){
   const n=s=>members.filter(m=>m.status===s).length,A=n("Active"),I=n("Inactive");
@@ -552,7 +584,7 @@ function dash(){
 
   const SHOW=5;
   const hasB=members.filter(m=>m.status!=="Deceased"&&m.status!==REMOVED&&m.birthday);
-  const up=hasB.map(m=>{const[,mm,dd]=m.birthday.split("-");let d=new Date(yr,+mm-1,+dd);if(d<tdy)d=new Date(yr+1,+mm-1,+dd);return{m,d,n:Math.round((d-tdy)/864e5)}}).sort((a,b)=>a.n-b.n||nm(a.m).localeCompare(nm(b.m)));
+  const up=hasB.map(m=>{const[,mm,dd2]=m.birthday.split("-");let d=new Date(yr,+mm-1,+dd2);if(d<tdy)d=new Date(yr+1,+mm-1,+dd2);return{m,d,n:Math.round((d-tdy)/864e5)}}).sort((a,b)=>a.n-b.n||nm(a.m).localeCompare(nm(b.m)));
   const soon=up.filter(u=>u.n<=14);
   const when=k=>k===0?"Today":k===1?"Tomorrow":"In "+k+" days";
   const brow=u=>`<button class="li" data-id="${u.m.id}"><span class="db"><b>${u.d.getDate()}</b><small>${u.d.toLocaleDateString("en",{month:"short"})}</small></span><span class="lt"><b>${esc(nm(u.m))}</b><small>Turns ${u.d.getFullYear()-+u.m.birthday.slice(0,4)}${u.m.group?" · Group "+esc(u.m.group):""}</small></span><span class="pill ${u.n===0?"y":"n"}">${when(u.n)}</span></button>`;
@@ -574,11 +606,21 @@ function dash(){
     +res.map(([l,a])=>a.length?`<details class="ck"><summary>${ic("alert",16)}<span>${l}</span><b class="pill r">${a.length}</b></summary><div class="mn">${a.map(m=>`<button data-id="${m.id}">${esc(nm(m))}</button>`).join("")}</div></details>`
       :`<div class="ck ok">${ic("check",16)}<span>${l}</span><b class="pill g">Complete</b></div>`).join("");
 
-  $("#v").innerHTML=`<div class="ph2"><div class="ptl"><span class="eb">Ministry Overview</span><h2>Dashboard</h2><p>Membership, birthdays, and records at a glance.</p></div><div class="pmeta">${now.toLocaleDateString("en",{weekday:"long",month:"long",day:"numeric"})}<span class="chip"><i></i>${S.n}</span><button class="gh" id="rpt" title="Create a ministry report for the parish priest" aria-label="Create ministry report">${ic("doc",15)}Report</button></div></div>
+  /* upcoming activities */
+  const openA=acts.filter(a=>a.status==="Scheduled"&&a.date).sort(ASC),lateA=openA.filter(late),nextA=openA.filter(a=>!late(a));
+  const arow=a=>{const k=dd(a.date);return `<button class="li" data-aid="${a.id}">${dblk(a.date)}<span class="lt"><b>${esc(a.title)}</b><small>${asub(a)}</small></span><span class="pill ${k<0?"r":k<=NOTIFY_DAYS?"y":"n"}">${k<0?"Needs Update":whenA(k)}</span></button>`};
+  const aShow=[...lateA,...nextA].slice(0,5);
+  const ah=actErr?'<p class="none">Could not load activities. In Firebase, allow signed-in users to read and write the “activities” collection in the Firestore rules.</p>'
+    :(aShow.length?`${lateA.length?`<p class="cps" style="margin:0 0 .3rem;color:var(--red)">${lateA.length} past activit${lateA.length>1?"ies need":"y needs"} a Done or Not Done update.</p>`:""}<div class="bl">${aShow.map(arow).join("")}</div>`:`<p class="none">No upcoming activities. Schedule one from the Activities tab.</p>`)
+      +`<button class="more" id="gA">${ic("expand",16)} Open Activities</button>`;
+  const atail=lateA.length?`<span class="pill r" title="Past activities that need an update">${lateA.length}</span>`:nextA.length?`<span class="pill n" title="Upcoming activities">${nextA.length}</span>`:"";
+
+  $("#v").innerHTML=`<div class="ph2"><div class="ptl"><span class="eb">Ministry Overview</span><h2>Dashboard</h2><p>Membership, activities, birthdays, and records at a glance.</p></div><div class="pmeta">${now.toLocaleDateString("en",{weekday:"long",month:"long",day:"numeric"})}<span class="chip"><i></i>${S.n}</span><button class="gh" id="rpt" title="Create a ministry report for the parish priest" aria-label="Create ministry report">${ic("doc",15)}Report</button></div></div>
   ${wel}
   <div class="stats">${stat(members.length,"Total Members","users","p")}${stat(A,"Active","check","g")}${stat(I,"Inactive","pause","y")}${othT}</div>
   ${othp}
   <div class="cols">
+  ${box("Upcoming Activities","cal","g",ah,"",atail)}
   ${box("Members per Group","users","p",grp)}
   ${box("Birthdays in the Next 2 Weeks","cake","y",bdh,"",bdc)}
   ${box("Officers and Leaders","cross","r",offh+(vac.length&&filled?`<p class="vac">Vacant: ${vac.join(", ")}</p>`:""),"rbx")}
@@ -708,6 +750,199 @@ function openForm(id){
   $("#dlg").showModal();
 }
 
+/* ---------- Activities ---------- */
+function shellA(){
+  $("#v").innerHTML=`<div class="ph2"><div class="ptl"><span class="eb">Ministry Activities</span><h2>Activities</h2><p>Schedule activities and record whether they were done.</p><span class="chip" id="acnt" style="margin-top:.45rem"></span></div>
+  <div class="acts"><button id="exA" class="ib" aria-label="Export">${ic("down",18)}<span>Export</span></button><button id="addA" class="pri addb" aria-label="Add Activity">${ic("plus",18)}<span>Add Activity</span></button></div></div>
+  <div class="tools"><div class="srch">${ic("search",18)}<input id="aq" type="search" placeholder="Search activities"></div></div>
+  <div class="chs" id="afc" style="margin-bottom:.7rem"></div><div id="alist"></div>`;
+  $("#aq").oninput=e=>{sa.q=e.target.value;drawActs()};
+  $("#afc").onclick=e=>{const b=e.target.closest("[data-f]");if(b){sa.f=b.dataset.f;drawActs()}};
+  $("#addA").onclick=()=>openActForm(null);
+  $("#exA").onclick=openActExport;
+  $("#alist").onclick=e=>{const c=e.target.closest("[data-aid]");if(c)openAct(c.dataset.aid)};
+}
+
+function drawActs(){
+  if(!$("#alist"))return;
+  if(actErr){$("#afc").innerHTML="";$("#acnt").textContent="";
+    $("#alist").innerHTML='<p class="none">Could not load activities. In Firebase, allow signed-in users to read and write the “activities” collection in the Firestore rules.</p>';return}
+  const q=sa.q.trim().toLowerCase();
+  const cnt={all:acts.length,up:acts.filter(a=>a.status==="Scheduled"&&!late(a)).length,late:acts.filter(late).length,Done:acts.filter(a=>a.status==="Done").length,"Not Done":acts.filter(a=>a.status==="Not Done").length};
+  const FL=[["all","All"],["up","Upcoming"],["late","Needs Update"],["Done","Done"],["Not Done","Not Done"]];
+  $("#afc").innerHTML=FL.map(([k,l])=>`<button class="ch${sa.f===k?" on":""}" data-f="${k}">${l} (${cnt[k]})</button>`).join("");
+  const a=acts.filter(m=>(!q||`${m.title} ${m.venue||""} ${m.type||""}`.toLowerCase().includes(q))&&
+    (sa.f==="all"||(sa.f==="up"?m.status==="Scheduled"&&!late(m):sa.f==="late"?late(m):m.status===sa.f)));
+  const list=[...a.filter(m=>m.status==="Scheduled").sort(ASC),...a.filter(m=>m.status!=="Scheduled").sort((x,y)=>ASC(y,x))];
+  $("#acnt").textContent=list.length===acts.length?`${list.length} activit${list.length===1?"y":"ies"}`:`${list.length} of ${acts.length} activities`;
+  $("#alist").innerHTML=list.length?list.map(m=>`<button class="card" data-aid="${m.id}">${dblk(m.date)}<span class="am"><b>${esc(m.title)}</b><small>${asub(m)}</small>${apill(m)}${m.status==="Not Done"&&m.reason?`<small>Reason: ${esc(m.reason)}</small>`:""}</span></button>`).join(""):
+    `<p class="none">${acts.length?"No activities match your search or filter.":"No activities yet. Select Add Activity to schedule one."}</p>`;
+}
+
+function openAct(id){
+  const a=acts.find(x=>x.id===id);if(!a)return;
+  const f=(l,x,i)=>`<div class="f"><small>${i?`<span class="ri">${ic(i,14)}</span>`:""}${l}</small>${x?esc(x):'<span class="na">Not Provided</span>'}</div>`;
+  const k=a.date?dd(a.date):0;
+  const res=a.status==="Done"?f("Remarks / Outcome",a.remarks,"note")+(a.attendees?f("Attendees",a.attendees,"users"):""):a.status==="Not Done"?f("Reason Not Done",a.reason,"alert"):"";
+  const fin=a.status!=="Scheduled";
+  $("#dlg").innerHTML=`<div class="fm"><div class="dh"><h2>${esc(a.title)}</h2><small class="hint">${esc(a.type||"Activity")}</small></div>
+  <div class="bd"><div style="margin-bottom:.4rem">${apill(a)}${a.status==="Scheduled"&&a.date?`<span class="st" style="margin-left:.5rem">${late(a)?"Past due: "+whenA(k):whenA(k)}</span>`:""}</div>
+  ${f("Date",fmtL(a.date),"cal")}${f("Time",fmtT(a.time),"clock")}${f("Venue",a.venue,"pin")}${f("Description / Notes",a.description,"note")}${res}</div>
+  <div class="foot"><button type="button" class="lft" id="ae">${ic("edit",18)}Edit</button><button type="button" id="ac">Close</button>${fin?`<button type="button" id="ar">Reopen</button>`:`<button type="button" id="an">Mark Not Done</button><button type="button" class="pri" id="ad">Mark Done</button>`}</div></div>`;
+  $("#ac").onclick=()=>$("#dlg").close();
+  $("#ae").onclick=()=>openActForm(id);
+  if(fin)$("#ar").onclick=async()=>{
+    const ok=await ask({icon:"alert",title:"Reopen This Activity?",ok:"Reopen",body:`<p><b>${esc(a.title)}</b> will go back to Scheduled and its ${a.status==="Done"?"remarks":"reason"} will be cleared.</p>`});
+    if(ok)saveAct(id,{status:"Scheduled",reason:"",remarks:"",attendees:""},"Activity reopened.")};
+  else{$("#ad").onclick=()=>openMark(id,"Done");$("#an").onclick=()=>openMark(id,"Not Done")}
+  if(!$("#dlg").open)$("#dlg").showModal();
+}
+
+function openMark(id,to){
+  const a=acts.find(x=>x.id===id);if(!a)return;
+  const done=to==="Done";
+  $("#dlg").innerHTML=`<form id="mk"><div class="dh"><h2>${done?"Mark as Done":"Mark as Not Done"}</h2><small class="hint">${esc(a.title)}${a.date?" · "+esc(fmtS(a.date)):""}</small></div>
+  <div class="bd"><div class="grid">${done
+    ?`<label class="w">Remarks / Outcome (optional)<textarea name="remarks">${esc(a.remarks)}</textarea></label><label>Number of Attendees (optional)<input name="attendees" type="number" min="0" inputmode="numeric" value="${esc(a.attendees)}"></label>`
+    :`<label class="w">Reason Why It Was Not Done<textarea name="reason" required placeholder="For example, cancelled due to bad weather">${esc(a.reason)}</textarea></label>`}</div></div>
+  <div class="foot"><button type="button" id="cx">Back</button><button class="${done?"pri":"dg"}">${done?"Save as Done":"Save as Not Done"}</button></div></form>`;
+  $("#cx").onclick=()=>openAct(id);
+  $("#mk").onsubmit=e=>{e.preventDefault();const el=e.target.elements;
+    if(!done&&!el.reason.value.trim()){toast("Please enter the reason.");el.reason.focus();return}
+    saveAct(id,{status:to,reason:done?"":el.reason.value.trim(),remarks:done?el.remarks.value.trim():"",attendees:done?el.attendees.value.trim():""},done?"Marked as done.":"Marked as not done.")};
+  if(!$("#dlg").open)$("#dlg").showModal();
+}
+
+async function saveAct(id,d,msg){
+  busy("Saving…");
+  try{const b=writeBatch(db);b.update(doc(db,"activities",id),d);await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast(msg)}
+  catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not save. Check your connection and try again.")}
+}
+
+function openActForm(id){
+  const a=acts.find(x=>x.id===id)||{status:"Scheduled"};
+  $("#dlg").innerHTML=`<form id="af"><div class="dh"><h2>${id?"Edit Activity":"New Activity"}</h2></div>
+  <div class="bd"><div class="grid">
+  <label class="w">Activity Title<input name="title" required value="${esc(a.title)}" placeholder="For example, Altar Servers' Recollection"></label>
+  <label>Type<select name="type"><option value="">Not Set</option>${ATYPES.map(x=>`<option value="${esc(x)}"${a.type===x?" selected":""}>${esc(x)}</option>`).join("")}</select></label>
+  <label>Status<select name="status">${ASTAT.map(x=>`<option value="${x}"${a.status===x?" selected":""}>${x}</option>`).join("")}</select></label>
+  <label>Date<input name="date" type="date" required value="${esc(a.date)}"></label>
+  <label>Time<input name="time" type="time" value="${esc(a.time)}"></label>
+  <label class="w">Venue<input name="venue" value="${esc(a.venue)}"></label>
+  <label class="w">Description / Notes<textarea name="description">${esc(a.description)}</textarea></label>
+  <label class="w" id="lrs">Reason Why It Was Not Done<textarea name="reason">${esc(a.reason)}</textarea></label>
+  <label class="w" id="lrm">Remarks / Outcome<textarea name="remarks">${esc(a.remarks)}</textarea></label>
+  <label id="lat">Number of Attendees<input name="attendees" type="number" min="0" inputmode="numeric" value="${esc(a.attendees)}"></label>
+  </div></div>
+  <div class="foot">${id?`<button type="button" class="del" id="dl">${ic("trash",18)}Delete</button>`:""}<button type="button" id="cx">Cancel</button><button class="pri">Save Activity</button></div></form>`;
+  const f=$("#af"),el=f.elements;
+  const sync=()=>{const s=el.status.value;$("#lrs").hidden=s!=="Not Done";$("#lrm").hidden=s!=="Done";$("#lat").hidden=s!=="Done"};
+  el.status.onchange=sync;sync();
+  $("#cx").onclick=()=>id?openAct(id):$("#dlg").close();
+  if(id)$("#dl").onclick=async()=>{
+    const ok=await ask({icon:"trash",danger:1,title:`Delete This Activity?`,ok:"Delete Activity",
+      body:`<div class="cfn"><span class="av">${ic("cal",20)}</span><span><b>${esc(a.title)}</b><br><small>${esc([fmtS(a.date),a.status].filter(Boolean).join(" · "))}</small></span></div><p>This permanently removes the activity and its record. This cannot be undone.</p>`});
+    if(!ok)return;
+    busy("Deleting activity…");
+    try{await withTimeout(deleteDoc(doc(db,"activities",id)),20000);busyEnd();$("#dlg").close();toast("Activity deleted.")}
+    catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not delete. Check your connection and try again.")}};
+  f.onsubmit=async e=>{e.preventDefault();
+    const s=el.status.value;
+    const d={title:el.title.value.trim(),type:el.type.value,status:s,date:el.date.value,time:el.time.value,venue:el.venue.value.trim(),description:el.description.value.trim(),
+      reason:s==="Not Done"?el.reason.value.trim():"",remarks:s==="Done"?el.remarks.value.trim():"",attendees:s==="Done"?el.attendees.value.trim():""};
+    if(!d.title)return;
+    if(s==="Not Done"&&!d.reason){toast("Please enter the reason it was not done.");el.reason.focus();return}
+    busy(id?"Saving changes…":"Adding activity…");
+    try{const b=writeBatch(db);
+      b.set(id?doc(db,"activities",id):doc(collection(db,"activities")),d);
+      await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast(id?"Changes saved.":"Activity added.")}
+    catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not save. Check your connection and try again.")}};
+  if(!$("#dlg").open)$("#dlg").showModal();
+}
+
+/* Pop-up reminder: shown once after sign-in when an activity is near or still needs a Done / Not Done update. */
+function notify(){
+  if(notified||actErr)return;notified=true;
+  const o=acts.filter(a=>a.status==="Scheduled"&&a.date);
+  const soon=o.filter(a=>{const k=dd(a.date);return k>=0&&k<=NOTIFY_DAYS}).sort(ASC),old=o.filter(late).sort(ASC);
+  if(!soon.length&&!old.length)return;
+  const row=a=>{const k=dd(a.date);return `<button class="li" data-aid="${a.id}">${dblk(a.date)}<span class="lt"><b>${esc(a.title)}</b><small>${asub(a)}</small></span><span class="pill ${k<0?"r":k===0?"y":"n"}">${k<0?"Needs Update":whenA(k)}</span></button>`};
+  const d=$("#nt");
+  d.innerHTML=`<div class="cfb"><span class="cfi y">${ic("bell",26)}</span><h2>Activity Reminder</h2>
+  <div class="cft"><p>${soon.length?`Happening within the next ${NOTIFY_DAYS} days.`:"These past activities still need a Done or Not Done update."}</p></div>
+  <div class="nl bl">${soon.map(row).join("")}${soon.length&&old.length?'<div class="sh2">Needs update</div>':""}${soon.length&&old.length||!soon.length?old.map(row).join(""):""}</div>
+  <div class="cfa"><button type="button" id="nx">Dismiss</button><button type="button" class="pri" id="ng">View Activities</button></div></div>`;
+  $("#nx").onclick=()=>d.close();
+  $("#ng").onclick=()=>{d.close();go("acts")};
+  d.querySelector(".nl").onclick=e=>{const b=e.target.closest("[data-aid]");if(b){d.close();openAct(b.dataset.aid)}};
+  if(!d.open)d.showModal();
+}
+
+/* Activities export: Activity Review PDF (for pre-planning) and CSV */
+function openActExport(){
+  const cy=String(new Date().getFullYear());
+  const yrs=[...new Set([cy,...acts.map(a=>(a.date||"").slice(0,4)).filter(Boolean)])].sort().reverse();
+  $("#dlg").innerHTML=`<form id="xa"><div class="dh"><h2>Export Activities</h2><small class="hint">The Activity Review PDF is made for pre-planning meetings. The CSV opens in Excel or Google Sheets.</small></div>
+  <div class="bd"><div class="grid">
+  <label class="w">What do you want to export?<select name="type"><option value="pdf">Activity Review (PDF)</option><option value="csv">All Activity Details (CSV)</option></select></label>
+  <label>Year<select name="yr">${yrs.map(y=>`<option value="${y}"${y===cy?" selected":""}>${y}</option>`).join("")}<option value="all">All Years</option></select></label>
+  <label>Status<select name="s"><option value="">All Statuses</option>${ASTAT.map(x=>`<option value="${x}">${x}</option>`).join("")}</select></label>
+  <label class="w a">Prepared by<input name="by" placeholder="Your name and position (optional)"></label></div></div>
+  <div class="foot"><button type="button" id="cx">Cancel</button><button class="pri">${ic("down",18)}Export</button></div></form>`;
+  const f=$("#xa"),e=f.elements;
+  e.type.onchange=()=>f.querySelectorAll(".a").forEach(x=>x.hidden=e.type.value!=="pdf");
+  $("#cx").onclick=()=>$("#dlg").close();
+  f.onsubmit=ev=>{ev.preventDefault();
+    const l=acts.filter(a=>(e.yr.value==="all"||(a.date||"").slice(0,4)===e.yr.value)&&(!e.s.value||a.status===e.s.value)).sort(ASC);
+    if(!l.length){alert("No activities match these filters.");return}
+    $("#dlg").close();
+    e.type.value==="csv"?exportActCsv(l,e.yr.value):printActReview(l,e.yr.value,e.by.value.trim())};
+  $("#dlg").showModal();
+}
+
+function exportActCsv(l,yr){
+  const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;
+  const H=["Date","Time","Activity","Type","Venue","Description / Notes","Status","Reason Not Done","Remarks / Outcome","Attendees"];
+  const rows=[H.map(q).join(",")].concat(l.map(a=>[a.date,fmtT(a.time),a.title,a.type,a.venue,a.description,late(a)?"Scheduled (Needs Update)":a.status,a.reason,a.remarks,a.attendees].map(q).join(",")));
+  const k=document.createElement("a");
+  k.href=URL.createObjectURL(new Blob(["﻿"+rows.join("\r\n")],{type:"text/csv"}));
+  k.download="activities-"+(yr==="all"?"all-years":yr)+".csv";k.click();
+}
+
+function printActReview(l,yr,by){
+  const lab=yr==="all"?"All Years":yr;
+  const n=s=>l.filter(a=>a.status===s).length,nD=n("Done"),nN=n("Not Done"),nS=n("Scheduled"),nL=l.filter(late).length;
+  const rate=nD+nN?Math.round(nD/(nD+nN)*100):0;
+  const att=l.filter(a=>a.status==="Done"&&+a.attendees>0),attT=att.reduce((s,a)=>s+ +a.attendees,0);
+  const tbl=(head,rows,nums=[])=>`<table class="pdt rt"><thead><tr>${head.map((h,i)=>`<th${nums.includes(i)?' class="num"':""}>${h}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table>`;
+  const tr=(cells,nums=[],cls="")=>`<tr${cls?` class="${cls}"`:""}>${cells.map((v,i)=>`<td${nums.includes(i)?' class="num"':""}>${v}</td>`).join("")}</tr>`;
+  const cnt=(g,s)=>g.filter(a=>a.status===s).length;
+  const grp=(keys,pick)=>keys.map(k=>{const g=l.filter(a=>pick(a)===k);return{k,g}});
+  const N4=[1,2,3,4];
+  const total=tr(["Total",l.length,nD,nN,nS],N4,"tot");
+  const types=[...new Set(l.map(a=>a.type||"Not Set"))].sort();
+  const tRows=grp(types,a=>a.type||"Not Set").map(({k,g})=>tr([esc(k),g.length,cnt(g,"Done"),cnt(g,"Not Done"),cnt(g,"Scheduled")],N4)).join("")+total;
+  const months=[...new Set(l.filter(a=>a.date).map(a=>a.date.slice(0,7)))].sort();
+  const mRows=grp(months,a=>(a.date||"").slice(0,7)).map(({k,g})=>tr([new Date(k+"-01T00:00:00").toLocaleDateString("en",{month:"long",year:"numeric"}),g.length,cnt(g,"Done"),cnt(g,"Not Done"),cnt(g,"Scheduled")],N4)).join("")+total;
+  const res=a=>a.status==="Done"?a.remarks:a.status==="Not Done"?(a.reason?"Reason: "+a.reason:""):"";
+  const lRows=l.map(a=>tr([fmtS(a.date)+(a.time?`<br><small>${esc(fmtT(a.time))}</small>`:""),esc(a.title)+(a.type?`<br><small>${esc(a.type)}</small>`:""),esc(a.venue),late(a)?"Awaiting update":esc(a.status),esc(res(a)),a.status==="Done"&&a.attendees?esc(a.attendees):""],[5])).join("");
+  const nds=l.filter(a=>a.status==="Not Done"),lts=l.filter(late);
+  const html=`<div class="rp">${phead("Ministry Activities Review")}
+  <p class="pm">Period: <b>${esc(lab)}</b> · Generated ${fmtL(today)}</p>
+  <p>For pre-planning review. <b>${l.length}</b> activit${l.length===1?"y":"ies"} on record: <b>${nD}</b> done, <b>${nN}</b> not done, and <b>${nS}</b> still scheduled${nL?` (${nL} past the date and awaiting an update)`:""}.${nD+nN?` Of the activities already finished, <b>${rate}%</b> were carried out.`:""}${attT?` Total recorded attendance for done activities: <b>${attT}</b> across ${att.length} activit${att.length===1?"y":"ies"} (average ${Math.round(attT/att.length)}).`:""}</p>
+  <div class="kp"><div><b>${l.length}</b><span>Total</span></div><div><b>${nD}</b><span>Done</span></div><div><b>${nN}</b><span>Not Done</span></div><div><b>${nS}</b><span>Scheduled</span></div></div>
+  <h3>By Type</h3>${tbl(["Type","Total","Done","Not Done","Scheduled"],tRows,N4)}
+  <h3>By Month</h3>${tbl(["Month","Total","Done","Not Done","Scheduled"],mRows,N4)}
+  <h3>Full Activity List</h3>${tbl(["Date","Activity","Venue","Status","Remarks / Reason","Attendees"],lRows,[5])}
+  <h3>Items for Planning Review</h3>
+  ${nds.length?`<p>Activities that were not carried out:</p><ul>${nds.map(a=>`<li><b>${esc(a.title)}</b> (${esc(fmtS(a.date))}): ${esc(a.reason||"No reason recorded")}</li>`).join("")}</ul>`:"<p>No activities were marked as not done.</p>"}
+  ${lts.length?`<p>Past activities with no Done or Not Done record yet:</p><ul>${lts.map(a=>`<li><b>${esc(a.title)}</b> (${esc(fmtS(a.date))})</li>`).join("")}</ul>`:""}
+  <h3>Notes for Pre-Planning</h3><div style="border:1px solid #888;height:38mm;border-radius:4px"></div>
+  <div class="sgn"><div>Prepared by:<br><b>${esc(by)||"&nbsp;"}</b></div><div>Reviewed by:<br><b>&nbsp;</b></div></div>
+  <p class="rnote">Confidential. This review contains no contact details of members or families.</p></div>`;
+  printDoc(html,0);
+}
+
 function openExport(){
   const opts=(a,all,lb=x=>x)=>`<option value="">${all}</option>`+a.map(x=>`<option value="${esc(x)}">${esc(lb(x))}</option>`).join("");
   $("#dlg").innerHTML=`<form id="xf"><div class="dh"><h2>Export</h2></div><div class="bd"><div class="grid">
@@ -730,11 +965,13 @@ function openExport(){
 }
 
 function openReport(){
-  $("#dlg").innerHTML=`<form id="rf"><div class="dh"><h2>Ministry Report</h2><small class="hint">A summary of the whole ministry for the parish priest. It names only officers and award recipients, and has no contact details.</small></div>
-  <div class="bd"><div class="grid"><label class="w">Prepared for<input name="to" value="Parish Priest"></label><label class="w">Prepared by<input name="by" placeholder="Your name and position (optional)"></label></div></div>
+  const yrs=[...new Set([String(new Date().getFullYear()),...acts.map(a=>(a.date||"").slice(0,4)).filter(Boolean)])].sort().reverse();
+  $("#dlg").innerHTML=`<form id="rf"><div class="dh"><h2>Ministry Report</h2><small class="hint">A summary of the whole ministry for the parish priest, including its activities. It names only officers and award recipients, and has no contact details.</small></div>
+  <div class="bd"><div class="grid"><label class="w">Prepared for<input name="to" value="Parish Priest"></label><label class="w">Prepared by<input name="by" placeholder="Your name and position (optional)"></label>
+  <label class="w">Activities Covered<select name="yr">${yrs.map(y=>`<option value="${y}">${y}</option>`).join("")}<option value="all">All Years</option></select></label></div></div>
   <div class="foot"><button type="button" id="cx">Cancel</button><button class="pri">${ic("print",18)}Create PDF</button></div></form>`;
   $("#cx").onclick=()=>$("#dlg").close();
-  $("#rf").onsubmit=e=>{e.preventDefault();const f=e.target.elements;$("#dlg").close();printReport(f.to.value.trim(),f.by.value.trim())};
+  $("#rf").onsubmit=e=>{e.preventDefault();const f=e.target.elements;$("#dlg").close();printReport(f.to.value.trim(),f.by.value.trim(),f.yr.value)};
   $("#dlg").showModal();
 }
 
@@ -775,7 +1012,7 @@ function printProfile(m){
   <p class="pm" style="margin-top:10px;color:#777">Printed ${fmtL(today)}</p>`,0);
 }
 
-function printReport(to,by){
+function printReport(to,by,yr){
   const tot=members.length,cnt=s=>members.filter(m=>m.status===s).length,A=cnt("Active"),I=cnt("Inactive"),O=tot-A-I;
   const P=n=>tot?Math.round(n/tot*100):0;
   const extra=[...new Set(members.map(m=>m.status).filter(s=>s&&!STATUS.includes(s)))];
@@ -793,6 +1030,18 @@ function printReport(to,by){
   const th=h=>`<th${/^\d|Total|Active|Inactive|Other|Members|Share/.test(h)?' class="num"':""}>${h}</th>`;
   const tb=(head,body,foot="")=>`<table class="pdt rt"><thead><tr>${head.map(th).join("")}</tr></thead><tbody>${body}${foot}</tbody></table>`;
   const tr=cells=>`<tr>${cells.map(([v,c])=>`<td${c?` class="${c}"`:""}>${v}</td>`).join("")}</tr>`;
+
+  /* ministry activities */
+  const AY=yr==="all"||!yr?acts:acts.filter(a=>(a.date||"").slice(0,4)===yr);
+  const aD=AY.filter(a=>a.status==="Done").length,aN=AY.filter(a=>a.status==="Not Done").length,aS=AY.filter(a=>a.status==="Scheduled").length,aL=AY.filter(late).length;
+  const aRate=aD+aN?Math.round(aD/(aD+aN)*100):0;
+  const aRes=a=>a.status==="Done"?[a.remarks,a.attendees&&"Attendees: "+a.attendees].filter(Boolean).join(" · "):a.status==="Not Done"?(a.reason?"Reason: "+a.reason:""):"";
+  const aRows=[...AY].sort(ASC).map(a=>tr([[fmtS(a.date)],[esc(a.title)+(a.type?`<br><small>${esc(a.type)}</small>`:"")],[esc(a.venue)],[late(a)?"Awaiting update":esc(a.status)],[esc(aRes(a))]])).join("");
+  const aHtml=AY.length
+    ?`<p><b>${AY.length}</b> activit${AY.length===1?"y is":"ies are"} on record: <b>${aD}</b> done, <b>${aN}</b> not done, and <b>${aS}</b> still scheduled${aL?` (${aL} past the date and awaiting an update)`:""}.${aD+aN?` Of the activities already finished, <b>${aRate}%</b> were carried out.`:""}</p>`
+      +tb(["Date","Activity","Venue","Status","Remarks / Reason"],aRows)
+    :"<p>No activities have been recorded for this period.</p>";
+
   const html=`<div class="rp">${phead("Ministry Status Report")}
   <p class="pm">As of <b>${fmtL(today)}</b> · Prepared for: <b>${esc(to||"Parish Priest")}</b></p>
   <p>As of ${fmtL(today)}, the Ministry of Altar Servers has <b>${tot}</b> member${tot===1?"":"s"}. <b>${A}</b> ${A===1?"is":"are"} currently active (${P(A)}%) and <b>${I}</b> ${I===1?"is":"are"} inactive${O?`, while <b>${O}</b> ${O===1?"has":"have"} another status`:""}.</p>
@@ -803,12 +1052,14 @@ function printReport(to,by){
   ${tb(["Status","Members","Share",""],stRows.map(([s,k])=>tr([[esc(s)],[k,"num"],[P(k)+"%","num"],[`<span class="rbar" style="width:${Math.max(P(k),2)}%"></span>`]])).join(""))}
   <h3>Officers and Leaders</h3>
   ${tb(["Role","Name"],oRows.map(([r,n])=>tr([[esc(r)],[n==="Vacant"?"<i>Vacant</i>":esc(n)]])).join(""))}
+  <h3>Ministry Activities (${yr==="all"||!yr?"All Years":esc(yr)})</h3>
+  ${aHtml}
   <h3>Formation and Sacraments</h3>
   <p>Among the <b>${act.length}</b> active member${act.length===1?"":"s"}: <b>${cf}</b> ha${cf===1?"s":"ve"} received the Sacrament of Confirmation, <b>${nc}</b> ${nc===1?"has":"have"} not yet, and <b>${nr}</b> ${nr===1?"has":"have"} no record.</p>
   <h3>Awards and Recognition</h3>
   ${aw.length?tb(["Member","Award","Date Given"],aw.map(r=>tr([[esc(r[0])],[esc(r[1])],[fmtS(r[2])]])).join("")):"<p>No awards have been recorded yet.</p>"}
   <h3>Points for Attention</h3>
-  <ul>${flag.map(([k,t])=>`<li><b>${k}</b> member${k===1?" is":"s are"} ${t}.</li>`).join("")}<li>Records of active members are <b>${pct}%</b> complete.</li></ul>
+  <ul>${flag.map(([k,t])=>`<li><b>${k}</b> member${k===1?" is":"s are"} ${t}.</li>`).join("")}${aL?`<li><b>${aL}</b> past ${aL===1?"activity has":"activities have"} no Done or Not Done update yet.</li>`:""}${aN?`<li><b>${aN}</b> ${aN===1?"activity was":"activities were"} not carried out. See the reasons above.</li>`:""}<li>Records of active members are <b>${pct}%</b> complete.</li></ul>
   <div class="sgn"><div>Prepared by:<br><b>${esc(by)||"&nbsp;"}</b></div><div>Received by:<br><b>${esc(to)||"&nbsp;"}</b></div></div>
   <p class="rnote">Confidential. This report contains no contact details of members or families.</p></div>`;
   printDoc(html,0);
