@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
 <title>Ministry of Altar Servers</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600&family=Nunito:wght@400;600;700&display=swap">
 <style>
@@ -228,6 +230,8 @@ dialog form,.fm{display:flex;flex-direction:column;max-height:92vh}
 .pw input{padding-right:3rem}
 .pw button{position:absolute;right:2px;top:2px;min-height:40px;width:40px;padding:0;border:0;background:none;color:var(--mut)}
 .err{color:var(--red);min-height:1.5em;margin:.75rem 0 0!important;font-size:.9rem}
+.nt2{background:var(--goldt);color:#8a6a1f!important;border-radius:12px;padding:.6rem .8rem;margin:.9rem 0 0!important;font-size:.88rem}
+.login .hint{text-align:center;margin-top:.8rem}
 #pr{display:none;font-family:Nunito,Arial,sans-serif;color:#222}
 .ph{display:flex;align-items:center;gap:12px;border-bottom:2px solid #d4b277;padding-bottom:8px}
 .ph img{height:56px}
@@ -302,11 +306,12 @@ tr{break-inside:avoid}
 <body><div id="app"></div><div id="pr"></div><style id="pg"></style>
 <dialog id="cf" class="cf"></dialog>
 <dialog id="nt" class="cf" aria-label="Activity reminder"></dialog>
+<dialog id="wd" class="cf" aria-label="Session timeout warning"></dialog>
 <dialog id="ld" class="ld" aria-labelledby="ldm"><span class="spin" aria-hidden="true"></span><p id="ldm">Saving…</p></dialog>
 <div id="ts" class="ts" role="status" aria-live="polite"></div>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserSessionPersistence,reauthenticateWithCredential,EmailAuthProvider,sendPasswordResetEmail}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import{getFirestore,collection,onSnapshot,doc,deleteDoc,writeBatch}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const cfg={apiKey:"AIzaSyDqtjhvtmAea9S9TKf94CIdd5BpbdpiZeA",authDomain:"moas-system.firebaseapp.com",projectId:"moas-system",appId:"1:302631045782:web:89769532d1cd1f4c0810b7"};
@@ -504,24 +509,111 @@ function ask(o){return new Promise(res=>{
 })}
 
 const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
-onAuthStateChanged(auth,u=>{if(unsub){unsub();unsub=null}u?showApp():showLogin()});
+/* ---------- Security: session-only login, idle timeout, re-authentication ---------- */
+const IDLE_MS=10*60e3,WARN_MS=60e3,MAX_MS=8*60*60e3,REAUTH_MS=5*60e3,MAXTRY=5,LOCK_MS=5*60e3;
+const ss={get:k=>{try{return sessionStorage.getItem(k)}catch{return null}},set:(k,v)=>{try{sessionStorage.setItem(k,String(v))}catch{}},del:k=>{try{sessionStorage.removeItem(k)}catch{}}};
+/* The login lives in this tab only. Closing the tab or browser signs the user out. */
+const ready=setPersistence(auth,browserSessionPersistence).catch(()=>{});
+let tick=null,lastAct=Date.now(),T0=0,reAt=0,warnOn=false,locking=false,fresh=false;
+const ACT=["pointerdown","keydown","touchstart","wheel","scroll"];
+function touch(){if(warnOn)return;const n=Date.now();if(n-lastAct>1500){lastAct=n;ss.set("moas_la",n)}}
+function closeAll(){document.querySelectorAll("dialog").forEach(d=>{if(d.open)d.close()})}
+function watch(){
+  stopWatch();
+  T0=+ss.get("moas_t0")||Date.now();ss.set("moas_t0",T0);
+  lastAct=+ss.get("moas_la")||Date.now();
+  ACT.forEach(e=>addEventListener(e,touch,{passive:true,capture:true}));
+  document.addEventListener("visibilitychange",check);
+  tick=setInterval(check,1000);check();
+}
+function stopWatch(){clearInterval(tick);tick=null;ACT.forEach(e=>removeEventListener(e,touch,true));document.removeEventListener("visibilitychange",check);hideWarn()}
+function check(){
+  const n=Date.now(),idle=n-lastAct;
+  if(n-T0>=MAX_MS)return lock("For your security, your session expired. Please sign in again.");
+  if(idle>=IDLE_MS+WARN_MS)return lock("You were signed out after 10 minutes of inactivity.");
+  idle>=IDLE_MS?showWarn(Math.ceil((IDLE_MS+WARN_MS-idle)/1000)):hideWarn();
+}
+function showWarn(s){
+  const d=$("#wd");
+  if(!warnOn){warnOn=true;
+    d.innerHTML=`<div class="cfb"><span class="cfi y">${ic("clock",26)}</span><h2>Still There?</h2><div class="cft"><p>For your security, you will be signed out in <b id="wc"></b> seconds.</p></div><div class="cfa"><button type="button" id="wo">Sign Out</button><button type="button" class="pri" id="wk">Stay Signed In</button></div></div>`;
+    $("#wo").onclick=()=>lock("You have been signed out.");
+    $("#wk").onclick=()=>{lastAct=Date.now();ss.set("moas_la",lastAct);hideWarn()};
+    d.oncancel=e=>e.preventDefault();
+    d.showModal();
+  }
+  $("#wc").textContent=s;
+}
+function hideWarn(){warnOn=false;const d=$("#wd");if(d&&d.open)d.close()}
+async function lock(msg){
+  if(locking)return;locking=true;
+  stopWatch();closeAll();ss.set("moas_msg",msg);
+  try{await signOut(auth)}catch{}
+  locking=false;
+}
+/* Ask for the password again before sensitive actions (valid for 5 minutes). */
+function reauth(){
+  if(!auth.currentUser)return Promise.resolve(false);
+  if(Date.now()-reAt<REAUTH_MS)return Promise.resolve(true);
+  return new Promise(res=>{
+    const d=$("#cf");
+    d.innerHTML=`<form class="cfb" id="raf"><span class="cfi p">${ic("lock",26)}</span><h2>Confirm It's You</h2><div class="cft"><p>Enter your password to continue with this sensitive action.</p></div>
+    <label style="display:block;margin-top:.8rem"><input id="rap" type="password" required autocomplete="current-password" placeholder="Password"></label><p class="err" id="rae" role="alert" style="margin:.5rem 0 0!important"></p>
+    <div class="cfa"><button type="button" id="rac">Cancel</button><button class="pri" id="rak">Confirm</button></div></form>`;
+    let done=false;const fin=v=>{if(done)return;done=true;d.close();res(v)};
+    d.oncancel=()=>{done=true;res(false)};
+    $("#rac").onclick=()=>fin(false);
+    $("#raf").onsubmit=async e=>{e.preventDefault();const b=$("#rak");b.disabled=true;$("#rae").textContent="";
+      try{await withTimeout(reauthenticateWithCredential(auth.currentUser,EmailAuthProvider.credential(auth.currentUser.email,$("#rap").value)),20000);reAt=Date.now();fin(true)}
+      catch(x){$("#rae").textContent=x.message==="timeout"?"No connection. Please try again.":x.code==="auth/too-many-requests"?"Too many attempts. Please wait a few minutes.":"Wrong password. Please try again.";b.disabled=false;$("#rap").select()}};
+    d.showModal();$("#rap").focus();
+  });
+}
+
+onAuthStateChanged(auth,u=>{
+  if(unsub){unsub();unsub=null}
+  /* A login left over from the old "stay signed in" storage is not trusted. Require a fresh sign-in. */
+  if(u&&!fresh&&!ss.get("moas_t0")){signOut(auth);return}
+  if(u){showApp();watch()}
+  else{stopWatch();["moas_t0","moas_la"].forEach(ss.del);reAt=0;fresh=false;showLogin()}
+});
 addEventListener("popstate",()=>{if(view==="profile")go("members")});
 
 const ERR={"auth/invalid-credential":"Wrong email or password. Check both and try again.","auth/invalid-email":"Please enter a valid email address.","auth/user-disabled":"This account has been disabled.","auth/too-many-requests":"Too many attempts. Please wait a few minutes and try again.","auth/network-request-failed":"No internet connection. Check your connection and try again.","auth/unauthorized-domain":"This website address is not authorized in Firebase. Add it under Authentication > Settings > Authorized domains.","auth/operation-not-allowed":"Email/password sign-in is turned off in Firebase. Turn it on under Authentication > Sign-in method."};
 ERR["auth/wrong-password"]=ERR["auth/user-not-found"]=ERR["auth/invalid-credential"];
 
 function showLogin(){
-  acts=[];actErr=false;notified=false;
-  if($("#nt").open)$("#nt").close();
+  /* Wipe everything held in memory so nothing is left behind after sign-out. */
+  members=[];acts=[];actErr=false;notified=false;pid=null;view="dash";bdFull="";
+  $("#pr").innerHTML="";closeAll();
+  const msg=ss.get("moas_msg")||"";ss.del("moas_msg");
   $("#app").innerHTML=`<div class="top"><div class="in">${brand}</div></div>
   <div class="lw"><form class="login" id="lf"><span class="ic p">${ic("lock")}</span><h2>Admin Sign In</h2><p>Sign in to view and update member records.</p>
   <label>Email<input id="em" type="email" required autocomplete="username" inputmode="email"></label>
   <label>Password<span class="pw"><input id="pw" type="password" required autocomplete="current-password"><button type="button" id="tg" aria-label="Show or hide password">${ic("eye",18)}</button></span></label>
-  <p class="err" id="err" role="alert"></p><button class="pri" id="sb">Sign In</button></form></div>`;
+  ${msg?`<p class="nt2" role="status">${esc(msg)}</p>`:""}
+  <p class="err" id="err" role="alert"></p><button class="pri" id="sb">Sign In</button>
+  <button type="button" class="gh" id="fp" style="margin:.5rem auto 0;display:flex">Forgot password?</button>
+  <small class="hint">Using a shared computer? Always sign out when you are done.</small></form></div>`;
   $("#tg").onclick=()=>{const p=$("#pw");p.type=p.type==="password"?"text":"password"};
-  $("#lf").onsubmit=async e=>{e.preventDefault();const b=$("#sb");b.disabled=true;b.textContent="Signing In…";$("#err").textContent="";
-    try{await signInWithEmailAndPassword(auth,$("#em").value.trim(),$("#pw").value)}
-    catch(x){$("#err").textContent=ERR[x.code]||`Could not sign in (${x.code||"unknown error"}). Please try again.`;b.disabled=false;b.textContent="Sign In"}};
+  $("#fp").onclick=async()=>{const em=$("#em").value.trim(),er=$("#err");er.style.color="";
+    if(!em){er.textContent="Enter your email above first, then select Forgot password.";$("#em").focus();return}
+    try{await withTimeout(sendPasswordResetEmail(auth,em),20000)}
+    catch(x){if(x.code==="auth/network-request-failed"||x.message==="timeout"){er.textContent=ERR["auth/network-request-failed"];return}}
+    er.style.color="var(--grn)";er.textContent="If an account exists for that email, a password reset link has been sent."};
+  $("#lf").onsubmit=async e=>{e.preventDefault();const b=$("#sb"),er=$("#err");er.style.color="";er.textContent="";
+    const wait=(+ss.get("moas_u")||0)-Date.now();
+    if(wait>0){er.textContent=`Too many failed attempts. Please try again in ${Math.ceil(wait/6e4)} minute${wait>6e4?"s":""}.`;return}
+    b.disabled=true;b.textContent="Signing In…";
+    try{await ready;fresh=true;ss.set("moas_t0",Date.now());ss.del("moas_la");
+      await signInWithEmailAndPassword(auth,$("#em").value.trim(),$("#pw").value);ss.del("moas_f")}
+    catch(x){fresh=false;ss.del("moas_t0");
+      const n=(+ss.get("moas_f")||0)+1;
+      if(["auth/invalid-credential","auth/wrong-password","auth/user-not-found"].includes(x.code)){
+        if(n>=MAXTRY){ss.set("moas_u",Date.now()+LOCK_MS);ss.del("moas_f");er.textContent="Too many failed attempts. Please try again in 5 minutes."}
+        else{ss.set("moas_f",n);er.textContent=ERR[x.code]}}
+      else er.textContent=ERR[x.code]||`Could not sign in (${x.code||"unknown error"}). Please try again.`;
+      b.disabled=false;b.textContent="Sign In"}};
 }
 
 function showApp(){
@@ -730,7 +822,7 @@ function openForm(id){
       body:`<div class="cfn"><span class="av">${ini(m)}</span><span><b>${esc(full(m))}</b><br><small>${esc(sub)}</small></span></div>
       <p>This permanently removes the member and all of their records, including awards. This cannot be undone.</p>
       <p class="cfh">If this member has left the ministry, consider changing their status instead, such as Transferred or Graduated.</p>`});
-    if(!ok)return;
+    if(!ok||!await reauth())return;
     busy("Deleting member…");
     try{await withTimeout(deleteDoc(doc(db,"members",id)),20000);busyEnd();$("#dlg").close();toast("Member deleted.");if(view==="profile")go("members")}
     catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not delete. Check your connection and try again.")}};
@@ -842,7 +934,7 @@ function openActForm(id){
   if(id)$("#dl").onclick=async()=>{
     const ok=await ask({icon:"trash",danger:1,title:`Delete This Activity?`,ok:"Delete Activity",
       body:`<div class="cfn"><span class="av">${ic("cal",20)}</span><span><b>${esc(a.title)}</b><br><small>${esc([fmtS(a.date),a.status].filter(Boolean).join(" · "))}</small></span></div><p>This permanently removes the activity and its record. This cannot be undone.</p>`});
-    if(!ok)return;
+    if(!ok||!await reauth())return;
     busy("Deleting activity…");
     try{await withTimeout(deleteDoc(doc(db,"activities",id)),20000);busyEnd();$("#dlg").close();toast("Activity deleted.")}
     catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not delete. Check your connection and try again.")}};
@@ -956,9 +1048,11 @@ function openExport(){
   const sync=()=>{const att=e.type.value==="att";f.querySelectorAll(".a").forEach(x=>x.hidden=!att);e.s.value=att?"Active":""};
   e.type.onchange=sync;sync();
   $("#cx").onclick=()=>$("#dlg").close();
-  f.onsubmit=ev=>{ev.preventDefault();
+  f.onsubmit=async ev=>{ev.preventDefault();
     const a=members.filter(m=>(!e.g.value||m.group===e.g.value)&&(!e.s.value||m.status===e.s.value)).sort((x,y)=>nm(x).localeCompare(nm(y)));
     if(!a.length){alert("No members match these filters.");return}
+    /* Full member details include addresses and contacts, so ask for the password first. */
+    if(e.type.value!=="att"&&!await reauth())return;
     $("#dlg").close();
     e.type.value==="csv"?exportCsv(a):e.type.value==="pdf"?printDetails(a):printAtt(a,e.title.value.trim(),e.date.value)};
   $("#dlg").showModal();
