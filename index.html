@@ -331,6 +331,8 @@ const CONF=["Confirmed","Not Yet Confirmed"];
 const SCHOOL=["Grade 4","Grade 5","Grade 6","Grade 7","Grade 8","Grade 9","Grade 10","Grade 11","Grade 12","Bachelor's - Year 1","Bachelor's - Year 2","Bachelor's - Year 3","Bachelor's - Year 4","Bachelor's - Year 5","Graduate (Bachelor's)","Masteral","Doctorate"];
 const AW=[{k:"dominic",n:"Saint Dominic Savio Award",c:"m1",d:"Exemplary performance, the epitome of an altar server"},{k:"berchmans",n:"Saint John Berchmans Award",c:"m2",d:"More than a decade of faithful dedication and service"}];
 const F=[["lastName","Last Name"],["firstName","First Name"],["middleName","Middle Name"],["status","Status",STATUS],["role","Role",ROLES],["group","Group",GROUPS],["start","Start of Service","date"],["end","End of Service","date"],["birthday","Birthday","date"],["gender","Gender",["Female","Male"]],["confirmation","Sacrament of Confirmation",CONF],["contact","Contact Number"],["messenger","Messenger"],["address","Home Address","w"],["guardian","Parent/Guardian Name"],["guardianContact","Parent/Guardian Contact"],["schoolLevel","School Level",SCHOOL],["schoolName","School Name"],["dominic","Saint Dominic Savio Award (Date Given)","date"],["berchmans","Saint John Berchmans Award (Date Given)","date"]];
+/* Contact numbers must be 11 digits starting with 09 (example: 09171234567). Empty is allowed. */
+const PH=["contact","guardianContact"];
 const SEC={lastName:"Name",status:"Service",birthday:"Personal",contact:"Contact",guardian:"Parent or Guardian",schoolLevel:"School",dominic:"Awards · Leave the date blank if not received"};
 
 /* Ministry activities. Edit the type list or the reminder window here. */
@@ -808,6 +810,7 @@ function openForm(id){
     if(Array.isArray(t)){const o=m[k]&&!t.includes(m[k])?[...t,m[k]]:t,lb=k==="status"?sl:x=>x;
       inp=`<select name="${k}"><option value="">Not Set</option>${o.map(x=>`<option value="${esc(x)}"${m[k]===x?" selected":""}>${esc(lb(x))}</option>`).join("")}</select>`
         +(k==="status"?`<small class="hint" id="sth">${esc(SD[m.status]||"")}</small>`:"")}
+    else if(PH.includes(k))inp=`<input name="${k}" type="tel" inputmode="numeric" maxlength="11" pattern="09[0-9]{9}" placeholder="09XXXXXXXXX" title="11 digits starting with 09, like 09171234567" value="${esc(m[k])}">`;
     else inp=`<input name="${k}" type="${t==="date"?"date":"text"}" value="${esc(m[k])}"${k==="lastName"||k==="firstName"?" required":""}>`;
     return (SEC[k]?`<div class="sh">${SEC[k]}</div>`:"")+`<label class="${t==="w"?"w":""}">${l}${inp}</label>`};
   $("#dlg").innerHTML=`<form id="mf"><div class="dh"><h2>${id?"Edit Member":"New Member"}</h2></div>
@@ -815,6 +818,9 @@ function openForm(id){
   <div class="foot">${id?`<button type="button" class="del" id="dl">${ic("trash",18)}Delete</button>`:""}
   <button type="button" id="cx">Cancel</button><button class="pri">Save Member</button></div></form>`;
   $("#mf").elements.status.onchange=e=>{$("#sth").textContent=SD[e.target.value]||""};
+  PH.forEach(k=>{const i=$("#mf").elements[k];
+    const chk=()=>{i.value=i.value.replace(/\D/g,"").slice(0,11);i.setCustomValidity(i.value&&!/^09\d{9}$/.test(i.value)?"Enter 11 digits starting with 09, like 09171234567.":"")};
+    i.addEventListener("input",chk);chk()});
   $("#cx").onclick=()=>$("#dlg").close();
   if(id)$("#dl").onclick=async()=>{
     const sub=[m.role,m.group&&"Group "+m.group,m.status&&sl(m.status)].filter(Boolean).join(" · ")||"Member record";
