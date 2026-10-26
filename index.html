@@ -185,7 +185,14 @@ nav button.on{color:var(--pur);box-shadow:inset 0 3px var(--gold)}
 dialog{border:0;border-radius:20px;padding:0;width:min(660px,96vw);max-height:92vh;overflow:hidden}
 dialog::backdrop{background:#2a1f4599}
 dialog form,.fm{display:flex;flex-direction:column;max-height:92vh}
-.dh{padding:1.1rem 1.25rem .6rem;border-bottom:2px solid var(--gold)}
+.dh{padding:1.1rem 3.6rem .6rem 1.25rem;border-bottom:2px solid var(--gold)}
+.x{position:absolute;top:.65rem;right:.65rem;z-index:3;width:38px;height:38px;min-height:38px;padding:0;border:0;border-radius:50%;background:var(--purt);color:var(--pd)}
+.x:hover{background:var(--goldt);border-color:transparent}
+.ip{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin:.6rem 0 .8rem}
+.ip div{border:1px solid var(--line);border-radius:14px;padding:.6rem .3rem;text-align:center}
+.ip b{display:block;font:600 1.6rem/1.1 Lora,Georgia,serif}
+.ip span{font-size:.76rem;color:var(--mut)}
+.imp{margin-top:.45rem;font-size:.78rem;min-height:30px}
 .dh h2{font-size:1.6rem;overflow-wrap:anywhere}
 .bd{padding:1rem 1.25rem;overflow:auto;flex:1}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
@@ -289,7 +296,7 @@ tr{break-inside:avoid}
  .top button span,.ib span{display:none}
  .rb{margin-top:-.7rem}.rb i{width:22px;height:46px;padding-top:7px}
  main{padding:.75rem .75rem 1rem}
- .ph2{margin-bottom:.6rem;gap:.4rem}.ptl h2{font-size:1.55rem}.ptl p{font-size:.85rem}
+ .ph2{margin-bottom:.6rem;gap:.4rem;flex-wrap:nowrap;align-items:flex-start}.ph2 .ptl{flex:1;min-width:0}.ptl h2{font-size:1.55rem}.ptl p{font-size:.85rem}
  .wel{padding:.85rem .9rem;gap:.7rem}.wm .wh{font-size:1.35rem}
  .stats,.cols,#list,#alist{gap:.5rem}.stats{margin-bottom:.5rem}
  .stat{padding:.7rem;gap:.6rem}.stat .ic{width:40px;height:40px}.stat b{font-size:1.55rem}
@@ -304,6 +311,7 @@ tr{break-inside:avoid}
 }
 </style></head>
 <body><div id="app"></div><div id="pr"></div><style id="pg"></style>
+<dialog id="dlg"></dialog>
 <dialog id="cf" class="cf"></dialog>
 <dialog id="nt" class="cf" aria-label="Activity reminder"></dialog>
 <dialog id="wd" class="cf" aria-label="Session timeout warning"></dialog>
@@ -312,7 +320,7 @@ tr{break-inside:avoid}
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserSessionPersistence,reauthenticateWithCredential,EmailAuthProvider,sendPasswordResetEmail}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import{getFirestore,collection,onSnapshot,doc,deleteDoc,writeBatch}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{getFirestore,collection,onSnapshot,doc,deleteDoc,writeBatch,serverTimestamp,query,orderBy,limit}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const cfg={apiKey:"AIzaSyDqtjhvtmAea9S9TKf94CIdd5BpbdpiZeA",authDomain:"moas-system.firebaseapp.com",projectId:"moas-system",appId:"1:302631045782:web:89769532d1cd1f4c0810b7"};
 
@@ -436,7 +444,11 @@ const IC={
  chev:'<path d="m6 9 6 6 6-6"/>',
  expand:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
  doc:'<path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/>',
- bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 20.5a2 2 0 0 0 4 0"/>'
+ bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 20.5a2 2 0 0 0 4 0"/>',
+ x:'<path d="M6 6l12 12M18 6 6 18"/>',
+ up:'<path d="M12 20V9m0 0-4 4m4-4 4 4M5 4h14"/>',
+ expo:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5 M12 18v-6m0 0-2.5 2.5M12 12l2.5 2.5"/>',
+ impo:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5 M12 12v6m0 0-2.5-2.5M12 18l2.5-2.5"/>'
 };
 const ic=(n,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
 const RIC={"President":"crown","Coordinator":"compass","Vice President":"shield","Secretary":"note","Treasurer":"wallet","Property Custodian":"key"};
@@ -471,7 +483,7 @@ const nm=m=>`${m.lastName||""}, ${m.firstName||""}${m.middleName?" "+m.middleNam
 const full=m=>[m.firstName,m.middleName,m.lastName].filter(Boolean).join(" ");
 const ini=m=>esc(((m.firstName||"")[0]||"")+((m.lastName||"")[0]||"")).toUpperCase();
 const day=m=>(m.birthday||"").slice(5);
-const CHK=[["Contact Number",m=>!m.contact],["Birthday",m=>!m.birthday],["Group",m=>!m.group],["Confirmation Record",m=>!m.confirmation],["Guardian Contact (Under 18)",m=>(!m.birthday||age(m.birthday)<18)&&!m.guardianContact]];
+const CHK=[["Contact Number",m=>!m.contact],["Birthday",m=>!m.birthday],["Group",m=>!m.group],["Confirmation Record",m=>!m.confirmation],["Guardian Contact (Under 18)",m=>(!m.birthday||age(m.birthday)<18)&&!m.guardianContact],["Group Lead Not in Own Group",m=>{const x=/^Group (\d) Lead$/.exec(m.role||"");return !!x&&m.group!==x[1]}]];
 const completeness=()=>{const act=members.filter(m=>m.status==="Active"),res=CHK.map(([l,f])=>[l,act.filter(f)]),gaps=res.reduce((s,r)=>s+r[1].length,0);return{act,res,pct:act.length?Math.round(100-gaps/(act.length*CHK.length)*100):0}};
 const stat=(v,l,i,c)=>`<div class="stat"><span class="ic ${c}">${ic(i,22)}</span><div><b>${v}</b><span>${l}</span></div></div>`;
 const LOGO='<img class="logo" src="logos/Origin.png" alt="" onerror="this.remove()">';
@@ -479,6 +491,12 @@ const ribbon=`<span class="rb" title="${S.n}" role="img" aria-label="Liturgical 
 const brand=`${LOGO}<div class="brand"><h1>Ministry of Altar Servers</h1><p><span>St. Anthony Ma. Zaccaria Parish</span><i> | </i><span>Silangan San Mateo Rizal</span></p></div>${ribbon}`;
 let unsub,members=[],view="dash",pid=null,othOpen=false,bdFull="",bdCount=0,shown=0;
 let acts=[],actErr=false,notified=false;
+let hist=[];
+const LB=Object.fromEntries(F.map(f=>[f[0],f[1]]));
+const diff=(o,n,keys)=>keys.filter(k=>String(o[k]??"")!==String(n[k]??"")).map(k=>({f:LB[k]||k,from:String(o[k]??""),to:String(n[k]??"")}));
+const logH=(b,action,kind,refId,name,changes=[])=>b.set(doc(collection(db,"history")),{at:serverTimestamp(),by:auth.currentUser?.email||"unknown",action,kind,refId:refId||"",name:name||"",changes});
+const fmtAt=h=>{const t=h.at&&h.at.toDate?h.at.toDate():null;return t?t.toLocaleString("en",{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"}):"Just now"};
+const hrow=h=>`<div class="f"><b>${esc(h.action)} ${esc(h.kind)}${h.name?": "+esc(h.name):""}</b><small>${esc(fmtAt(h))} · ${esc(h.by)}</small>${(h.changes||[]).map(c=>`<small>${esc(c.f)}: ${c.from?esc(c.from):"<i>empty</i>"} → ${c.to?esc(c.to):"<i>empty</i>"}</small>`).join("")}</div>`;
 const st={q:"",g:"",s:"",r:"",sort:"name"};
 const sa={q:"",f:"all"};
 
@@ -496,7 +514,7 @@ const asub=a=>esc([fmtT(a.time),a.venue].filter(Boolean).join(" · ")||a.type||"
 const busy=m=>{$("#ldm").textContent=m;if(!$("#ld").open)$("#ld").showModal()};
 const busyEnd=()=>{if($("#ld").open)$("#ld").close()};
 $("#ld").addEventListener("cancel",e=>e.preventDefault());
-function toast(m){const t=$("#ts");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("show"),2600)}
+function toast(m){const t=$("#ts");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("show"),m.length>45?6000:2600)}
 const withTimeout=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error("timeout")),ms))]);
 const slowMsg="This is taking longer than expected. Check your connection. The change will save automatically once you are back online.";
 
@@ -511,6 +529,23 @@ function ask(o){return new Promise(res=>{
 })}
 
 const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
+/* ---------- Pop-ups: every window gets a close icon (top right) and closes when you tap outside it ---------- */
+const XB=`<button type="button" class="x" aria-label="Close">${ic("x",18)}</button>`;
+function dismiss(d){const ev=new Event("cancel",{cancelable:true});d.dispatchEvent(ev);if(!ev.defaultPrevented&&d.open)d.close()}
+["dlg","cf","nt"].forEach(id=>{
+  const d=document.getElementById(id);let down=null;
+  /* Windows are re-filled often, so the close icon is added again whenever the content changes. */
+  new MutationObserver(()=>{if(!d.querySelector(":scope>.x"))d.insertAdjacentHTML("beforeend",XB)}).observe(d,{childList:true});
+  d.addEventListener("pointerdown",e=>{down=e.target});
+  d.addEventListener("click",e=>{
+    const b=e.target.closest(".x");
+    let out=false;
+    if(e.target===d&&down===d){const r=d.getBoundingClientRect();out=e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom}
+    if((b&&d.contains(b))||out)dismiss(d);
+  });
+});
+/* The sign-out warning and the loading screen stay as they are: they need an answer or a moment. */
+
 /* ---------- Security: session-only login, idle timeout, re-authentication ---------- */
 const IDLE_MS=10*60e3,WARN_MS=60e3,MAX_MS=8*60*60e3,REAUTH_MS=5*60e3,MAXTRY=5,LOCK_MS=5*60e3;
 const ss={get:k=>{try{return sessionStorage.getItem(k)}catch{return null}},set:(k,v)=>{try{sessionStorage.setItem(k,String(v))}catch{}},del:k=>{try{sessionStorage.removeItem(k)}catch{}}};
@@ -586,7 +621,7 @@ ERR["auth/wrong-password"]=ERR["auth/user-not-found"]=ERR["auth/invalid-credenti
 
 function showLogin(){
   /* Wipe everything held in memory so nothing is left behind after sign-out. */
-  members=[];acts=[];actErr=false;notified=false;pid=null;view="dash";bdFull="";
+  members=[];acts=[];hist=[];actErr=false;notified=false;pid=null;view="dash";bdFull="";
   $("#pr").innerHTML="";closeAll();
   const msg=ss.get("moas_msg")||"";ss.del("moas_msg");
   $("#app").innerHTML=`<div class="top"><div class="in">${brand}</div></div>
@@ -620,8 +655,8 @@ function showLogin(){
 
 function showApp(){
   $("#app").innerHTML=`<div class="top"><div class="in">${brand}<button id="so" aria-label="Sign Out">${ic("out",18)}<span>Sign Out</span></button></div></div>
-  <nav><button data-v="dash">${ic("dash")}Dashboard</button><button data-v="members">${ic("users")}Members</button><button data-v="acts">${ic("cal")}Activities</button></nav>
-  <main id="v"></main><dialog id="dlg"></dialog>`;
+  <nav><button data-v="dash">${ic("dash")}Dashboard</button><button data-v="members">${ic("users")}Members</button><button data-v="acts">${ic("cal")}Activities</button><button data-v="hist">${ic("clock")}History</button></nav>
+  <main id="v"></main>`;
   $("#so").onclick=()=>signOut(auth);
   $("nav").onclick=e=>{const b=e.target.closest("button");if(b)go(b.dataset.v)};
   $("#v").onclick=e=>{if(view!=="dash")return;
@@ -636,7 +671,8 @@ function showApp(){
     ()=>{$("#v").innerHTML='<p class="none">This account does not have access to the member records.</p>'});
   const u2=onSnapshot(collection(db,"activities"),s=>{actErr=false;acts=s.docs.map(d=>normA({id:d.id,...d.data()}));fill();notify()},
     ()=>{actErr=true;acts=[];fill()});
-  unsub=()=>{u1();u2()};
+  const u3=onSnapshot(query(collection(db,"history"),orderBy("at","desc"),limit(300)),s=>{hist=s.docs.map(d=>({id:d.id,...d.data()}));fill()},()=>{});
+  unsub=()=>{u1();u2();u3()};
   go("dash");
 }
 
@@ -645,10 +681,11 @@ function go(v,id){
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===(v==="profile"?"members":v)));
   if(v==="members")shell();
   if(v==="acts")shellA();
+  if(v==="hist")shellH();
   if(v==="profile")history.pushState(null,"");
   fill();scrollTo(0,0);
 }
-const fill=()=>view==="dash"?dash():view==="profile"?prof():view==="acts"?drawActs():draw();
+const fill=()=>view==="dash"?dash():view==="profile"?prof():view==="acts"?drawActs():view==="hist"?drawHist():draw();
 
 function dash(){
   const n=s=>members.filter(m=>m.status===s).length,A=n("Active"),I=n("Inactive");
@@ -732,14 +769,15 @@ function openBirthdays(){
 }
 
 function shell(){
-  $("#v").innerHTML=`<div class="ph2"><div class="ptl"><span class="eb">Member Directory</span><h2>Members</h2><p>Search, filter, and manage every member record.</p><span class="chip" id="cnt" style="margin-top:.45rem"></span></div>
-  <div class="acts"><button id="ex" class="ib" aria-label="Export">${ic("down",18)}<span>Export</span></button><button id="add" class="pri addb" aria-label="Add Member">${ic("plus",18)}<span>Add Member</span></button></div></div>
+  $("#v").innerHTML=`<div class="ph2"><div class="ptl"><span class="eb">Member Directory</span><h2>Members</h2><p>Search, filter, and manage every member record.</p><span class="chip" id="cnt" style="margin-top:.45rem"></span> <button class="gh imp" id="imp" title="Import members from a CSV or Excel file (rarely needed)">${ic("impo",14)}Import from file</button></div>
+  <div class="acts"><button id="ex" class="ib" aria-label="Export">${ic("expo",18)}<span>Export</span></button><button id="add" class="pri addb" aria-label="Add Member">${ic("plus",18)}<span>Add Member</span></button></div></div>
   <div class="tools"><div class="srch">${ic("search",18)}<input id="q" type="search" placeholder="Search by name"></div><button id="ft">${ic("filter",18)}Filters<em id="fb" hidden></em></button></div>
   <div class="fc" id="fc"></div><div id="list"></div>`;
   $("#q").oninput=e=>{st.q=e.target.value;draw()};
   $("#ft").onclick=openFilters;
   $("#fc").onclick=e=>{const b=e.target.closest("[data-x]");if(b){st[b.dataset.x]=b.dataset.x==="sort"?"name":"";draw()}};
   $("#ex").onclick=openExport;
+  $("#imp").onclick=()=>openImport();
   $("#add").onclick=()=>openForm(null);
   $("#list").onclick=e=>{const c=e.target.closest(".card");if(c)go("profile",c.dataset.id)};
 }
@@ -750,7 +788,8 @@ function draw(){
     (!st.g||m.group===st.g)&&(!st.s||m.status===st.s)&&(!st.r||m.role===st.r));
   a.sort((x,y)=>st.sort==="bday"?(day(x)||"99").localeCompare(day(y)||"99"):nm(x).localeCompare(nm(y)));
   shown=a.length;
-  $("#cnt").textContent=a.length===members.length?`${a.length} members`:`${a.length} of ${members.length} members`;
+  const mw=n=>n===1?"member":"members";
+  $("#cnt").textContent=a.length===members.length?`${a.length} ${mw(a.length)}`:`${a.length} of ${members.length} ${mw(members.length)}`;
   const lab={s:esc(sl(st.s)),g:"Group "+esc(st.g),r:rbadge(st.r)+esc(st.r),sort:"Sorted by Birthday"};
   const act=["s","g","r"].filter(k=>st[k]);if(st.sort!=="name")act.push("sort");
   $("#fb").hidden=!act.length;$("#fb").textContent=act.length;
@@ -801,6 +840,7 @@ function prof(){
   $("#bk").onclick=()=>history.back();
   $("#ed").onclick=()=>openForm(m.id);
   $("#pp").onclick=()=>printProfile(m);
+  $("#v").insertAdjacentHTML("beforeend",`<div class="box" style="margin-top:.75rem"><h3><span class="ic p">${ic("clock",16)}</span>History</h3>${hist.filter(h=>h.refId===m.id).map(hrow).join("")||'<p class="none">No changes recorded yet.</p>'}</div>`);
 }
 
 function openForm(id){
@@ -818,6 +858,9 @@ function openForm(id){
   <div class="foot">${id?`<button type="button" class="del" id="dl">${ic("trash",18)}Delete</button>`:""}
   <button type="button" id="cx">Cancel</button><button class="pri">Save Member</button></div></form>`;
   $("#mf").elements.status.onchange=e=>{$("#sth").textContent=SD[e.target.value]||""};
+  {const f=$("#mf").elements,hn=document.createElement("small");hn.className="hint";f.role.parentNode.appendChild(hn);
+   f.role.onchange=()=>{const x=/^Group (\d) Lead$/.exec(f.role.value);hn.textContent="";if(x){f.group.value=x[1];hn.textContent=`Group set to ${x[1]}: a ${f.role.value} must belong to that group.`}};
+   f.group.onchange=()=>{const x=/^Group (\d) Lead$/.exec(f.role.value);hn.textContent="";if(x&&f.group.value!==x[1]){f.role.value="";hn.textContent=`Role removed: only a member of Group ${x[1]} can be its lead.`}}}
   PH.forEach(k=>{const i=$("#mf").elements[k];
     const chk=()=>{i.value=i.value.replace(/\D/g,"").slice(0,11);i.setCustomValidity(i.value&&!/^09\d{9}$/.test(i.value)?"Enter 11 digits starting with 09, like 09171234567.":"")};
     i.addEventListener("input",chk);chk()});
@@ -830,10 +873,13 @@ function openForm(id){
       <p class="cfh">If this member has left the ministry, consider changing their status instead, such as Transferred or Graduated.</p>`});
     if(!ok||!await reauth())return;
     busy("Deleting member…");
-    try{await withTimeout(deleteDoc(doc(db,"members",id)),20000);busyEnd();$("#dlg").close();toast("Member deleted.");if(view==="profile")go("members")}
+    try{const b=writeBatch(db);b.delete(doc(db,"members",id));logH(b,"Deleted","member",id,full(m),diff(m,{},F.map(f=>f[0])));await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast("Member deleted.");if(view==="profile")go("members")}
     catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not delete. Check your connection and try again.")}};
   $("#mf").onsubmit=async e=>{e.preventDefault();
     const d={};F.forEach(([k])=>d[k]=e.target.elements[k].value.trim());
+    const lm=/^Group (\d) Lead$/.exec(d.role);let note="";
+    if(lm&&id&&m.role===d.role&&m.group!==d.group){d.role="";note=`The ${m.role} role was removed because the member moved to ${d.group?"Group "+d.group:"no group"}.`}
+    else if(lm&&d.group!==lm[1]){d.group=lm[1];note=`Group was set to ${lm[1]} because a ${d.role} must belong to Group ${lm[1]}.`}
     const prev=d.role?members.filter(o=>o.id!==id&&o.role===d.role):[];
     if(prev.length){const names=prev.map(full).join(" and "),many=prev.length>1;
       const ok=await ask({icon:"shield",title:"Reassign This Role?",ok:"Reassign Role",
@@ -841,17 +887,32 @@ function openForm(id){
       if(!ok)return}
     busy(id?"Saving changes…":"Adding member…");
     try{const b=writeBatch(db);
-      prev.forEach(o=>b.update(doc(db,"members",o.id),{role:""}));
-      b.set(id?doc(db,"members",id):doc(collection(db,"members")),d);
-      await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast(id?"Changes saved.":"Member added.")}
+      prev.forEach(o=>{b.update(doc(db,"members",o.id),{role:""});logH(b,"Role removed","member",o.id,full(o),[{f:"Role",from:o.role,to:""}])});
+      const ref=id?doc(db,"members",id):doc(collection(db,"members")),ch=id?diff(m,d,F.map(f=>f[0])):[];
+      b.set(ref,d);
+      if(!id||ch.length)logH(b,id?"Edited":"Added","member",ref.id,[d.firstName,d.lastName].join(" "),ch);
+      await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast(note||(id?"Changes saved.":"Member added."))}
     catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not save. Check your connection and try again.")}};
   $("#dlg").showModal();
+}
+
+/* ---------- History ---------- */
+function shellH(){
+  $("#v").innerHTML=`<div class="ph2"><div class="ptl"><span class="eb">Audit Trail</span><h2>History</h2><p>Every change, with the email of the admin who made it.</p></div></div>
+  <div class="tools"><div class="srch">${ic("search",18)}<input id="hq" type="search" placeholder="Search name, email, or action"></div></div><div class="box" id="hl"></div>`;
+  $("#hq").oninput=drawHist;
+}
+function drawHist(){
+  if(!$("#hl"))return;
+  const q=($("#hq").value||"").toLowerCase();
+  const l=hist.filter(h=>!q||`${h.name} ${h.by} ${h.action} ${h.kind}`.toLowerCase().includes(q));
+  $("#hl").innerHTML=l.length?l.map(hrow).join(""):'<p class="none">No history yet.</p>';
 }
 
 /* ---------- Activities ---------- */
 function shellA(){
   $("#v").innerHTML=`<div class="ph2"><div class="ptl"><span class="eb">Ministry Activities</span><h2>Activities</h2><p>Schedule activities and record whether they were done.</p><span class="chip" id="acnt" style="margin-top:.45rem"></span></div>
-  <div class="acts"><button id="exA" class="ib" aria-label="Export">${ic("down",18)}<span>Export</span></button><button id="addA" class="pri addb" aria-label="Add Activity">${ic("plus",18)}<span>Add Activity</span></button></div></div>
+  <div class="acts"><button id="exA" class="ib" aria-label="Export">${ic("expo",18)}<span>Export</span></button><button id="addA" class="pri addb" aria-label="Add Activity">${ic("plus",18)}<span>Add Activity</span></button></div></div>
   <div class="tools"><div class="srch">${ic("search",18)}<input id="aq" type="search" placeholder="Search activities"></div></div>
   <div class="chs" id="afc" style="margin-bottom:.7rem"></div><div id="alist"></div>`;
   $("#aq").oninput=e=>{sa.q=e.target.value;drawActs()};
@@ -913,7 +974,7 @@ function openMark(id,to){
 
 async function saveAct(id,d,msg){
   busy("Saving…");
-  try{const b=writeBatch(db);b.update(doc(db,"activities",id),d);await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast(msg)}
+  try{const b=writeBatch(db);b.update(doc(db,"activities",id),d);const o=acts.find(x=>x.id===id)||{};logH(b,"Updated","activity",id,o.title,diff(o,d,Object.keys(d)));await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast(msg)}
   catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not save. Check your connection and try again.")}
 }
 
@@ -942,7 +1003,7 @@ function openActForm(id){
       body:`<div class="cfn"><span class="av">${ic("cal",20)}</span><span><b>${esc(a.title)}</b><br><small>${esc([fmtS(a.date),a.status].filter(Boolean).join(" · "))}</small></span></div><p>This permanently removes the activity and its record. This cannot be undone.</p>`});
     if(!ok||!await reauth())return;
     busy("Deleting activity…");
-    try{await withTimeout(deleteDoc(doc(db,"activities",id)),20000);busyEnd();$("#dlg").close();toast("Activity deleted.")}
+    try{const b=writeBatch(db);b.delete(doc(db,"activities",id));logH(b,"Deleted","activity",id,a.title,diff(a,{},["title","type","status","date","time","venue","description"]));await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast("Activity deleted.")}
     catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not delete. Check your connection and try again.")}};
   f.onsubmit=async e=>{e.preventDefault();
     const s=el.status.value;
@@ -952,7 +1013,9 @@ function openActForm(id){
     if(s==="Not Done"&&!d.reason){toast("Please enter the reason it was not done.");el.reason.focus();return}
     busy(id?"Saving changes…":"Adding activity…");
     try{const b=writeBatch(db);
-      b.set(id?doc(db,"activities",id):doc(collection(db,"activities")),d);
+      const ref=id?doc(db,"activities",id):doc(collection(db,"activities")),ch=id?diff(a,d,Object.keys(d)):[];
+      b.set(ref,d);
+      if(!id||ch.length)logH(b,id?"Edited":"Added","activity",ref.id,d.title,ch);
       await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast(id?"Changes saved.":"Activity added.")}
     catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not save. Check your connection and try again.")}};
   if(!$("#dlg").open)$("#dlg").showModal();
@@ -986,7 +1049,7 @@ function openActExport(){
   <label>Year<select name="yr">${yrs.map(y=>`<option value="${y}"${y===cy?" selected":""}>${y}</option>`).join("")}<option value="all">All Years</option></select></label>
   <label>Status<select name="s"><option value="">All Statuses</option>${ASTAT.map(x=>`<option value="${x}">${x}</option>`).join("")}</select></label>
   <label class="w a">Prepared by<input name="by" placeholder="Your name and position (optional)"></label></div></div>
-  <div class="foot"><button type="button" id="cx">Cancel</button><button class="pri">${ic("down",18)}Export</button></div></form>`;
+  <div class="foot"><button type="button" id="cx">Cancel</button><button class="pri">${ic("expo",18)}Export</button></div></form>`;
   const f=$("#xa"),e=f.elements;
   e.type.onchange=()=>f.querySelectorAll(".a").forEach(x=>x.hidden=e.type.value!=="pdf");
   $("#cx").onclick=()=>$("#dlg").close();
@@ -1041,6 +1104,168 @@ function printActReview(l,yr,by){
   printDoc(html,0);
 }
 
+/* ---------- Import members from a CSV or Excel file (rarely needed) ---------- */
+const DATEF=["start","end","birthday","dominic","berchmans"];
+const HMAP=(()=>{
+  const m={};
+  F.forEach(([k,l])=>{m[key(l)]=k;m[key(k)]=k});
+  const add=(k,...a)=>a.forEach(x=>m[x]=k);
+  add("lastName","surname","familyname","apelyido");add("firstName","givenname");add("middleName","middleinitial","mi");
+  add("role","position");add("start","startdate","datestarted");add("end","enddate");
+  add("birthday","birthdate","dob","dateofbirth","bday");add("gender","sex");
+  add("confirmation","confirmationstatus","confirmed");
+  add("contact","mobile","mobilenumber","phone","phonenumber","cellphone","cellphonenumber");add("address","homeaddress");
+  add("guardian","parent","parentname","guardianname","parentguardian");
+  add("guardianContact","parentcontact","guardiannumber","parentnumber","parentguardiancontactnumber");
+  add("schoolLevel","gradelevel","level");add("schoolName","school");
+  add("dominic","dominicsavio");add("berchmans","johnberchmans");
+  return m;
+})();
+let XL=null;
+const loadXl=async()=>XL||(XL=await import("https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs"));
+
+function parseCsv(t){
+  t=t.replace(/^﻿/,"");
+  const first=t.split(/\r?\n/,1)[0]||"",cnt=c=>first.split(c).length-1;
+  const sep=cnt("\t")>cnt(",")&&cnt("\t")>=cnt(";")?"\t":cnt(";")>cnt(",")?";":",";
+  const rows=[];let row=[],f="",q=false;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;
+    else if(c===sep){row.push(f);f=""}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&t[i+1]==="\n")i++;row.push(f);f="";rows.push(row);row=[]}
+    else f+=c;
+  }
+  if(f!==""||row.length){row.push(f);rows.push(row)}
+  return rows;
+}
+function pdate(v){
+  let x="";
+  if(v instanceof Date)x=isNaN(v)?"":iso(new Date(v.getTime()+12*36e5));
+  else if(typeof v==="number")x=v>1&&v<80000?new Date(Math.round((v-25569)*864e5)).toISOString().slice(0,10):"";
+  else x=dt(String(v).trim());
+  const y=+x.slice(0,4),t=new Date(x+"T00:00:00");
+  return y>=1900&&y<=2100&&!isNaN(t)&&iso(t)===x?x:"";
+}
+/* Accepts 09XXXXXXXXX, +63 9XX XXX XXXX, or 9XXXXXXXXX (Excel often drops the leading 0). Returns 09XXXXXXXXX or "". */
+function fixPh(v){
+  let x=String(v).replace(/[\s\-().]/g,"");
+  if(/^\+?63\d{10}$/.test(x))x="0"+x.replace(/^\+?63/,"");
+  if(/^9\d{9}$/.test(x))x="0"+x;
+  return /^09\d{9}$/.test(x)?x:"";
+}
+async function readTable(file){
+  if(file.size>5*1024*1024)throw new Error("This file is larger than 5 MB.");
+  if(/\.xlsx?$/i.test(file.name)){
+    let X;try{X=await loadXl()}catch{throw new Error("The Excel reader could not load. Check your connection, or save the file as CSV and try again.")}
+    const wb=X.read(await file.arrayBuffer(),{type:"array",cellDates:true}),ws=wb.Sheets[wb.SheetNames[0]];
+    if(!ws)throw new Error("No sheet was found in this file.");
+    return X.utils.sheet_to_json(ws,{header:1,raw:true,defval:""});
+  }
+  if(/\.(csv|txt)$/i.test(file.name))return parseCsv(await file.text());
+  throw new Error("Please choose a .csv or .xlsx file.");
+}
+
+function buildImport(table){
+  const rows=table.map((r,i)=>({r,n:i+1})).filter(x=>x.r.some(c=>String(c??"").trim()!==""));
+  if(!rows.length)throw new Error("This file is empty.");
+  const head=rows[0].r.map(h=>HMAP[key(h)]||null);
+  if(!head.includes("lastName")||!head.includes("firstName"))throw new Error("Could not find the “Last Name” and “First Name” columns in the first row. Check your headings, or download the template.");
+  if(rows.length>2001)throw new Error("This file has more than 2,000 rows. Please split it into smaller files.");
+  const label=k=>F.find(f=>f[0]===k)[1];
+  const exist=new Set(members.map(m=>key(m.lastName)+"|"+key(m.firstName)+"|"+m.birthday));
+  const holders=new Map(members.filter(m=>m.role).map(m=>[m.role,full(m)]));
+  const seen=new Set(),out={ready:[],skipped:[],bad:[],notes:[]};
+  rows.slice(1).forEach(({r,n})=>{
+    const raw={};head.forEach((k,i)=>{if(k&&raw[k]===undefined)raw[k]=r[i]});
+    const s=k=>{const v=raw[k];return v==null||v instanceof Date?"":String(v).trim()};
+    const errs=[],d={};F.forEach(([k])=>d[k]="");
+    ["lastName","firstName","middleName","guardian","schoolName","address"].forEach(k=>d[k]=tc(s(k)));
+    d.messenger=s("messenger");
+    d.schoolLevel=canon(s("schoolLevel"),SCHOOL);
+    DATEF.forEach(k=>{const v=raw[k];if(v==null||v==="")return;const x=pdate(v);x?d[k]=x:errs.push(`${label(k)} is not a valid date (use YYYY-MM-DD).`)});
+    PH.forEach(k=>{const v=s(k);if(!v)return;const x=fixPh(v);x?d[k]=x:errs.push(`${label(k)} must be 09XXXXXXXXX (11 digits).`)});
+    [["status",STATUS],["role",ROLES]].forEach(([k,list])=>{const v=s(k);if(!v)return;const c=canon(v,list);list.includes(c)?d[k]=c:errs.push(`${label(k)} “${v}” is not one of the options.`)});
+    const cv=key(s("confirmation"));
+    if(cv){d.confirmation=["confirmed","yes","y"].includes(cv)?"Confirmed":["notyetconfirmed","notconfirmed","no","n"].includes(cv)?"Not Yet Confirmed":"";if(!d.confirmation)errs.push("Confirmation must be Confirmed or Not Yet Confirmed.")}
+    const gv=key(s("gender"));
+    if(gv){d.gender=["f","female"].includes(gv)?"Female":["m","male"].includes(gv)?"Male":"";if(!d.gender)errs.push("Gender must be Female or Male.")}
+    const g=s("group").replace(/^group\s*/i,"");
+    if(g){GROUPS.includes(g)?d.group=g:errs.push("Group must be 1 to 5.")}
+    const nm2=[d.lastName,d.firstName].filter(Boolean).join(", ")||"(no name)";
+    if(!d.lastName||!d.firstName){errs.unshift("Last Name and First Name are required.");out.bad.push({n,name:nm2,msgs:errs});return}
+    const dk=key(d.lastName)+"|"+key(d.firstName)+"|"+d.birthday;
+    if(exist.has(dk)){out.skipped.push({n,name:nm2,why:"Already in the system"});return}
+    if(seen.has(dk)){out.skipped.push({n,name:nm2,why:"Repeated in this file"});return}
+    if(errs.length){out.bad.push({n,name:nm2,msgs:errs});return}
+    seen.add(dk);
+    if(d.role){
+      if(holders.has(d.role)){out.notes.push({n,name:nm2,msg:`Role “${d.role}” is already held by ${holders.get(d.role)}, so it was left blank.`});d.role=""}
+      else{holders.set(d.role,"another row in this file");const lmi=/^Group (\d) Lead$/.exec(d.role);if(lmi&&d.group!==lmi[1]){out.notes.push({n,name:nm2,msg:`Group set to ${lmi[1]} to match the role “${d.role}”.`});d.group=lmi[1]}}
+    }
+    out.ready.push({n,name:nm2,data:d});
+  });
+  return out;
+}
+
+function openImport(msg){
+  $("#dlg").innerHTML=`<div class="fm"><div class="dh"><h2>Import Members</h2><small class="hint">For moving records from another file. Accepts CSV or Excel (.xlsx).</small></div>
+  <div class="bd"><p class="cps" style="margin-top:0">The first row must be column headings. Only <b>Last Name</b> and <b>First Name</b> are required. You will see a preview first, and nothing is saved until you confirm.</p>
+  <ul class="cps" style="padding-left:1.1rem;margin:.3rem 0">
+  <li>Contact numbers: <b>09XXXXXXXXX</b></li>
+  <li>Dates: <b>YYYY-MM-DD</b>, for example 2010-03-15</li>
+  <li>Status, role, group, gender, and confirmation must match the options in the app</li>
+  <li>A member already in the system (same name and birthday) is skipped</li></ul>
+  <p class="err" id="ime" role="alert">${esc(msg||"")}</p></div>
+  <div class="foot"><button type="button" class="lft" id="imt">Download Template</button><button type="button" class="pri" id="imc">${ic("impo",18)}Choose File</button></div></div>`;
+  $("#imt").onclick=()=>{
+    const q=v=>`"${String(v).replace(/"/g,'""')}"`;
+    const l=document.createElement("a");
+    l.href=URL.createObjectURL(new Blob(["﻿"+F.map(f=>q(f[1])).join(",")+"\r\n"],{type:"text/csv"}));
+    l.download="members-import-template.csv";l.click();
+  };
+  $("#imc").onclick=()=>{
+    const inp=document.createElement("input");inp.type="file";inp.accept=".csv,.txt,.xlsx,.xls,text/csv";
+    inp.onchange=async()=>{const f=inp.files[0];if(!f)return;
+      busy("Reading file…");
+      try{const res=buildImport(await readTable(f));busyEnd();previewImport(res,f.name)}
+      catch(x){busyEnd();openImport(x.message||"Could not read this file.")}};
+    inp.click();
+  };
+  if(!$("#dlg").open)$("#dlg").showModal();
+}
+
+function previewImport(res,fname){
+  const{ready,skipped,bad,notes}=res,n=ready.length;
+  const more=(a,max)=>a.length>max?`<p class="cps" style="margin:.2rem 0">…and ${a.length-max} more.</p>`:"";
+  const sec=(title,pill,cls,icon,a,fn,open)=>a.length?`<details class="ck"${open?" open":""}><summary><span style="flex:none;display:flex;color:${cls==="g"?"var(--grn)":"var(--red)"}">${ic(icon,16)}</span><span>${title}</span><b class="pill ${pill}">${a.length}</b></summary><div style="padding:0 0 .6rem 1.7rem">${a.slice(0,100).map(fn).join("")}${more(a,100)}</div></details>`:"";
+  const line=(x,t)=>`<p class="cps" style="margin:.15rem 0">Row ${x.n} · <b>${esc(x.name)}</b>${t?" — "+esc(t):""}</p>`;
+  const needS=ready.some(r=>!r.data.status);
+  $("#dlg").innerHTML=`<div class="fm"><div class="dh"><h2>Import Preview</h2><small class="hint">${esc(fname)}</small></div>
+  <div class="bd"><div class="ip"><div><b style="color:var(--grn)">${n}</b><span>Ready to import</span></div><div><b style="color:#9a7a2f">${skipped.length}</b><span>Skipped</span></div><div><b style="color:var(--red)">${bad.length}</b><span>Have problems</span></div></div>
+  ${bad.length?`<p class="cps" style="margin-top:0">Rows with problems will <b>not</b> be imported. Fix them in your file and import again, or add them by hand.</p>`:""}
+  ${needS&&n?`<label class="cps" style="display:block;margin-bottom:.6rem">Status for rows that have none<select id="ims"><option value="">Leave blank</option>${STATUS.map(s=>`<option value="${esc(s)}"${s==="Active"?" selected":""}>${esc(sl(s))}</option>`).join("")}</select></label>`:""}
+  ${sec("Problems (not imported)","r","r","alert",bad,x=>line(x,x.msgs.join(" ")),true)}
+  ${sec("Skipped","y","r","pause",skipped,x=>line(x,x.why),false)}
+  ${sec("Notes","y","r","alert",notes,x=>line(x,x.msg),false)}
+  ${sec("Will be imported","g","g","check",ready,x=>line(x,""),!bad.length&&!skipped.length)}
+  ${!n&&!bad.length&&!skipped.length?'<p class="none">Nothing to import.</p>':""}</div>
+  <div class="foot"><button type="button" class="lft" id="imb">Choose Another File</button><button type="button" class="pri" id="imo"${n?"":" disabled"}>Import ${n} Member${n===1?"":"s"}</button></div></div>`;
+  $("#imb").onclick=()=>openImport();
+  $("#imo").onclick=async()=>{
+    if(!n)return;
+    if(!await reauth())return;
+    const defS=$("#ims")?$("#ims").value:"";
+    busy(`Importing ${n} member${n===1?"":"s"}…`);
+    try{
+      for(let i=0;i<n;i+=200){const b=writeBatch(db);
+        ready.slice(i,i+200).forEach(r=>{const ref=doc(collection(db,"members"));b.set(ref,{...r.data,status:r.data.status||defS});logH(b,"Imported","member",ref.id,r.name,[])});
+        await withTimeout(b.commit(),30000)}
+      busyEnd();$("#dlg").close();toast(`${n} member${n===1?"":"s"} imported.`);
+    }catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"The import could not finish. Some members may already have been added. Import the same file again and those will be skipped.")}
+  };
+}
+
 function openExport(){
   const opts=(a,all,lb=x=>x)=>`<option value="">${all}</option>`+a.map(x=>`<option value="${esc(x)}">${esc(lb(x))}</option>`).join("");
   $("#dlg").innerHTML=`<form id="xf"><div class="dh"><h2>Export</h2></div><div class="bd"><div class="grid">
@@ -1049,7 +1274,7 @@ function openExport(){
   <label class="a">Date<input name="date" type="date" value="${today}"></label>
   <label>Group<select name="g">${opts(GROUPS,"All Groups",x=>"Group "+x)}</select></label>
   <label>Status<select name="s">${opts(STATUS,"All Statuses",sl)}</select></label></div></div>
-  <div class="foot"><button type="button" id="cx">Cancel</button><button class="pri">${ic("down",18)}Export</button></div></form>`;
+  <div class="foot"><button type="button" id="cx">Cancel</button><button class="pri">${ic("expo",18)}Export</button></div></form>`;
   const f=$("#xf"),e=f.elements;
   const sync=()=>{const att=e.type.value==="att";f.querySelectorAll(".a").forEach(x=>x.hidden=!att);e.s.value=att?"Active":""};
   e.type.onchange=sync;sync();
