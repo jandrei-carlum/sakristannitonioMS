@@ -309,6 +309,15 @@ tr{break-inside:avoid}
  .cf{width:92vw;margin:auto;border-radius:22px}
  .kp{grid-template-columns:repeat(2,1fr)}
 }
+@media(max-width:560px){
+ .dsh{flex-wrap:wrap;gap:.5rem}
+ .dsh .ptl{flex:1 1 100%}
+ .dsh .pmeta{flex:1 1 100%;justify-content:space-between;gap:.4rem}
+ .ptl h2{overflow-wrap:anywhere}
+ .ptl p{line-height:1.4}
+ .box h3{flex-wrap:wrap}
+ .stat div span{line-height:1.25}
+}
 </style></head>
 <body><div id="app"></div><div id="pr"></div><style id="pg"></style>
 <dialog id="dlg"></dialog>
@@ -748,7 +757,7 @@ function dash(){
       +`<button class="more" id="gA">${ic("expand",16)} Open Activities</button>`;
   const atail=lateA.length?`<span class="pill r" title="Past activities that need an update">${lateA.length}</span>`:nextA.length?`<span class="pill n" title="Upcoming activities">${nextA.length}</span>`:"";
 
-  $("#v").innerHTML=`<div class="ph2"><div class="ptl"><span class="eb">Ministry Overview</span><h2>Dashboard</h2><p>Membership, activities, birthdays, and records at a glance.</p></div><div class="pmeta">${now.toLocaleDateString("en",{weekday:"long",month:"long",day:"numeric"})}<span class="chip"><i></i>${S.n}</span><button class="gh" id="rpt" title="Create a ministry report for the parish priest" aria-label="Create ministry report">${ic("doc",15)}Report</button></div></div>
+  $("#v").innerHTML=`<div class="ph2 dsh"><div class="ptl"><span class="eb">Ministry Overview</span><h2>Dashboard</h2><p>Membership, activities, birthdays, and records at a glance.</p></div><div class="pmeta">${now.toLocaleDateString("en",{weekday:"long",month:"long",day:"numeric"})}<span class="chip"><i></i>${S.n}</span><button class="gh" id="rpt" title="Create a ministry report for the parish priest" aria-label="Create ministry report">${ic("doc",15)}Report</button></div></div>
   ${wel}
   <div class="stats">${stat(members.length,"Total Members","users","p")}${stat(A,"Active","check","g")}${stat(I,"Inactive","pause","y")}${othT}</div>
   ${othp}
