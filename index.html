@@ -318,6 +318,12 @@ tr{break-inside:avoid}
  .box h3{flex-wrap:wrap}
  .stat div span{line-height:1.25}
 }
+.pgr{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-top:.9rem}
+.pgb{min-height:44px;padding:.4rem .9rem;border-radius:12px;font-weight:700;color:var(--pd)}
+.pgb:disabled{opacity:.4;cursor:default;border-color:var(--line)}
+.pgi{text-align:center;font-weight:700;color:var(--pd);font-size:.9rem;line-height:1.3}
+.pgi small{display:block;font-weight:400;color:var(--mut);font-size:.75rem}
+@media(max-width:720px){#list,#alist{padding-bottom:0}#pgm,#pga{padding-bottom:3.8rem}}
 </style></head>
 <body><div id="app"></div><div id="pr"></div><style id="pg"></style>
 <dialog id="dlg"></dialog>
@@ -328,7 +334,7 @@ tr{break-inside:avoid}
 <div id="ts" class="ts" role="status" aria-live="polite"></div>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserSessionPersistence,reauthenticateWithCredential,EmailAuthProvider,sendPasswordResetEmail}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserSessionPersistence,reauthenticateWithCredential,EmailAuthProvider,sendPasswordResetEmail,updatePassword}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import{getFirestore,collection,onSnapshot,doc,deleteDoc,writeBatch,serverTimestamp,query,orderBy,limit}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const cfg={apiKey:"AIzaSyDqtjhvtmAea9S9TKf94CIdd5BpbdpiZeA",authDomain:"moas-system.firebaseapp.com",projectId:"moas-system",appId:"1:302631045782:web:89769532d1cd1f4c0810b7"};
@@ -458,6 +464,7 @@ const IC={
  bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 20.5a2 2 0 0 0 4 0"/>',
  x:'<path d="M6 6l12 12M18 6 6 18"/>',
  up:'<path d="M12 20V9m0 0-4 4m4-4 4 4M5 4h14"/>',
+ next:'<path d="m9 5 7 7-7 7"/>',
  expo:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5 M12 18v-6m0 0-2.5 2.5M12 12l2.5 2.5"/>',
  impo:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5 M12 12v6m0 0-2.5-2.5M12 18l2.5-2.5"/>'
 };
@@ -503,6 +510,19 @@ const brand=`${LOGO}<div class="brand"><h1>Ministry of Altar Servers</h1><p><spa
 let unsub,members=[],view="dash",pid=null,othOpen=false,bdFull="",bdCount=0,shown=0;
 let acts=[],actErr=false,notified=false;
 let hist=[];
+/* Pagination: items per page for Members (m), Activities (a), History (h), and a member's own history (p). */
+const PS={m:10,a:8,h:8,p:5};
+const pg={m:1,a:1,h:1,p:1};
+function pager(k,total){
+  const pages=Math.max(1,Math.ceil(total/PS[k]));
+  if(pg[k]>pages)pg[k]=pages;
+  if(pg[k]<1)pg[k]=1;
+  if(pages<2)return"";
+  const p=pg[k],from=(p-1)*PS[k]+1,to=Math.min(p*PS[k],total);
+  return `<div class="pgr"><button type="button" class="pgb" data-p="${p-1}"${p<2?" disabled":""} aria-label="Previous page">${ic("back",16)}Prev</button><span class="pgi">Page ${p} of ${pages}<small>${from}–${to} of ${total}</small></span><button type="button" class="pgb" data-p="${p+1}"${p>=pages?" disabled":""} aria-label="Next page">Next${ic("next",16)}</button></div>`;
+}
+const slice=(k,a)=>a.slice((pg[k]-1)*PS[k],pg[k]*PS[k]);
+const pgClick=(k,fn)=>e=>{const b=e.target.closest("[data-p]");if(b&&!b.disabled){pg[k]=+b.dataset.p;fn();scrollTo(0,0)}};
 const LB=Object.fromEntries(F.map(f=>[f[0],f[1]]));
 const diff=(o,n,keys)=>keys.filter(k=>String(o[k]??"")!==String(n[k]??"")).map(k=>({f:LB[k]||k,from:String(o[k]??""),to:String(n[k]??"")}));
 const logH=(b,action,kind,refId,name,changes=[])=>b.set(doc(collection(db,"history")),{at:serverTimestamp(),by:auth.currentUser?.email||"unknown",action,kind,refId:refId||"",name:name||"",changes});
@@ -606,8 +626,9 @@ function reauth(){
   return new Promise(res=>{
     const d=$("#cf");
     d.innerHTML=`<form class="cfb" id="raf"><span class="cfi p">${ic("lock",26)}</span><h2>Confirm It's You</h2><div class="cft"><p>Enter your password to continue with this sensitive action.</p></div>
-    <label style="display:block;margin-top:.8rem"><input id="rap" type="password" required autocomplete="current-password" placeholder="Password"></label><p class="err" id="rae" role="alert" style="margin:.5rem 0 0!important"></p>
+    <label style="display:block;margin-top:.8rem">${pwBox('id="rap" required autocomplete="current-password" placeholder="Password"')}</label><p class="err" id="rae" role="alert" style="margin:.5rem 0 0!important"></p>
     <div class="cfa"><button type="button" id="rac">Cancel</button><button class="pri" id="rak">Confirm</button></div></form>`;
+    pwWire(d);
     let done=false;const fin=v=>{if(done)return;done=true;d.close();res(v)};
     d.oncancel=()=>{done=true;res(false)};
     $("#rac").onclick=()=>fin(false);
@@ -665,10 +686,11 @@ function showLogin(){
 }
 
 function showApp(){
-  $("#app").innerHTML=`<div class="top"><div class="in">${brand}<button id="so" aria-label="Sign Out">${ic("out",18)}<span>Sign Out</span></button></div></div>
+  $("#app").innerHTML=`<div class="top"><div class="in">${brand}<button id="cp" aria-label="Change Password" title="Change Password">${ic("key",18)}<span>Password</span></button><button id="so" aria-label="Sign Out">${ic("out",18)}<span>Sign Out</span></button></div></div>
   <nav><button data-v="dash">${ic("dash")}Dashboard</button><button data-v="members">${ic("users")}Members</button><button data-v="acts">${ic("cal")}Activities</button><button data-v="hist">${ic("clock")}History</button></nav>
   <main id="v"></main>`;
   $("#so").onclick=()=>signOut(auth);
+  $("#cp").onclick=openPw;
   $("nav").onclick=e=>{const b=e.target.closest("button");if(b)go(b.dataset.v)};
   $("#v").onclick=e=>{if(view!=="dash")return;
     if(e.target.closest("#rpt")){openReport();return}
@@ -687,8 +709,45 @@ function showApp(){
   go("dash");
 }
 
+/* ---------- Change own password ---------- */
+/* Password box with a show / hide eye button. */
+const pwBox=a=>`<span class="pw"><input type="password" ${a}><button type="button" aria-label="Show or hide password">${ic("eye",18)}</button></span>`;
+const pwWire=root=>root.querySelectorAll(".pw button").forEach(b=>b.onclick=()=>{const i=b.previousElementSibling;i.type=i.type==="password"?"text":"password"});
+function openPw(){
+  const u0=auth.currentUser;if(!u0)return;
+  $("#dlg").innerHTML=`<form id="pf"><div class="dh"><h2>Change Password</h2><small class="hint">${esc(u0.email)}</small></div>
+  <div class="bd"><div class="grid">
+  <label class="w">Current Password${pwBox('name="cur" required autocomplete="current-password"')}</label>
+  <label class="w">New Password${pwBox('name="n1" required minlength="10" autocomplete="new-password"')}<small class="hint">At least 10 characters. A short sentence you can remember works well.</small></label>
+  <label class="w">Confirm New Password${pwBox('name="n2" required autocomplete="new-password"')}</label>
+  </div><p class="err" id="pe" role="alert"></p></div>
+  <div class="foot"><button type="button" id="cx">Cancel</button><button class="pri" id="ps">Change Password</button></div></form>`;
+  const f=$("#pf").elements;
+  pwWire($("#pf"));
+  $("#cx").onclick=()=>$("#dlg").close();
+  $("#pf").onsubmit=async e=>{e.preventDefault();const er=$("#pe"),b=$("#ps");er.textContent="";
+    if(f.n1.value.length<10){er.textContent="The new password must be at least 10 characters.";f.n1.focus();return}
+    if(f.n1.value!==f.n2.value){er.textContent="The two new passwords do not match.";f.n2.focus();return}
+    if(f.n1.value===f.cur.value){er.textContent="The new password must be different from the current one.";f.n1.focus();return}
+    b.disabled=true;b.textContent="Saving…";
+    try{const u=auth.currentUser;
+      await withTimeout(reauthenticateWithCredential(u,EmailAuthProvider.credential(u.email,f.cur.value)),20000);
+      await withTimeout(updatePassword(u,f.n1.value),20000);
+      reAt=Date.now();
+      try{const hb=writeBatch(db);logH(hb,"Password changed","",u.uid,u.email,[]);await withTimeout(hb.commit(),10000)}catch{}
+      $("#dlg").close();toast("Password changed.")}
+    catch(x){
+      er.textContent=x.message==="timeout"||x.code==="auth/network-request-failed"?"No connection. Please try again."
+        :["auth/wrong-password","auth/invalid-credential"].includes(x.code)?"The current password is wrong."
+        :x.code==="auth/too-many-requests"?"Too many attempts. Please wait a few minutes."
+        :x.code==="auth/weak-password"?"That password is too weak. Try a longer one."
+        :"Could not change the password. Please try again.";
+      b.disabled=false;b.textContent="Change Password";f.cur.select()}};
+  $("#dlg").showModal();f.cur.focus();
+}
+
 function go(v,id){
-  view=v;pid=id||null;Object.assign(st,{q:"",g:"",s:"",r:"",sort:"name"});Object.assign(sa,{q:"",f:"all"});
+  view=v;pid=id||null;Object.assign(st,{q:"",g:"",s:"",r:"",sort:"name"});Object.assign(sa,{q:"",f:"all"});Object.assign(pg,{m:1,a:1,h:1,p:1});
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===(v==="profile"?"members":v)));
   if(v==="members")shell();
   if(v==="acts")shellA();
@@ -783,13 +842,14 @@ function shell(){
   $("#v").innerHTML=`<div class="ph2"><div class="ptl"><span class="eb">Member Directory</span><h2>Members</h2><p>Search, filter, and manage every member record.</p><span class="chip" id="cnt" style="margin-top:.45rem"></span> <button class="gh imp" id="imp" title="Import members from a CSV file (rarely needed)">${ic("impo",14)}Import from file</button></div>
   <div class="acts"><button id="ex" class="ib" aria-label="Export">${ic("expo",18)}<span>Export</span></button><button id="add" class="pri addb" aria-label="Add Member">${ic("plus",18)}<span>Add Member</span></button></div></div>
   <div class="tools"><div class="srch">${ic("search",18)}<input id="q" type="search" placeholder="Search by name"></div><button id="ft">${ic("filter",18)}Filters<em id="fb" hidden></em></button></div>
-  <div class="fc" id="fc"></div><div id="list"></div>`;
-  $("#q").oninput=e=>{st.q=e.target.value;draw()};
+  <div class="fc" id="fc"></div><div id="list"></div><div id="pgm"></div>`;
+  $("#q").oninput=e=>{st.q=e.target.value;pg.m=1;draw()};
   $("#ft").onclick=openFilters;
-  $("#fc").onclick=e=>{const b=e.target.closest("[data-x]");if(b){st[b.dataset.x]=b.dataset.x==="sort"?"name":"";draw()}};
+  $("#fc").onclick=e=>{const b=e.target.closest("[data-x]");if(b){st[b.dataset.x]=b.dataset.x==="sort"?"name":"";pg.m=1;draw()}};
   $("#ex").onclick=openExport;
   $("#imp").onclick=()=>openImport();
   $("#add").onclick=()=>openForm(null);
+  $("#pgm").onclick=pgClick("m",draw);
   $("#list").onclick=e=>{const c=e.target.closest(".card");if(c)go("profile",c.dataset.id)};
 }
 
@@ -806,7 +866,8 @@ function draw(){
   $("#fb").hidden=!act.length;$("#fb").textContent=act.length;
   $("#fc").innerHTML=act.map(k=>`<button class="ch on" data-x="${k}">${lab[k]}</button>`).join("");
   if($("#fok"))$("#fok").textContent=`Show ${a.length} Member${a.length===1?"":"s"}`;
-  $("#list").innerHTML=a.length?a.map(m=>`<button class="card" data-id="${m.id}">
+  $("#pgm").innerHTML=pager("m",a.length);
+  $("#list").innerHTML=a.length?slice("m",a).map(m=>`<button class="card" data-id="${m.id}">
     <span class="av">${ini(m)}${m.group?`<i>${esc(m.group)}</i>`:""}</span>
     <span><b>${esc(nm(m))}</b><small>${rbadge(m.role)}${esc(m.role||"No Role")}${m.contact?" · "+esc(m.contact):""}</small>
     ${m.status?`<span class="st">${esc(sl(m.status))}</span>`:""}</span></button>`).join(""):
@@ -818,7 +879,7 @@ function openFilters(){
   $("#dlg").innerHTML=`<div class="fm"><div class="dh"><h2>Filters</h2></div><div class="bd">
   ${grp("Status","s",STATUS,x=>esc(sl(x)))}${grp("Group","g",GROUPS,x=>"Group "+x)}${grp("Role","r",ROLES,x=>rbadge(x)+esc(x))}${grp("Sort By","sort",["name","bday"],x=>x==="name"?"Last Name":"Birthday")}</div>
   <div class="foot"><button type="button" class="lft" id="fclr">Clear All</button><button type="button" class="pri" id="fok"></button></div></div>`;
-  const sync=()=>{document.querySelectorAll("#dlg .ch").forEach(c=>c.classList.toggle("on",st[c.dataset.k]===c.dataset.v));draw()};
+  const sync=()=>{document.querySelectorAll("#dlg .ch").forEach(c=>c.classList.toggle("on",st[c.dataset.k]===c.dataset.v));pg.m=1;draw()};
   $("#dlg .bd").onclick=e=>{const c=e.target.closest(".ch");if(!c)return;
     const k=c.dataset.k,v=c.dataset.v;st[k]=k==="sort"?v:(st[k]===v?"":v);sync()};
   $("#fclr").onclick=()=>{Object.assign(st,{g:"",s:"",r:"",sort:"name"});sync()};
@@ -851,7 +912,9 @@ function prof(){
   $("#bk").onclick=()=>history.back();
   $("#ed").onclick=()=>openForm(m.id);
   $("#pp").onclick=()=>printProfile(m);
-  $("#v").insertAdjacentHTML("beforeend",`<div class="box" style="margin-top:.75rem"><h3><span class="ic p">${ic("clock",16)}</span>History</h3>${hist.filter(h=>h.refId===m.id).map(hrow).join("")||'<p class="none">No changes recorded yet.</p>'}</div>`);
+  $("#v").insertAdjacentHTML("beforeend",`<div class="box" style="margin-top:.75rem"><h3><span class="ic p">${ic("clock",16)}</span>History</h3><div id="phl"></div><div id="php"></div></div>`);
+  const ph=()=>{const l=hist.filter(h=>h.refId===m.id);$("#php").innerHTML=pager("p",l.length);$("#phl").innerHTML=slice("p",l).map(hrow).join("")||'<p class="none">No changes recorded yet.</p>'};
+  ph();$("#php").onclick=e=>{const b=e.target.closest("[data-p]");if(b&&!b.disabled){pg.p=+b.dataset.p;ph()}};
 }
 
 function openForm(id){
@@ -910,14 +973,16 @@ function openForm(id){
 /* ---------- History ---------- */
 function shellH(){
   $("#v").innerHTML=`<div class="ph2"><div class="ptl"><span class="eb">Audit Trail</span><h2>History</h2><p>Every change, with the email of the admin who made it.</p></div></div>
-  <div class="tools"><div class="srch">${ic("search",18)}<input id="hq" type="search" placeholder="Search name, email, or action"></div></div><div class="box" id="hl"></div>`;
-  $("#hq").oninput=drawHist;
+  <div class="tools"><div class="srch">${ic("search",18)}<input id="hq" type="search" placeholder="Search name, email, or action"></div></div><div class="box" id="hl"></div><div id="hpg"></div>`;
+  $("#hq").oninput=()=>{pg.h=1;drawHist()};
+  $("#hpg").onclick=pgClick("h",drawHist);
 }
 function drawHist(){
   if(!$("#hl"))return;
   const q=($("#hq").value||"").toLowerCase();
   const l=hist.filter(h=>!q||`${h.name} ${h.by} ${h.action} ${h.kind}`.toLowerCase().includes(q));
-  $("#hl").innerHTML=l.length?l.map(hrow).join(""):'<p class="none">No history yet.</p>';
+  $("#hpg").innerHTML=pager("h",l.length);
+  $("#hl").innerHTML=l.length?slice("h",l).map(hrow).join(""):'<p class="none">No history yet.</p>';
 }
 
 /* ---------- Activities ---------- */
@@ -925,10 +990,11 @@ function shellA(){
   $("#v").innerHTML=`<div class="ph2"><div class="ptl"><span class="eb">Ministry Activities</span><h2>Activities</h2><p>Schedule activities and record whether they were done.</p><span class="chip" id="acnt" style="margin-top:.45rem"></span></div>
   <div class="acts"><button id="exA" class="ib" aria-label="Export">${ic("expo",18)}<span>Export</span></button><button id="addA" class="pri addb" aria-label="Add Activity">${ic("plus",18)}<span>Add Activity</span></button></div></div>
   <div class="tools"><div class="srch">${ic("search",18)}<input id="aq" type="search" placeholder="Search activities"></div></div>
-  <div class="chs" id="afc" style="margin-bottom:.7rem"></div><div id="alist"></div>`;
-  $("#aq").oninput=e=>{sa.q=e.target.value;drawActs()};
-  $("#afc").onclick=e=>{const b=e.target.closest("[data-f]");if(b){sa.f=b.dataset.f;drawActs()}};
+  <div class="chs" id="afc" style="margin-bottom:.7rem"></div><div id="alist"></div><div id="pga"></div>`;
+  $("#aq").oninput=e=>{sa.q=e.target.value;pg.a=1;drawActs()};
+  $("#afc").onclick=e=>{const b=e.target.closest("[data-f]");if(b){sa.f=b.dataset.f;pg.a=1;drawActs()}};
   $("#addA").onclick=()=>openActForm(null);
+  $("#pga").onclick=pgClick("a",drawActs);
   $("#exA").onclick=openActExport;
   $("#alist").onclick=e=>{const c=e.target.closest("[data-aid]");if(c)openAct(c.dataset.aid)};
 }
@@ -945,7 +1011,8 @@ function drawActs(){
     (sa.f==="all"||(sa.f==="up"?m.status==="Scheduled"&&!late(m):sa.f==="late"?late(m):m.status===sa.f)));
   const list=[...a.filter(m=>m.status==="Scheduled").sort(ASC),...a.filter(m=>m.status!=="Scheduled").sort((x,y)=>ASC(y,x))];
   $("#acnt").textContent=list.length===acts.length?`${list.length} activit${list.length===1?"y":"ies"}`:`${list.length} of ${acts.length} activities`;
-  $("#alist").innerHTML=list.length?list.map(m=>`<button class="card" data-aid="${m.id}">${dblk(m.date)}<span class="am"><b>${esc(m.title)}</b><small>${asub(m)}</small>${apill(m)}${m.status==="Not Done"&&m.reason?`<small>Reason: ${esc(m.reason)}</small>`:""}</span></button>`).join(""):
+  $("#pga").innerHTML=pager("a",list.length);
+  $("#alist").innerHTML=list.length?slice("a",list).map(m=>`<button class="card" data-aid="${m.id}">${dblk(m.date)}<span class="am"><b>${esc(m.title)}</b><small>${asub(m)}</small>${apill(m)}${m.status==="Not Done"&&m.reason?`<small>Reason: ${esc(m.reason)}</small>`:""}</span></button>`).join(""):
     `<p class="none">${acts.length?"No activities match your search or filter.":"No activities yet. Select Add Activity to schedule one."}</p>`;
 }
 
