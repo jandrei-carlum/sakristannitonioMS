@@ -344,7 +344,7 @@ if(window.top!==window.self){document.body.textContent="";throw new Error("block
 const REMOVED="Removed (Disciplinary)";
 const STATUS=["Active","Inactive","Probationary","On Leave","Suspended","Graduated","Deceased","Transferred","Honorary / Alumni",REMOVED];
 const SI={"Active":"🟢","Inactive":"🟡","Probationary":"🔵","On Leave":"🟣","Suspended":"⚫","Graduated":"🎓","Deceased":"🕊️","Transferred":"🔄","Honorary / Alumni":"📜",[REMOVED]:"🚫"};
-const SD={"Active":"Currently serving in the ministry","Inactive":"Still a member, but currently not serving","Probationary":"New member undergoing formation/training","On Leave":"Temporarily unable to serve","Suspended":"Temporarily restricted from serving","Graduated":"Completed/finished their time in the ministry","Deceased":"Member who has passed away","Transferred":"Continued their ministry/service elsewhere","Honorary / Alumni":"Former member who remains part of the ministry's historical community",[REMOVED]:"Removed from the ministry for disciplinary reasons"};
+const SD={"Active":"Currently serving in the ministry","Inactive":"Still a member, but currently not serving","Probationary":"Member under observation, and subject to removal or suspension","On Leave":"Temporarily unable to serve","Suspended":"Temporarily restricted from serving","Graduated":"Completed/finished their time in the ministry","Deceased":"Member who has passed away","Transferred":"Continued their ministry/service elsewhere","Honorary / Alumni":"Former member who remains part of the ministry's historical community",[REMOVED]:"Removed from the ministry for disciplinary reasons"};
 const SCOL={"Active":"#4f8f69","Inactive":"#d4b277","Probationary":"#6a8fd8","On Leave":"#8f77c4","Suspended":"#4a4452","Graduated":"#4aa3a3","Deceased":"#a9a2b3","Transferred":"#d98f5f","Honorary / Alumni":"#c58ab5",[REMOVED]:"#9b4a52","No Status":"#e0dbe6"};
 const scol=s=>SCOL[s]||"#c9c1d3";
 const sl=s=>(SI[s]||"⚪")+" "+s;
@@ -1421,7 +1421,7 @@ function printReport(to,by,yr){
   const{act,pct}=completeness();
   const cf=act.filter(m=>m.confirmation==="Confirmed").length,nc=act.filter(m=>m.confirmation==="Not Yet Confirmed").length,nr=act.length-cf-nc;
   const aw=[];members.forEach(m=>AW.forEach(a=>{if(m[a.k])aw.push([full(m),a.n,m[a.k]])}));aw.sort((x,y)=>y[2].localeCompare(x[2]));
-  const flag=[["Suspended","currently suspended"],["On Leave","currently on leave"],["Probationary","in probation (formation/training)"]].map(([s,t])=>[cnt(s),t]).filter(r=>r[0]);
+  const flag=[["Suspended","currently suspended"],["On Leave","currently on leave"],["Probationary","on probation (under observation)"]].map(([s,t])=>[cnt(s),t]).filter(r=>r[0]);
   const th=h=>`<th${/^\d|Total|Active|Inactive|Other|Members|Share/.test(h)?' class="num"':""}>${h}</th>`;
   const tb=(head,body,foot="")=>`<table class="pdt rt"><thead><tr>${head.map(th).join("")}</tr></thead><tbody>${body}${foot}</tbody></table>`;
   const tr=cells=>`<tr>${cells.map(([v,c])=>`<td${c?` class="${c}"`:""}>${v}</td>`).join("")}</tr>`;
