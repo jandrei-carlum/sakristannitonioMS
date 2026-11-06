@@ -273,7 +273,7 @@ dialog form,.fm{display:flex;flex-direction:column;max-height:92vh}
 .sgn div{flex:1;border-top:1px solid #555;padding-top:3px;font-size:9pt;color:#444}
 .rnote{margin-top:14px;font-size:8pt;color:#777}
 tr{break-inside:avoid}
-@media print{body{background:#fff;padding:0}#app,#ts,#ld,#cf,#nt{display:none}#pr{display:block}}
+@media print{body{background:#fff;padding:0}#app,#ts,#ld,#cf,#nt,#cr{display:none}#pr{display:block}}
 @media(min-width:721px){
  body{padding-bottom:0}
  nav{position:static;max-width:1000px;margin:1rem auto 0;padding:0 1rem;border:0;background:none;gap:.5rem}
@@ -324,18 +324,33 @@ tr{break-inside:avoid}
 .pgi{text-align:center;font-weight:700;color:var(--pd);font-size:.9rem;line-height:1.3}
 .pgi small{display:block;font-weight:400;color:var(--mut);font-size:.75rem}
 @media(max-width:720px){#list,#alist{padding-bottom:0}#pgm,#pga{padding-bottom:3.8rem}}
+.av img.pf{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+#chp{cursor:pointer}
+.phr{display:flex;align-items:center;gap:.9rem;margin-bottom:.9rem;padding-bottom:.8rem;border-bottom:1px solid var(--line)}
+.phr .av{width:72px;height:72px;font-size:1.6rem;flex:none}
+.phr b{display:block}
+.phr button{min-height:38px;padding:.3rem .9rem;font-size:.88rem;margin-top:.3rem}
+.pm button{width:100%;margin-top:.55rem}
+.pm .del2{color:var(--red);border-color:var(--redt)}
+.crw{position:relative;width:280px;height:280px;max-width:100%;margin:.9rem auto .6rem;border-radius:16px;overflow:hidden;background:#fff;touch-action:none}
+.crw canvas{display:block;cursor:grab;touch-action:none}
+.crm{position:absolute;inset:0;pointer-events:none;border-radius:50%;box-shadow:0 0 0 400px #2a1f45b3;outline:2px solid #d4b277}
+#crz{padding:0;border:0;min-height:32px}
+.pph{display:flex;align-items:center;gap:14px;margin:8px 0}
+.ppf{width:30mm;height:30mm;border-radius:50%;object-fit:cover;border:1.5px solid #d4b277;flex:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 </style></head>
 <body><div id="app"></div><div id="pr"></div><style id="pg"></style>
 <dialog id="dlg"></dialog>
 <dialog id="cf" class="cf"></dialog>
 <dialog id="nt" class="cf" aria-label="Activity reminder"></dialog>
+<dialog id="cr" class="cf" aria-label="Adjust photo"></dialog>
 <dialog id="wd" class="cf" aria-label="Session timeout warning"></dialog>
 <dialog id="ld" class="ld" aria-labelledby="ldm"><span class="spin" aria-hidden="true"></span><p id="ldm">Saving…</p></dialog>
 <div id="ts" class="ts" role="status" aria-live="polite"></div>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserSessionPersistence,reauthenticateWithCredential,EmailAuthProvider,sendPasswordResetEmail,updatePassword}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import{getFirestore,collection,onSnapshot,doc,deleteDoc,writeBatch,serverTimestamp,query,orderBy,limit}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{getFirestore,collection,onSnapshot,doc,deleteDoc,writeBatch,serverTimestamp,query,orderBy,limit,getDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const cfg={apiKey:"AIzaSyDqtjhvtmAea9S9TKf94CIdd5BpbdpiZeA",authDomain:"moas-system.firebaseapp.com",projectId:"moas-system",appId:"1:302631045782:web:89769532d1cd1f4c0810b7"};
 
@@ -464,6 +479,8 @@ const IC={
  bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 20.5a2 2 0 0 0 4 0"/>',
  x:'<path d="M6 6l12 12M18 6 6 18"/>',
  up:'<path d="M12 20V9m0 0-4 4m4-4 4 4M5 4h14"/>',
+ cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+ img:'<rect x="4" y="5" width="16" height="14" rx="2"/><path d="m4 16 5-5 4 4 3-3 4 4"/><circle cx="9" cy="9.5" r="1"/>',
  next:'<path d="m9 5 7 7-7 7"/>',
  expo:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5 M12 18v-6m0 0-2.5 2.5M12 12l2.5 2.5"/>',
  impo:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5 M12 12v6m0 0-2.5-2.5M12 18l2.5-2.5"/>'
@@ -501,7 +518,7 @@ const nm=m=>`${m.lastName||""}, ${m.firstName||""}${m.middleName?" "+m.middleNam
 const full=m=>[m.firstName,m.middleName,m.lastName].filter(Boolean).join(" ");
 const ini=m=>esc(((m.firstName||"")[0]||"")+((m.lastName||"")[0]||"")).toUpperCase();
 const day=m=>(m.birthday||"").slice(5);
-const CHK=[["Contact Number",m=>!m.contact],["Birthday",m=>!m.birthday],["Group",m=>!m.group],["Confirmation Record",m=>!m.confirmation],["Guardian Contact (Under 18)",m=>(!m.birthday||age(m.birthday)<18)&&!m.guardianContact],["Group Lead Not in Own Group",m=>{const x=/^Group (\d) Lead$/.exec(m.role||"");return !!x&&m.group!==x[1]}]];
+const CHK=[["Contact Number",m=>!m.contact],["Birthday",m=>!m.birthday],["Group",m=>!m.group],["Confirmation Record",m=>!m.confirmation],["Guardian Contact (Under 18)",m=>(!m.birthday||age(m.birthday)<18)&&!m.guardianContact],["Profile Photo",m=>!okImg(m.photoThumb)],["Group Lead Not in Own Group",m=>{const x=/^Group (\d) Lead$/.exec(m.role||"");return !!x&&m.group!==x[1]}]];
 const completeness=()=>{const act=members.filter(m=>m.status==="Active"),res=CHK.map(([l,f])=>[l,act.filter(f)]),gaps=res.reduce((s,r)=>s+r[1].length,0);return{act,res,pct:act.length?Math.round(100-gaps/(act.length*CHK.length)*100):0}};
 const stat=(v,l,i,c)=>`<div class="stat"><span class="ic ${c}">${ic(i,22)}</span><div><b>${v}</b><span>${l}</span></div></div>`;
 const LOGO='<img class="logo" src="logos/Origin.png" alt="" onerror="this.remove()">';
@@ -510,6 +527,7 @@ const brand=`${LOGO}<div class="brand"><h1>Ministry of Altar Servers</h1><p><spa
 let unsub,members=[],view="dash",pid=null,othOpen=false,bdFull="",bdCount=0,shown=0;
 let acts=[],actErr=false,notified=false;
 let hist=[];
+const photoCache=new Map();
 /* Pagination: items per page for Members (m), Activities (a), History (h), and a member's own history (p). */
 const PS={m:10,a:8,h:8,p:5};
 const pg={m:1,a:1,h:1,p:1};
@@ -527,7 +545,7 @@ const LB=Object.fromEntries(F.map(f=>[f[0],f[1]]));
 const diff=(o,n,keys)=>keys.filter(k=>String(o[k]??"")!==String(n[k]??"")).map(k=>({f:LB[k]||k,from:String(o[k]??""),to:String(n[k]??"")}));
 const logH=(b,action,kind,refId,name,changes=[])=>b.set(doc(collection(db,"history")),{at:serverTimestamp(),by:auth.currentUser?.email||"unknown",action,kind,refId:refId||"",name:name||"",changes});
 const fmtAt=h=>{const t=h.at&&h.at.toDate?h.at.toDate():null;return t?t.toLocaleString("en",{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"}):"Just now"};
-const hrow=h=>`<div class="f"><b>${esc(h.action)} ${esc(h.kind)}${h.name?": "+esc(h.name):""}</b><small>${esc(fmtAt(h))} · ${esc(h.by)}</small>${(h.changes||[]).map(c=>`<small>${esc(c.f)}: ${c.from?esc(c.from):"<i>empty</i>"} → ${c.to?esc(c.to):"<i>empty</i>"}</small>`).join("")}</div>`;
+const hrow=h=>`<div class="f"><b>${esc((h.action+" "+h.kind).trim())}${h.name?": "+esc(h.name):""}</b><small>${esc(fmtAt(h))} · ${esc(h.by)}</small>${(h.changes||[]).map(c=>`<small>${esc(c.f)}: ${c.from?esc(c.from):"<i>empty</i>"} → ${c.to?esc(c.to):"<i>empty</i>"}</small>`).join("")}</div>`;
 const st={q:"",g:"",s:"",r:"",sort:"name"};
 const sa={q:"",f:"all"};
 
@@ -558,6 +576,34 @@ function ask(o){return new Promise(res=>{
   d.oncancel=()=>res(false);
   d.showModal();$("#cn").focus();
 })}
+
+/* Error window: replaces the plain browser alert(). Resolves when the person taps OK or closes it. */
+function showErr(o){return new Promise(res=>{
+  const d=$("#cf");
+  d.innerHTML=`<div class="cfb"><span class="cfi ${o.warn?"y":"r"}">${ic("alert",26)}</span><h2>${o.title}</h2><div class="cft">${o.body}</div><div class="cfa"><button type="button" class="pri" id="eok">OK</button></div></div>`;
+  let done=false;const fin=()=>{if(done)return;done=true;if(d.open)d.close();res()};
+  $("#eok").onclick=fin;
+  d.oncancel=()=>{done=true;res()};
+  d.showModal();$("#eok").focus();
+})}
+/* Friendly text for save errors. "what" completes the sentence "...not allowed to ___". */
+function errInfo(x,what){
+  const c=(x&&x.code)||"",m=(x&&x.message)||"";
+  if(m==="timeout")return{warn:1,title:"Taking Longer Than Expected",body:`<p>Your connection looks slow or offline.</p><p class="cfh">Your change will save automatically once you are back online. Please don't repeat it.</p>`};
+  if(c==="permission-denied")return{title:"Permission Denied",body:`<p>This account is not allowed to ${what}.</p><p class="cfh">If this keeps happening, check the Firestore rules for the collection involved.</p>`};
+  if(c==="unavailable"||c==="network-request-failed")return{title:"No Connection",body:`<p>Could not reach the server. Check your internet connection and try again.</p>`};
+  if(c==="resource-exhausted"||c==="invalid-argument"||/too large|exceeds/i.test(m))return{title:"Too Large",body:`<p>The data was too large to save. Try a smaller photo.</p>`};
+  return{title:"Could Not Complete",body:`<p>Something went wrong while trying to ${what}. Please try again.</p><p class="cfh">Details: ${esc(c||m||"unknown error")}</p>`};
+}
+/* Friendly text when a picture cannot be opened. */
+function imgReadErr(k){
+  const T={
+    heic:["Photo Format Not Supported",`<p>This looks like a HEIC photo, which this browser cannot open.</p><p class="cfh">On iPhone, go to Settings › Camera › Formats and choose “Most Compatible”, or pick a JPG or PNG photo instead.</p>`],
+    big:["Photo Is Too Large",`<p>That file is larger than 30 MB. Please choose a smaller photo.</p>`],
+    type:["Not a Picture",`<p>Please choose a picture file such as JPG or PNG.</p>`],
+    decode:["Could Not Read Photo",`<p>This picture could not be opened. It may be damaged, or still downloading from Google Drive.</p><p class="cfh">Try another photo, or save it to your phone first and choose it again.</p>`]};
+  const t=T[k]||T.decode;return{title:t[0],body:t[1]};
+}
 
 const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
 /* ---------- Pop-ups: every window gets a close icon (top right) and closes when you tap outside it ---------- */
@@ -653,7 +699,7 @@ ERR["auth/wrong-password"]=ERR["auth/user-not-found"]=ERR["auth/invalid-credenti
 
 function showLogin(){
   /* Wipe everything held in memory so nothing is left behind after sign-out. */
-  members=[];acts=[];hist=[];actErr=false;notified=false;pid=null;view="dash";bdFull="";
+  members=[];acts=[];hist=[];photoCache.clear();actErr=false;notified=false;pid=null;view="dash";bdFull="";
   $("#pr").innerHTML="";closeAll();
   const msg=ss.get("moas_msg")||"";ss.del("moas_msg");
   $("#app").innerHTML=`<div class="top"><div class="in">${brand}</div></div>
@@ -707,6 +753,104 @@ function showApp(){
   const u3=onSnapshot(query(collection(db,"history"),orderBy("at","desc"),limit(300)),s=>{hist=s.docs.map(d=>({id:d.id,...d.data()}));fill()},()=>{});
   unsub=()=>{u1();u2();u3()};
   go("dash");
+}
+
+/* ---------- Member photos (stored in Firestore: a small copy in the member record, a larger copy in "photos") ---------- */
+const okImg=s=>typeof s==="string"&&/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(s);
+const pimg=m=>okImg(m.photoThumb)?`<img class="pf" src="${m.photoThumb}" alt="">`:"";
+async function fullPhoto(m){
+  const c=photoCache.get(m.id);if(c&&c.t===m.photoThumb)return c.u;
+  try{const s=await withTimeout(getDoc(doc(db,"photos",m.id)),10000);const u=s.exists()?(s.data().full||""):"";photoCache.set(m.id,{t:m.photoThumb,u});return u}
+  catch(e){
+    console.warn("Full photo could not be loaded:",e&&e.code,e&&e.message);
+    if(e&&e.code==="permission-denied"&&!fullPhoto.warned){fullPhoto.warned=true;toast("Showing the small photo. The full-size photo could not be loaded (permission).")}
+    return""}
+}
+/* The file input is attached to the page while the picker is open. Without that, some phones never report the chosen file. */
+function pickPhoto(camera){return new Promise(r=>{
+  const i=document.createElement("input");
+  i.type="file";i.accept="image/*";
+  i.style.cssText="position:fixed;left:-9999px;top:0;opacity:0;pointer-events:none";
+  if(camera)i.setAttribute("capture","environment");
+  let done=false;
+  const fin=f=>{if(done)return;done=true;removeEventListener("focus",onFocus);setTimeout(()=>i.remove(),0);r(f||null)};
+  /* Older browsers have no "cancel" event. When the window regains focus with no file chosen, treat it as cancelled. */
+  const onFocus=()=>setTimeout(()=>{if(!done&&!(i.files&&i.files.length))fin(null)},2000);
+  i.addEventListener("change",()=>fin(i.files[0]));
+  i.addEventListener("cancel",()=>fin(null));
+  addEventListener("focus",onFocus);
+  document.body.appendChild(i);
+  i.click();
+})}
+/* Opens the picture with the normal decoder first, then a second decoder. Rejects with the reason: big, type, heic, or decode. */
+function loadImg(f){return new Promise((ok,no)=>{
+  if(!f)return no(new Error("decode"));
+  const name=f.name||"",type=f.type||"";
+  if(f.size>30*1024*1024)return no(new Error("big"));
+  const heic=/heic|heif/i.test(type)||/\.(heic|heif)$/i.test(name);
+  const isImg=type?/^image\//.test(type):/\.(jpe?g|png|webp|gif|heic|heif)$/i.test(name);
+  if(!isImg)return no(new Error("type"));
+  const u=URL.createObjectURL(f),i=new Image();
+  i.onload=()=>{URL.revokeObjectURL(u);ok(i)};
+  i.onerror=async()=>{URL.revokeObjectURL(u);
+    try{const b=await createImageBitmap(f);b.naturalWidth=b.width;b.naturalHeight=b.height;ok(b)}
+    catch{no(new Error(heic?"heic":"decode"))}};
+  i.src=u})}
+/* Drag and zoom inside a circle, then make a 96 px and a 320 px square copy. Redrawing also removes hidden camera data such as location. */
+function cropPhoto(file){return new Promise(async res=>{
+  let img;try{img=await loadImg(file)}catch(e){await showErr(imgReadErr(e&&e.message));return res(null)}
+  /* The crop square shrinks on very narrow phones so it is never clipped. */
+  const S=Math.max(200,Math.min(280,Math.floor(Math.min(innerWidth*0.92,420)-48))),d=$("#cr");
+  d.innerHTML=`<div class="cfb"><h2>Adjust Photo</h2><div class="cft"><p>Drag to move the picture. Use the slider or pinch to zoom.</p></div>
+  <div class="crw" style="width:${S}px;height:${S}px"><canvas id="crc" width="${S*2}" height="${S*2}" style="width:${S}px;height:${S}px"></canvas><span class="crm"></span></div>
+  <input id="crz" type="range" min="100" max="400" value="100" aria-label="Zoom">
+  <div class="cfa"><button type="button" id="crx">Cancel</button><button type="button" class="pri" id="cru">Use Photo</button></div></div>`;
+  const cv=$("#crc"),cx=cv.getContext("2d"),base=Math.max(S/img.naturalWidth,S/img.naturalHeight);
+  let z=1,ox=0,oy=0,lastD=0;const pts=new Map();
+  const dims=()=>[img.naturalWidth*base*z,img.naturalHeight*base*z];
+  const clamp=()=>{const[w,h]=dims(),mx=Math.max(0,(w-S)/2),my=Math.max(0,(h-S)/2);ox=Math.min(mx,Math.max(-mx,ox));oy=Math.min(my,Math.max(-my,oy))};
+  const draw=()=>{clamp();const[w,h]=dims();cx.setTransform(2,0,0,2,0,0);cx.fillStyle="#fff";cx.fillRect(0,0,S,S);cx.drawImage(img,S/2+ox-w/2,S/2+oy-h/2,w,h)};
+  const setZ=v=>{z=Math.min(4,Math.max(1,v));$("#crz").value=Math.round(z*100)};
+  cv.onpointerdown=e=>{cv.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);lastD=0};
+  cv.onpointermove=e=>{const p=pts.get(e.pointerId);if(!p)return;
+    if(pts.size===1){ox+=e.clientX-p[0];oy+=e.clientY-p[1]}
+    pts.set(e.pointerId,[e.clientX,e.clientY]);
+    if(pts.size===2){const[a,b]=[...pts.values()],dd=Math.hypot(a[0]-b[0],a[1]-b[1]);if(lastD)setZ(z*dd/lastD);lastD=dd}
+    draw()};
+  cv.onpointerup=cv.onpointercancel=e=>{pts.delete(e.pointerId);lastD=0};
+  cv.onwheel=e=>{e.preventDefault();setZ(z*(e.deltaY<0?1.06:.94));draw()};
+  $("#crz").oninput=e=>{setZ(e.target.value/100);draw()};
+  const out=(size,q)=>{const c=document.createElement("canvas");c.width=c.height=size;const x=c.getContext("2d"),k=size/S,[w,h]=dims();
+    x.fillStyle="#fff";x.fillRect(0,0,size,size);x.imageSmoothingQuality="high";x.drawImage(img,(S/2+ox-w/2)*k,(S/2+oy-h/2)*k,w*k,h*k);return c.toDataURL("image/jpeg",q)};
+  d.oncancel=()=>res(null);
+  $("#crx").onclick=()=>{d.close();res(null)};
+  $("#cru").onclick=()=>{const r={thumb:out(96,.78),full:out(320,.82)};d.close();res(r)};
+  d.showModal();draw();
+})}
+/* Photo menu. Resolves to {thumb, full}, "remove", or null (cancelled). */
+function getPhoto(has){return new Promise(res=>{
+  const d=$("#cf");
+  d.innerHTML=`<div class="cfb pm"><span class="cfi p">${ic("cam",26)}</span><h2>Member Photo</h2><div class="cft"><p>Use a clear, front-facing photo. You can pick one from your gallery, Google Drive, or Files.</p></div>
+  <button type="button" class="pri" id="pmt">${ic("cam",18)}Take Photo</button><button type="button" id="pmc">${ic("img",18)}Choose Photo</button>${has?`<button type="button" class="del2" id="pmr">${ic("trash",18)}Remove Photo</button>`:""}<button type="button" class="gh" id="pmx" style="margin:.5rem auto 0;display:flex">Cancel</button></div>`;
+  let done=false;const fin=v=>{if(done)return;done=true;res(v)};
+  const go=async cam=>{d.close();const f=await pickPhoto(cam);if(!f)return fin(null);fin(await cropPhoto(f))};
+  $("#pmt").onclick=()=>go(true);$("#pmc").onclick=()=>go(false);
+  if(has)$("#pmr").onclick=()=>{d.close();fin("remove")};
+  $("#pmx").onclick=()=>{d.close();fin(null)};
+  d.oncancel=()=>fin(null);
+  d.showModal();
+})}
+async function changePhoto(id){
+  const m=members.find(x=>x.id===id);if(!m)return;
+  const r=await getPhoto(!!m.photoThumb);if(!r)return;
+  const rm=r==="remove";
+  busy(rm?"Removing photo…":"Saving photo…");
+  try{const b=writeBatch(db);
+    if(rm){b.update(doc(db,"members",id),{photoThumb:""});b.delete(doc(db,"photos",id))}
+    else{b.update(doc(db,"members",id),{photoThumb:r.thumb});b.set(doc(db,"photos",id),{full:r.full,at:serverTimestamp()})}
+    logH(b,rm?"Photo removed":m.photoThumb?"Photo changed":"Photo added","",id,full(m),[]);
+    await withTimeout(b.commit(),20000);photoCache.delete(id);busyEnd();toast(rm?"Photo removed.":"Photo saved.")}
+  catch(x){busyEnd();console.error("Photo save failed:",x.code,x.message);showErr(errInfo(x,rm?"remove the photo":"save the photo"))}
 }
 
 /* ---------- Change own password ---------- */
@@ -796,7 +940,7 @@ function dash(){
   const bdc=soon.length?`<span class="pill y" title="Birthdays in the next 2 weeks">${soon.length}</span>`:"";
 
   const holder=r=>members.find(m=>m.role===r);
-  const rb=(m,r)=>`<button class="li" data-id="${m.id}"><span class="av rd">${ic(ri(r),20)}</span><span class="lt"><b>${esc(nm(m))}</b><small class="rl">${esc(r)}</small></span></button>`;
+  const rb=(m,r)=>`<button class="li" data-id="${m.id}"><span class="av rd">${pimg(m)||ic(ri(r),20)}</span><span class="lt"><b>${esc(nm(m))}</b><small class="rl">${esc(r)}</small></span></button>`;
   const rr=r=>{const m=holder(r);return m?rb(m,r):""};
   const other=members.filter(m=>m.role&&!ROLES.includes(m.role));
   const vac=ROLES.filter(r=>!holder(r)),filled=ROLES.length-vac.length+other.length;
@@ -868,7 +1012,7 @@ function draw(){
   if($("#fok"))$("#fok").textContent=`Show ${a.length} Member${a.length===1?"":"s"}`;
   $("#pgm").innerHTML=pager("m",a.length);
   $("#list").innerHTML=a.length?slice("m",a).map(m=>`<button class="card" data-id="${m.id}">
-    <span class="av">${ini(m)}${m.group?`<i>${esc(m.group)}</i>`:""}</span>
+    <span class="av">${ini(m)}${pimg(m)}${m.group?`<i>${esc(m.group)}</i>`:""}</span>
     <span><b>${esc(nm(m))}</b><small>${rbadge(m.role)}${esc(m.role||"No Role")}${m.contact?" · "+esc(m.contact):""}</small>
     ${m.status?`<span class="st">${esc(sl(m.status))}</span>`:""}</span></button>`).join(""):
     `<p class="none">${members.length?"No members match your search or filters.":"No members yet. Select Add Member to get started."}</p>`;
@@ -897,7 +1041,7 @@ function prof(){
   const awards=AW.map(a=>m[a.k]?`<div class="medal ${a.c}"><span class="mdl">${ic("medal",26)}</span><div><b>${a.n}</b><small>${a.d}</small><span class="dt2">Given ${fmtL(m[a.k])}</span></div></div>`
     :`<div class="medal off"><span class="mdl">${ic("medal",26)}</span><div><b>${a.n}</b><small>${a.d}</small><small>Not Yet Received</small></div></div>`).join("");
   $("#v").innerHTML=`<button class="back" id="bk">${ic("back",18)}Members</button>
-  <div class="hero"><span class="av big">${ini(m)}</span>
+  <div class="hero"><span class="av big" id="chp" role="button" tabindex="0" title="Change photo" aria-label="Change photo">${ini(m)}${pimg(m)}<i>${ic("cam",11)}</i></span>
   <div class="hn"><h2>${esc(full(m))}</h2><p>${rbadge(m.role,16)}${esc(m.role||"No Role Assigned")}${m.group?" · Group "+esc(m.group):""}</p>${m.status?`<span class="st" title="${esc(SD[m.status]||"")}">${esc(sl(m.status))}</span>`:""}${m.confirmation?`<span class="tag ${m.confirmation==="Confirmed"?"ok":"no"}">${m.confirmation==="Confirmed"?ic("check",14):""}${esc(m.confirmation)}</span>`:""}</div>
   <div class="acts"><button id="pp">${ic("print",18)}Print Profile</button><button class="pri" id="ed">${ic("edit",18)}Edit</button></div></div>
   <div class="strip">${cell(m.birthday?age(m.birthday):"—","Age","cake","y")}${cell(span(m.start,m.end)||"—","In Service","clock","g")}${cell(m.group||"—","Group","users","p")}</div>
@@ -912,6 +1056,8 @@ function prof(){
   $("#bk").onclick=()=>history.back();
   $("#ed").onclick=()=>openForm(m.id);
   $("#pp").onclick=()=>printProfile(m);
+  $("#chp").onclick=()=>changePhoto(m.id);$("#chp").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();changePhoto(m.id)}};
+  if(okImg(m.photoThumb))fullPhoto(m).then(u=>{const el=document.querySelector("#v .av.big img.pf");if(okImg(u)&&el&&pid===m.id)el.src=u});
   $("#v").insertAdjacentHTML("beforeend",`<div class="box" style="margin-top:.75rem"><h3><span class="ic p">${ic("clock",16)}</span>History</h3><div id="phl"></div><div id="php"></div></div>`);
   const ph=()=>{const l=hist.filter(h=>h.refId===m.id);$("#php").innerHTML=pager("p",l.length);$("#phl").innerHTML=slice("p",l).map(hrow).join("")||'<p class="none">No changes recorded yet.</p>'};
   ph();$("#php").onclick=e=>{const b=e.target.closest("[data-p]");if(b&&!b.disabled){pg.p=+b.dataset.p;ph()}};
@@ -928,7 +1074,7 @@ function openForm(id){
     else inp=`<input name="${k}" type="${t==="date"?"date":"text"}" value="${esc(m[k])}"${k==="lastName"||k==="firstName"?" required":""}>`;
     return (SEC[k]?`<div class="sh">${SEC[k]}</div>`:"")+`<label class="${t==="w"?"w":""}">${l}${inp}</label>`};
   $("#dlg").innerHTML=`<form id="mf"><div class="dh"><h2>${id?"Edit Member":"New Member"}</h2></div>
-  <div class="bd"><div class="grid">${F.map(field).join("")}</div></div>
+  <div class="bd"><div class="phr"><span class="av" id="fpv"></span><div><b>Photo</b><small class="hint" id="fph"></small><button type="button" id="fpb">${ic("cam",16)}<span id="fpt">Add Photo</span></button></div></div><div class="grid">${F.map(field).join("")}</div></div>
   <div class="foot">${id?`<button type="button" class="del" id="dl">${ic("trash",18)}Delete</button>`:""}
   <button type="button" id="cx">Cancel</button><button class="pri">Save Member</button></div></form>`;
   $("#mf").elements.status.onchange=e=>{$("#sth").textContent=SD[e.target.value]||""};
@@ -938,19 +1084,28 @@ function openForm(id){
   PH.forEach(k=>{const i=$("#mf").elements[k];
     const chk=()=>{i.value=i.value.replace(/\D/g,"").slice(0,11);i.setCustomValidity(i.value&&!/^09\d{9}$/.test(i.value)?"Enter 11 digits starting with 09, like 09171234567.":"")};
     i.addEventListener("input",chk);chk()});
+  let pend={};
+  const showP=()=>{const t=pend.thumb||(!pend.removed&&m.photoThumb)||"";
+    $("#fpv").innerHTML=okImg(t)?`<img class="pf" src="${t}" alt="">`:(ini(m)||ic("user",30));
+    $("#fpt").textContent=t?"Change Photo":"Add Photo";
+    $("#fph").textContent=pend.thumb?"New photo chosen. Tap Save Member to keep it.":pend.removed?"Photo will be removed when you tap Save Member.":"";};
+  showP();
+  $("#fpb").onclick=async()=>{const r=await getPhoto(!!(pend.thumb||(m.photoThumb&&!pend.removed)));if(!r)return;
+    pend=r==="remove"?(m.photoThumb?{removed:true}:{}):{thumb:r.thumb,full:r.full};showP()};
   $("#cx").onclick=()=>$("#dlg").close();
   if(id)$("#dl").onclick=async()=>{
     const sub=[m.role,m.group&&"Group "+m.group,m.status&&sl(m.status)].filter(Boolean).join(" · ")||"Member record";
     const ok=await ask({icon:"trash",danger:1,title:`Delete ${esc(full(m))}?`,ok:"Delete Member",
-      body:`<div class="cfn"><span class="av">${ini(m)}</span><span><b>${esc(full(m))}</b><br><small>${esc(sub)}</small></span></div>
+      body:`<div class="cfn"><span class="av">${ini(m)}${pimg(m)}</span><span><b>${esc(full(m))}</b><br><small>${esc(sub)}</small></span></div>
       <p>This permanently removes the member and all of their records, including awards. This cannot be undone.</p>
       <p class="cfh">If this member has left the ministry, consider changing their status instead, such as Transferred or Graduated.</p>`});
     if(!ok||!await reauth())return;
     busy("Deleting member…");
-    try{const b=writeBatch(db);b.delete(doc(db,"members",id));logH(b,"Deleted","member",id,full(m),diff(m,{},F.map(f=>f[0])));await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast("Member deleted.");if(view==="profile")go("members")}
-    catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not delete. Check your connection and try again.")}};
+    try{const b=writeBatch(db);b.delete(doc(db,"members",id));b.delete(doc(db,"photos",id));logH(b,"Deleted","member",id,full(m),diff(m,{},F.map(f=>f[0])));await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast("Member deleted.");if(view==="profile")go("members")}
+    catch(x){busyEnd();console.error("Member delete failed:",x.code,x.message);showErr(errInfo(x,"delete this member"))}};
   $("#mf").onsubmit=async e=>{e.preventDefault();
     const d={};F.forEach(([k])=>d[k]=e.target.elements[k].value.trim());
+    d.photoThumb=pend.thumb?pend.thumb:pend.removed?"":(m.photoThumb||"");
     const lm=/^Group (\d) Lead$/.exec(d.role);let note="";
     if(lm&&id&&m.role===d.role&&m.group!==d.group){d.role="";note=`The ${m.role} role was removed because the member moved to ${d.group?"Group "+d.group:"no group"}.`}
     else if(lm&&d.group!==lm[1]){d.group=lm[1];note=`Group was set to ${lm[1]} because a ${d.role} must belong to Group ${lm[1]}.`}
@@ -963,10 +1118,13 @@ function openForm(id){
     try{const b=writeBatch(db);
       prev.forEach(o=>{b.update(doc(db,"members",o.id),{role:""});logH(b,"Role removed","member",o.id,full(o),[{f:"Role",from:o.role,to:""}])});
       const ref=id?doc(db,"members",id):doc(collection(db,"members")),ch=id?diff(m,d,F.map(f=>f[0])):[];
-      b.set(ref,d);
+      /* merge keeps any extra fields on the record that this form does not list */
+      b.set(ref,d,{merge:true});
       if(!id||ch.length)logH(b,id?"Edited":"Added","member",ref.id,[d.firstName,d.lastName].join(" "),ch);
+      if(pend.thumb){b.set(doc(db,"photos",ref.id),{full:pend.full,at:serverTimestamp()});logH(b,m.photoThumb?"Photo changed":"Photo added","",ref.id,[d.firstName,d.lastName].join(" "),[]);photoCache.delete(ref.id)}
+      else if(pend.removed){b.delete(doc(db,"photos",ref.id));logH(b,"Photo removed","",ref.id,[d.firstName,d.lastName].join(" "),[]);photoCache.delete(ref.id)}
       await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast(note||(id?"Changes saved.":"Member added."))}
-    catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not save. Check your connection and try again.")}};
+    catch(x){busyEnd();console.error("Member save failed:",x.code,x.message);showErr(errInfo(x,"save this member"))}};
   $("#dlg").showModal();
 }
 
@@ -1053,7 +1211,7 @@ function openMark(id,to){
 async function saveAct(id,d,msg){
   busy("Saving…");
   try{const b=writeBatch(db);b.update(doc(db,"activities",id),d);const o=acts.find(x=>x.id===id)||{};logH(b,"Updated","activity",id,o.title,diff(o,d,Object.keys(d)));await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast(msg)}
-  catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not save. Check your connection and try again.")}
+  catch(x){busyEnd();console.error("Activity save failed:",x.code,x.message);showErr(errInfo(x,"save this activity"))}
 }
 
 function openActForm(id){
@@ -1082,7 +1240,7 @@ function openActForm(id){
     if(!ok||!await reauth())return;
     busy("Deleting activity…");
     try{const b=writeBatch(db);b.delete(doc(db,"activities",id));logH(b,"Deleted","activity",id,a.title,diff(a,{},["title","type","status","date","time","venue","description"]));await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast("Activity deleted.")}
-    catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not delete. Check your connection and try again.")}};
+    catch(x){busyEnd();console.error("Activity delete failed:",x.code,x.message);showErr(errInfo(x,"delete this activity"))}};
   f.onsubmit=async e=>{e.preventDefault();
     const s=el.status.value;
     const d={title:el.title.value.trim(),type:el.type.value,status:s,date:el.date.value,time:el.time.value,venue:el.venue.value.trim(),description:el.description.value.trim(),
@@ -1092,10 +1250,10 @@ function openActForm(id){
     busy(id?"Saving changes…":"Adding activity…");
     try{const b=writeBatch(db);
       const ref=id?doc(db,"activities",id):doc(collection(db,"activities")),ch=id?diff(a,d,Object.keys(d)):[];
-      b.set(ref,d);
+      b.set(ref,d,{merge:true});
       if(!id||ch.length)logH(b,id?"Edited":"Added","activity",ref.id,d.title,ch);
       await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast(id?"Changes saved.":"Activity added.")}
-    catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"Could not save. Check your connection and try again.")}};
+    catch(x){busyEnd();console.error("Activity save failed:",x.code,x.message);showErr(errInfo(x,"save this activity"))}};
   if(!$("#dlg").open)$("#dlg").showModal();
 }
 
@@ -1332,7 +1490,8 @@ function previewImport(res,fname){
         ready.slice(i,i+200).forEach(r=>{const ref=doc(collection(db,"members"));b.set(ref,{...r.data,status:r.data.status||defS});logH(b,"Imported","member",ref.id,r.name,[])});
         await withTimeout(b.commit(),30000)}
       busyEnd();$("#dlg").close();toast(`${n} member${n===1?"":"s"} imported.`);
-    }catch(x){busyEnd();alert(x.message==="timeout"?slowMsg:"The import could not finish. Some members may already have been added. Import the same file again and those will be skipped.")}
+    }catch(x){busyEnd();console.error("Import failed:",x.code,x.message);
+      showErr(x.message==="timeout"?errInfo(x,"import"):{title:"Import Did Not Finish",body:`<p>Some members may already have been added.</p><p class="cfh">Import the same file again and those will be skipped.</p>`,warn:1})}
   };
 }
 
@@ -1394,15 +1553,16 @@ function printDetails(a){
   <tbody>${a.map((m,i)=>`<tr><td class="nw">${i+1}</td>${cols.map(c=>cell(m,c)).join("")}</tr>`).join("")}</tbody></table>`,1);
 }
 
-function printProfile(m){
+async function printProfile(m){
+  const ph0=m.photoThumb?((await fullPhoto(m))||m.photoThumb):"",ph=okImg(ph0)?ph0:"";
   const rows=[["Personal",[["Gender",m.gender],["Birthday",fmtL(m.birthday)],["Age",m.birthday?age(m.birthday):""],["Sacrament of Confirmation",m.confirmation]]],
    ["Contact",[["Contact Number",m.contact],["Messenger",m.messenger],["Home Address",m.address]]],
    ["Parent or Guardian",[["Name",m.guardian],["Contact Number",m.guardianContact]]],
    ["School",[["Level",m.schoolLevel],["School Name",m.schoolName]]],
    ["Service",[["Role",m.role],["Group",m.group],["Status",m.status],["Started",fmtL(m.start)],["Ended",m.end?fmtL(m.end):m.start?"Ongoing":""],["Time in Service",span(m.start,m.end)]]],
    ["Awards",AW.map(a=>[a.n,(m[a.k]?"Given "+fmtL(m[a.k]):"Not yet received")+" - "+a.d])]];
-  printDoc(`${phead("Member Profile")}<h3 class="pn">${esc(full(m))}</h3>
-  <p class="pm">${esc([m.role,m.group&&"Group "+m.group,m.status].filter(Boolean).join(" · "))}</p>
+  printDoc(`${phead("Member Profile")}<div class="pph">${ph?`<img class="ppf" src="${ph}" alt="">`:""}<div><h3 class="pn">${esc(full(m))}</h3>
+  <p class="pm">${esc([m.role,m.group&&"Group "+m.group,m.status].filter(Boolean).join(" · "))}</p></div></div>
   <table class="pdt kv">${rows.map(([t,r])=>`<tr><th colspan="2">${t}</th></tr>`+r.map(([k,x])=>`<tr><td class="k">${k}</td><td>${esc(x)||"—"}</td></tr>`).join("")).join("")}</table>
   <p class="pm" style="margin-top:10px;color:#777">Printed ${fmtL(today)}</p>`,0);
 }
