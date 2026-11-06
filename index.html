@@ -338,6 +338,81 @@ tr{break-inside:avoid}
 #crz{padding:0;border:0;min-height:32px}
 .pph{display:flex;align-items:center;gap:14px;margin:8px 0}
 .ppf{width:30mm;height:30mm;border-radius:50%;object-fit:cover;border:1.5px solid #d4b277;flex:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+/* ---------- Dashboard motion ---------- */
+.nu{font-variant-numeric:tabular-nums}
+.sk{display:inline-block;min-width:1.6em;border-radius:8px;color:transparent;background:linear-gradient(90deg,var(--purt) 25%,#fff 50%,var(--purt) 75%);background-size:200% 100%;animation:shim 1.2s linear infinite}
+.skl{height:14px;border-radius:8px;margin:.7rem 0;background:linear-gradient(90deg,var(--purt) 25%,#fff 50%,var(--purt) 75%);background-size:200% 100%;animation:shim 1.2s linear infinite}
+@keyframes shim{to{background-position:-200% 0}}
+.rise{animation:rise .65s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:var(--rd,0s)}
+@keyframes rise{from{opacity:0;transform:translateY(16px) scale(.98)}}
+.box,.stat,.card{transition:transform .2s,box-shadow .2s,border-color .2s}
+.box:hover,button.stat:hover{transform:translateY(-2px);box-shadow:0 10px 26px #5d4d8c1f}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@keyframes bounce{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-7px) rotate(6deg)}}
+/* Group bars: grow from zero, show the numbers inside, and shine every few seconds */
+.sg{position:relative;height:18px;transition:width 1.1s cubic-bezier(.22,1,.36,1)}
+.sg i{display:flex;align-items:center;justify-content:center;min-width:14px;overflow:hidden}
+.sg i em{font:700 .66rem/1 Nunito,sans-serif;font-style:normal;color:#fff;text-shadow:0 1px 2px #0007}
+.sg::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,#ffffff77 50%,transparent 70%);transform:translateX(-100%);animation:shine 3.8s ease-in-out infinite;animation-delay:var(--d,0s)}
+@keyframes shine{0%,55%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.gt i{transition:width 1.3s cubic-bezier(.22,1,.36,1)}
+/* Records to Complete: red blinking alert icons */
+@keyframes blinkr{0%,100%{opacity:1;filter:drop-shadow(0 0 5px #c4636b)}50%{opacity:.2;filter:none}}
+.ck:not(.ok) summary>svg,.rcb h3 .ic svg{animation:blinkr 1s ease-in-out infinite}
+.ck:not(.ok) .pill.r{animation:pulse 1.6s ease-in-out infinite}
+/* Liturgical season dot: blinks and sends out a ring */
+.chip i{animation:ping 1.6s ease-out infinite}
+@keyframes ping{0%{opacity:1;box-shadow:0 0 0 0 var(--season)}50%{opacity:.35}70%{box-shadow:0 0 0 7px #0000}100%{opacity:1;box-shadow:0 0 0 0 #0000}}
+/* Birthdays */
+.bban{display:flex;align-items:center;justify-content:flex-start;gap:.8rem;position:relative;overflow:hidden;width:100%;text-align:left;margin-bottom:.75rem;padding:.9rem 1.1rem;min-height:68px;border-radius:18px;border:1px solid var(--gold);background:linear-gradient(110deg,#fff7e0,#fde8f0,#efe8ff,#fff7e0);background-size:300% 100%;animation:bgmove 6s linear infinite;box-shadow:0 8px 24px #d4b27744}
+.bban.rise{animation:rise .65s cubic-bezier(.2,.8,.2,1) backwards,bgmove 6s linear infinite;animation-delay:var(--rd,0s),0s}
+@keyframes bgmove{to{background-position:300% 0}}
+.bban .bi{font-size:2rem;line-height:1;flex:none;animation:bounce 1.4s ease-in-out infinite;position:relative}
+.bban .bt{position:relative;min-width:0}
+.bban .bt b{display:block;font:600 1.05rem/1.3 Lora,Georgia,serif;color:var(--pd);overflow-wrap:anywhere}
+.bban .bt small{display:block;color:var(--mut);font-size:.8rem}
+.cf1{position:absolute;top:-14px;width:7px;height:11px;border-radius:2px;opacity:.85;pointer-events:none;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(100px) rotate(540deg);opacity:0}}
+.bdy h3 .ic svg{animation:wig 1.8s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes wig{0%,60%,100%{transform:rotate(0)}15%{transform:rotate(-14deg)}30%{transform:rotate(12deg)}45%{transform:rotate(-8deg)}}
+.box.bdbox{position:relative}
+.box.bdbox::before{content:"";position:absolute;inset:-1px;border-radius:18px;pointer-events:none;border:2px solid var(--gold);animation:bdring 2s ease-in-out infinite}
+@keyframes bdring{0%,100%{opacity:.2}50%{opacity:1}}
+.li.bdt .db{background:var(--gold);animation:pulse 1.4s ease-in-out infinite}
+.li.bdt .db b,.li.bdt .db small{color:#fff}
+.pill.pop{animation:pulse 1.2s ease-in-out infinite}
+.bqb{position:relative;z-index:1}
+.cfx{position:absolute;top:-14px;width:8px;height:12px;border-radius:2px;opacity:.9;pointer-events:none;animation:drop linear infinite}
+@keyframes drop{to{transform:translateY(540px) rotate(720deg);opacity:.2}}
+.bn{font-size:1.9rem;line-height:1;animation:bounce 1.3s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.spin{animation:sp .8s linear infinite!important}}
+/* ---------- Smooth UI ---------- */
+html{-webkit-tap-highlight-color:transparent}
+button,.btn,.card,summary{touch-action:manipulation}          /* no double-tap zoom / tap delay on phones */
+button{transition:transform .12s ease,background-color .18s,border-color .18s,box-shadow .18s,color .18s}
+button:active:not(:disabled){transform:scale(.97)}             /* press feedback */
+button.li:active,button.card:active,button.gr:active,button.stat:active{transform:scale(.985)}
+nav button{transition:color .2s,box-shadow .2s,background-color .2s}
+nav button:active:not(:disabled){transform:none}
+@media(hover:none){.box:hover,button.stat:hover{transform:none;box-shadow:var(--sh)}}  /* no sticky hover on touch */
+
+/* page change */
+.vin{animation:vin .24s ease-out}
+@keyframes vin{from{opacity:0}}
+
+/* modals: fade + lift on desktop, slide-up sheet on phones, both animate on close too */
+dialog,.bd{overscroll-behavior:contain}
+dialog{opacity:0;transform:translateY(14px) scale(.97);transition:opacity .2s ease,transform .28s cubic-bezier(.2,.8,.2,1),overlay .28s allow-discrete,display .28s allow-discrete}
+dialog[open]{opacity:1;transform:none}
+@starting-style{dialog[open]{opacity:0;transform:translateY(14px) scale(.97)}}
+dialog::backdrop{opacity:0;transition:opacity .28s ease,overlay .28s allow-discrete,display .28s allow-discrete}
+dialog[open]::backdrop{opacity:1}
+@starting-style{dialog[open]::backdrop{opacity:0}}
+@media(max-width:560px){
+ #dlg,#cr{transform:translateY(100%)}
+ #dlg[open],#cr[open]{transform:none}
+ @starting-style{#dlg[open],#cr[open]{transform:translateY(100%)}}
+}
 </style></head>
 <body><div id="app"></div><div id="pr"></div><style id="pg"></style>
 <dialog id="dlg"></dialog>
@@ -527,6 +602,17 @@ const brand=`${LOGO}<div class="brand"><h1>Ministry of Altar Servers</h1><p><spa
 let unsub,members=[],view="dash",pid=null,othOpen=false,bdFull="",bdCount=0,shown=0;
 let acts=[],actErr=false,notified=false;
 let hist=[];
+let mLoaded=false,animNext=false,animUntil=0;
+function runAnim(root){
+  const els=root.querySelectorAll(".nu[data-to]"),t0=performance.now(),DUR=1300;
+  const step=now=>{
+    const p=Math.min(1,(now-t0)/DUR),e=1-Math.pow(1-p,3);
+    els.forEach(el=>{if(el.isConnected)el.textContent=Math.round(+el.dataset.to*e)+el.dataset.s});
+    if(p<1)requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>root.querySelectorAll("[data-w]").forEach(el=>el.style.width=el.dataset.w+"%")));
+}
 const photoCache=new Map();
 /* Pagination: items per page for Members (m), Activities (a), History (h), and a member's own history (p). */
 const PS={m:10,a:8,h:8,p:5};
@@ -699,7 +785,7 @@ ERR["auth/wrong-password"]=ERR["auth/user-not-found"]=ERR["auth/invalid-credenti
 
 function showLogin(){
   /* Wipe everything held in memory so nothing is left behind after sign-out. */
-  members=[];acts=[];hist=[];photoCache.clear();actErr=false;notified=false;pid=null;view="dash";bdFull="";
+  members=[];acts=[];hist=[];mLoaded=false;photoCache.clear();actErr=false;notified=false;pid=null;view="dash";bdFull="";
   $("#pr").innerHTML="";closeAll();
   const msg=ss.get("moas_msg")||"";ss.del("moas_msg");
   $("#app").innerHTML=`<div class="top"><div class="in">${brand}</div></div>
@@ -741,12 +827,14 @@ function showApp(){
   $("#v").onclick=e=>{if(view!=="dash")return;
     if(e.target.closest("#rpt")){openReport();return}
     if(e.target.closest("#oth")){othOpen=!othOpen;dash();return}
-    if(e.target.closest("#bdv")){openBirthdays();return}
+    if(e.target.closest("#bdv")||e.target.closest("#bdb")){openBirthdays();return}
     if(e.target.closest("#gA")){go("acts");return}
     const ab=e.target.closest("[data-aid]");if(ab){openAct(ab.dataset.aid);return}
     const g=e.target.closest("[data-grp]");if(g){go("members");st.g=g.dataset.grp;draw();return}
     const b=e.target.closest("[data-id]");if(b)go("profile",b.dataset.id)};
-  const u1=onSnapshot(collection(db,"members"),s=>{members=s.docs.map(d=>norm({id:d.id,...d.data()}));fill()},
+  const u1=onSnapshot(collection(db,"members"),s=>{
+    members=s.docs.map(d=>norm({id:d.id,...d.data()}));mLoaded=true;fill()
+  },
     ()=>{$("#v").innerHTML='<p class="none">This account does not have access to the member records.</p>'});
   const u2=onSnapshot(collection(db,"activities"),s=>{actErr=false;acts=s.docs.map(d=>normA({id:d.id,...d.data()}));fill();notify()},
     ()=>{actErr=true;acts=[];fill()});
@@ -891,20 +979,34 @@ function openPw(){
 }
 
 function go(v,id){
-  view=v;pid=id||null;Object.assign(st,{q:"",g:"",s:"",r:"",sort:"name"});Object.assign(sa,{q:"",f:"all"});Object.assign(pg,{m:1,a:1,h:1,p:1});
+  animUntil=0;if(v==="dash")animNext=true;
+view=v;pid=id||null;Object.assign(st,{q:"",g:"",s:"",r:"",sort:"name"});Object.assign(sa,{q:"",f:"all"});Object.assign(pg,{m:1,a:1,h:1,p:1});
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===(v==="profile"?"members":v)));
   if(v==="members")shell();
   if(v==="acts")shellA();
   if(v==="hist")shellH();
   if(v==="profile")history.pushState(null,"");
   fill();scrollTo(0,0);
+  const vv=$("#v");vv.classList.remove("vin");void vv.offsetWidth;vv.classList.add("vin");
+  clearTimeout(go.t);go.t=setTimeout(()=>vv.classList.remove("vin"),400);
 }
-const fill=()=>view==="dash"?dash():view==="profile"?prof():view==="acts"?drawActs():view==="hist"?drawHist():draw();
-
+const fill=()=>{
+  if(view==="dash"&&Date.now()<animUntil){clearTimeout(fill.t);fill.t=setTimeout(()=>{if(view==="dash")dash()},animUntil-Date.now()+50);return}
+  view==="dash"?dash():view==="profile"?prof():view==="acts"?drawActs():view==="hist"?drawHist():draw();
+};
 function dash(){
+  if(!mLoaded){
+    $("#v").innerHTML=`<div class="ph2"><div class="ptl"><span class="eb">Ministry Overview</span><h2>Dashboard</h2></div></div><div class="stats">${'<div class="stat"><div class="skl" style="width:100%;height:44px;margin:0"></div></div>'.repeat(4)}</div><div class="cols">${'<div class="box"><div class="skl" style="width:55%"></div><div class="skl"></div><div class="skl" style="width:80%"></div></div>'.repeat(3)}</div>`;
+    return;
+  }
+  const play=animNext&&!matchMedia("(prefers-reduced-motion:reduce)").matches;
+  animNext=false;
+  if(play){animUntil=Date.now()+1600;requestAnimationFrame(()=>requestAnimationFrame(()=>runAnim($("#v"))))}
+  let rc=0;
+  const cu=(n,s="")=>`<span class="nu" data-to="${n}" data-s="${s}">${play?"0"+s:n+s}</span>`;
   const n=s=>members.filter(m=>m.status===s).length,A=n("Active"),I=n("Inactive");
   const now=new Date(),yr=now.getFullYear(),tdy=new Date(yr,now.getMonth(),now.getDate());
-  const box=(t,i,c,body,x="",tail="")=>`<div class="box ${x}"><h3><span class="ic ${c}">${ic(i,16)}</span>${t}${tail?`<span class="tl">${tail}</span>`:""}</h3>${body}</div>`;
+  const box=(t,i,c,body,x="",tail="")=>`<div class="box ${x}${play?" rise":""}"${play?` style="--rd:${(rc++*.1).toFixed(2)}s"`:""}><h3><span class="ic ${c}">${ic(i,16)}</span>${t}${tail?`<span class="tl">${tail}</span>`:""}</h3>${body}</div>`;
 
   const hr=now.getHours(),greet=hr<12?"Good morning":hr<18?"Good afternoon":"Good evening";
   const doy=Math.floor((tdy-new Date(yr,0,0))/864e5),vs=VERSES[doy%VERSES.length];
@@ -915,7 +1017,7 @@ function dash(){
   const extra=Object.keys(sc).filter(k=>k&&!STATUS.includes(k));
   const oc=(s,e,c)=>`<div class="oc${c?"":" z"}"><span>${e}</span><span>${esc(s)}</span><b>${c}</b></div>`;
   const othp=othOpen?`<div class="oth" id="othp"><p class="cps" style="margin:0 0 .5rem">Members who are not Active or Inactive, shown by status.</p><div class="og">${others.map(s=>oc(s,SI[s]||"⚪",sc[s]||0)).join("")}${extra.map(s=>oc(s,"⚪",sc[s])).join("")}${sc[""]?oc("No Status","⚪",sc[""]):""}</div></div>`:"";
-  const othT=`<button class="stat" id="oth" aria-expanded="${othOpen}" aria-controls="othp" title="Show or hide every other status"><span class="ic r">${ic("dots",22)}</span><div><b>${members.length-A-I}</b><span>Other Status</span></div><span class="cv">${ic("chev",18)}</span></button>`;
+  const othT=`<button class="stat" id="oth" aria-expanded="${othOpen}" aria-controls="othp" title="Show or hide every other status"><span class="ic r">${ic("dots",22)}</span><div><b>${cu(members.length-A-I)}</b><span>Other Status</span></div><span class="cv">${ic("chev",18)}</span></button>`;
 
   const gc=GROUPS.map(g=>members.filter(m=>m.group===g).length),mx=Math.max(1,...gc),ng=members.length-gc.reduce((a,b)=>a+b,0);
   const ord=s=>{const i=STATUS.indexOf(s);return i<0?99:i};
@@ -923,7 +1025,8 @@ function dash(){
   const present=new Set();
   const rowsG=GROUPS.map((g,i)=>{const e=gsb(g);e.forEach(([s])=>present.add(s));
     const tip=`Group ${g}: ${e.map(([s,k])=>`${k} ${s}`).join(", ")||"no members yet"}. Tap to view.`;
-    return `<button class="gr" data-grp="${g}" title="${esc(tip)}"><span class="gb">${g}</span><span class="gm"><span class="gl"><span>Group ${g}<em>${GTIME[g]||""}</em></span><span class="sb2">${e.map(([s,k])=>`<span><i class="dt" style="background:${scol(s)}"></i>${k}</span>`).join("")||"<span>No members</span>"}</span></span><span class="sg" style="width:${gc[i]?Math.max(gc[i]/mx*100,10):0}%">${e.map(([s,k])=>`<i style="flex:${k};background:${scol(s)}"></i>`).join("")}</span></span><b class="gc">${gc[i]}</b></button>`}).join("");
+    const w=gc[i]?Math.max(gc[i]/mx*100,10):0;
+    return `<button class="gr" data-grp="${g}" title="${esc(tip)}"><span class="gb">${g}</span><span class="gm"><span class="gl"><span>Group ${g}<em>${GTIME[g]||""}</em></span><span class="sb2">${e.map(([s,k])=>`<span><i class="dt" style="background:${scol(s)}"></i>${cu(k)}</span>`).join("")||"<span>No members</span>"}</span></span><span class="sg" data-w="${w}" style="width:${play?0:w}%;transition-delay:${i*.12}s;--d:${i*.4}s">${e.map(([s,k])=>`<i style="flex:${k};background:${scol(s)}"><em>${k}</em></i>`).join("")}</span></span><b class="gc">${cu(gc[i])}</b></button>`}).join("");
   const lgd=[...present].sort((a,b)=>ord(a)-ord(b)).map(s=>`<span><i class="dt" style="background:${scol(s)}"></i>${esc(s)}</span>`).join("");
   const grp=`<p class="cps">Colors show each member's status. Tap a group to see its members.</p>${lgd?`<div class="lg">${lgd}</div>`:""}${rowsG}${ng?`<p class="none">${ng} member${ng>1?"s are":" is"} not assigned to a group.</p>`:""}`;
 
@@ -932,12 +1035,17 @@ function dash(){
   const up=hasB.map(m=>{const[,mm,dd2]=m.birthday.split("-");let d=new Date(yr,+mm-1,+dd2);if(d<tdy)d=new Date(yr+1,+mm-1,+dd2);return{m,d,n:Math.round((d-tdy)/864e5)}}).sort((a,b)=>a.n-b.n||nm(a.m).localeCompare(nm(b.m)));
   const soon=up.filter(u=>u.n<=14);
   const when=k=>k===0?"Today":k===1?"Tomorrow":"In "+k+" days";
-  const brow=u=>`<button class="li" data-id="${u.m.id}"><span class="db"><b>${u.d.getDate()}</b><small>${u.d.toLocaleDateString("en",{month:"short"})}</small></span><span class="lt"><b>${esc(nm(u.m))}</b><small>Turns ${u.d.getFullYear()-+u.m.birthday.slice(0,4)}${u.m.group?" · Group "+esc(u.m.group):""}</small></span><span class="pill ${u.n===0?"y":"n"}">${when(u.n)}</span></button>`;
+  const brow=u=>`<button class="li${u.n===0?" bdt":""}" data-id="${u.m.id}"><span class="db"><b>${u.d.getDate()}</b><small>${u.d.toLocaleDateString("en",{month:"short"})}</small></span><span class="lt"><b>${esc(nm(u.m))}</b><small>Turns ${u.d.getFullYear()-+u.m.birthday.slice(0,4)}${u.m.group?" · Group "+esc(u.m.group):""}</small></span><span class="pill ${u.n===0?"y pop":"n"}">${when(u.n)}</span></button>`;
   const rows=soon.map(brow);bdFull=rows.join("");bdCount=soon.length;
   const bdh=soon.length
     ?`<div class="bl">${rows.slice(0,SHOW).join("")}</div>`+(soon.length>SHOW?`<button class="more" id="bdv">${ic("expand",16)} View All ${soon.length}</button>`:"")
     :`<p class="none">${hasB.length?"No birthdays in the next 2 weeks.":"No birthdays recorded yet. Add them in each member's profile."}</p>`+(hasB.length?`<div class="sh2">Next Birthday</div><div class="bl">${brow(up[0])}</div>`:"");
-  const bdc=soon.length?`<span class="pill y" title="Birthdays in the next 2 weeks">${soon.length}</span>`:"";
+  const bdc=soon.length?`<span class="pill y" title="Birthdays in the next 2 weeks">${cu(soon.length)}</span>`:"";
+
+  /* birthday-today banner */
+  const bt=up.filter(u=>u.n===0),CC=["#d4b277","#c4636b","#6a5a9c","#4f8f69","#6a8fd8","#d98f5f"];
+  const conf=Array.from({length:18},(_,i)=>`<i class="cf1" style="left:${(i*37+11)%100}%;background:${CC[i%6]};animation-duration:${2.2+(i%5)*.5}s;animation-delay:${(i%7)*.35}s"></i>`).join("");
+  const bnr=bt.length?`<button class="bban${play?" rise":""}" id="bdb" aria-label="Birthday today">${conf}<span class="bi">🎂</span><span class="bt"><b>${bt.length===1?`Happy Birthday, ${esc(bt[0].m.firstName)}!`:`${bt.length} birthdays today! 🎉`}</b><small>${esc(bt.map(u=>`${u.m.firstName} ${u.m.lastName} (${u.d.getFullYear()-+u.m.birthday.slice(0,4)})`).join(" · "))} · Tap for details</small></span></button>`:"";
 
   const holder=r=>members.find(m=>m.role===r);
   const rb=(m,r)=>`<button class="li" data-id="${m.id}"><span class="av rd">${pimg(m)||ic(ri(r),20)}</span><span class="lt"><b>${esc(nm(m))}</b><small class="rl">${esc(r)}</small></span></button>`;
@@ -947,11 +1055,10 @@ function dash(){
   const offh=filled?`<div class="sh2">Officers</div>${ROLES.slice(0,6).map(rr).join("")||'<p class="none">None assigned.</p>'}<div class="sh2">Group Leads</div>${ROLES.slice(6).map(rr).join("")||'<p class="none">None assigned.</p>'}${other.length?`<div class="sh2">Other Roles</div>${other.map(m=>rb(m,m.role)).join("")}`:""}`:'<p class="none">No roles assigned yet.</p>';
 
   const{act,res,pct}=completeness();
-  const rec=`<div class="cp"><div class="gt"><i style="width:${pct}%"></i></div><b>${pct}%</b></div><p class="cps">${act.length?"Active member records are "+pct+"% complete.":"No active members yet."}</p>`
+  const rec=`<div class="cp"><div class="gt"><i data-w="${pct}" style="width:${play?0:pct}%"></i></div><b>${cu(pct,"%")}</b></div><p class="cps">${act.length?"Active member records are "+pct+"% complete.":"No active members yet."}</p>`
     +res.map(([l,a])=>a.length?`<details class="ck"><summary>${ic("alert",16)}<span>${l}</span><b class="pill r">${a.length}</b></summary><div class="mn">${a.map(m=>`<button data-id="${m.id}">${esc(nm(m))}</button>`).join("")}</div></details>`
       :`<div class="ck ok">${ic("check",16)}<span>${l}</span><b class="pill g">Complete</b></div>`).join("");
 
-  /* upcoming activities */
   const openA=acts.filter(a=>a.status==="Scheduled"&&a.date).sort(ASC),lateA=openA.filter(late),nextA=openA.filter(a=>!late(a));
   const arow=a=>{const k=dd(a.date);return `<button class="li" data-aid="${a.id}">${dblk(a.date)}<span class="lt"><b>${esc(a.title)}</b><small>${asub(a)}</small></span><span class="pill ${k<0?"r":k<=NOTIFY_DAYS?"y":"n"}">${k<0?"Needs Update":whenA(k)}</span></button>`};
   const aShow=[...lateA,...nextA].slice(0,5);
@@ -961,18 +1068,17 @@ function dash(){
   const atail=lateA.length?`<span class="pill r" title="Past activities that need an update">${lateA.length}</span>`:nextA.length?`<span class="pill n" title="Upcoming activities">${nextA.length}</span>`:"";
 
   $("#v").innerHTML=`<div class="ph2 dsh"><div class="ptl"><span class="eb">Ministry Overview</span><h2>Dashboard</h2><p>Membership, activities, birthdays, and records at a glance.</p></div><div class="pmeta">${now.toLocaleDateString("en",{weekday:"long",month:"long",day:"numeric"})}<span class="chip"><i></i>${S.n}</span><button class="gh" id="rpt" title="Create a ministry report for the parish priest" aria-label="Create ministry report">${ic("doc",15)}Report</button></div></div>
-  ${wel}
-  <div class="stats">${stat(members.length,"Total Members","users","p")}${stat(A,"Active","check","g")}${stat(I,"Inactive","pause","y")}${othT}</div>
+  ${wel}${bnr}
+  <div class="stats">${stat(cu(members.length),"Total Members","users","p")}${stat(cu(A),"Active","check","g")}${stat(cu(I),"Inactive","pause","y")}${othT}</div>
   ${othp}
   <div class="cols">
   ${box("Upcoming Activities","cal","g",ah,"",atail)}
   ${box("Members per Group","users","p",grp)}
-  ${box("Birthdays in the Next 2 Weeks","cake","y",bdh,"",bdc)}
+  ${box("Birthdays in the Next 2 Weeks","cake","y",bdh,soon.length?"bdbox bdy":"",bdc)}
   ${box("Officers and Leaders","cross","r",offh+(vac.length&&filled?`<p class="vac">Vacant: ${vac.join(", ")}</p>`:""),"rbx")}
   ${box("Records to Complete","alert","r",rec)}
   </div>`;
 }
-
 function openBirthdays(){
   const end=new Date();end.setDate(end.getDate()+14);
   $("#dlg").innerHTML=`<div class="fm"><div class="dh"><h2>Upcoming Birthdays</h2><small class="hint">${bdCount} birthday${bdCount>1?"s":""} through ${end.toLocaleDateString("en",{month:"long",day:"numeric"})}. Tap a name to open the profile.</small></div>
