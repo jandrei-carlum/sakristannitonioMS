@@ -1,6 +1,6 @@
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserSessionPersistence,reauthenticateWithCredential,EmailAuthProvider,sendPasswordResetEmail,updatePassword}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import{getFirestore,collection,onSnapshot,doc,deleteDoc,writeBatch,serverTimestamp,query,orderBy,limit,getDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{getFirestore,collection,onSnapshot,doc,deleteDoc,writeBatch,serverTimestamp,query,orderBy,limit,getDoc,arrayUnion,arrayRemove}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const cfg={apiKey:"AIzaSyDqtjhvtmAea9S9TKf94CIdd5BpbdpiZeA",authDomain:"moas-system.firebaseapp.com",projectId:"moas-system",appId:"1:302631045782:web:89769532d1cd1f4c0810b7"};
 
@@ -36,8 +36,8 @@ const SEC={lastName:"Name",status:"Service",birthday:"Personal",contact:"Contact
 /* Ministry activities. Edit the type list or the reminder window here. */
 const ASTAT=["Scheduled","Done","Not Done"];
 const ATYPES=["Mass / Liturgy","Meeting","Formation / Seminar","Training","Recollection / Retreat","Outreach / Service","Fellowship / Social","Fundraising","Other"];
+const MAX_SHEETS=3; /* attendance sheet photos allowed per activity */
 const NOTIFY_DAYS=3; /* pop-up reminder for activities happening within this many days */
-
 /* Daily verses: Douay-Rheims (public domain). One verse per day, rotating. */
 const VERSES=[
 ["I rejoiced at the things that were said to me: We shall go into the house of the Lord.","Psalm 122 (121):1"],
@@ -93,7 +93,7 @@ const norm=x=>({...x,role:canon(pick(x,["role","position"]),ROLES),status:canon(
   confirmation:canon(x.confirmation,CONF),schoolLevel:canon(x.schoolLevel,SCHOOL),
   firstName:tc(x.firstName),middleName:tc(x.middleName),lastName:tc(x.lastName),guardian:tc(x.guardian),schoolName:tc(x.schoolName),address:tc(x.address),
   birthday:dt(pick(x,["birthday","birthDate","birthdate","dob","dateOfBirth","bday"])),start:dt(x.start),end:dt(x.end),dominic:dt(x.dominic),berchmans:dt(x.berchmans)});
-const normA=x=>({...x,title:String(x.title??"").trim(),date:dt(x.date),time:String(x.time??"").trim(),status:ASTAT.includes(x.status)?x.status:"Scheduled"});
+const normA=x=>({...x,title:String(x.title??"").trim(),date:dt(x.date),time:String(x.time??"").trim(),status:ASTAT.includes(x.status)?x.status:"Scheduled",sheets:(Array.isArray(x.sheets)?x.sheets:[]).filter(s=>s&&typeof s.id==="string"&&okImg(s.thumb)).slice(0,MAX_SHEETS)});
 
 const IC={
  dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
@@ -369,7 +369,7 @@ ERR["auth/wrong-password"]=ERR["auth/user-not-found"]=ERR["auth/invalid-credenti
 
 function showLogin(){
   /* Wipe everything held in memory so nothing is left behind after sign-out. */
-  members=[];acts=[];hist=[];mLoaded=false;photoCache.clear();actErr=false;notified=false;pid=null;view="dash";bdFull="";
+  members=[];acts=[];hist=[];mLoaded=false;photoCache.clear();sheetCache.clear();;actErr=false;notified=false;pid=null;view="dash";bdFull="";
   $("#pr").innerHTML="";closeAll();
   const msg=ss.get("moas_msg")||"";ss.del("moas_msg");
   $("#app").innerHTML=`<div class="top"><div class="in">${brand}</div></div>
@@ -886,8 +886,114 @@ function drawActs(){
   const list=[...a.filter(m=>m.status==="Scheduled").sort(ASC),...a.filter(m=>m.status!=="Scheduled").sort((x,y)=>ASC(y,x))];
   $("#acnt").textContent=list.length===acts.length?`${list.length} activit${list.length===1?"y":"ies"}`:`${list.length} of ${acts.length} activities`;
   $("#pga").innerHTML=pager("a",list.length);
-  $("#alist").innerHTML=list.length?slice("a",list).map(m=>`<button class="card" data-aid="${m.id}">${dblk(m.date)}<span class="am"><b>${esc(m.title)}</b><small>${asub(m)}</small>${apill(m)}${m.status==="Not Done"&&m.reason?`<small>Reason: ${esc(m.reason)}</small>`:""}</span></button>`).join(""):
-    `<p class="none">${acts.length?"No activities match your search or filter.":"No activities yet. Select Add Activity to schedule one."}</p>`;
+    $("#alist").innerHTML=list.length?slice("a",list).map(m=>`<button class="card" data-aid="${m.id}">${dblk(m.date)}<span class="am"><b>${esc(m.title)}</b><small>${asub(m)}</small>${apill(m)}${m.status==="Not Done"&&m.reason?`<small>Reason: ${esc(m.reason)}</small>`:""}${(m.sheets||[]).length?`<small class="shn">${ic("img",12)} ${m.sheets.length} attendance photo${m.sheets.length>1?"s":""}</small>`:""}</span></button>`).join(""):
+     `<p class="none">${acts.length?"No activities match your search or filter.":"No activities yet. Select Add Activity to schedule one."}</p>`;
+}
+
+/* ---------- Attendance sheet photos (up to 3 per activity) ---------- */
+/* A small copy is kept on the activity record (for the thumbnails). The larger copy lives in "activityPhotos" and loads when you open it. */
+const sheetCache=new Map();
+function pickSheets(camera,max){return new Promise(r=>{
+  const i=document.createElement("input");
+  i.type="file";i.accept="image/*";
+  if(!camera&&max>1)i.multiple=true;
+  i.style.cssText="position:fixed;left:-9999px;top:0;opacity:0;pointer-events:none";
+  if(camera)i.setAttribute("capture","environment");
+  let done=false;
+  const fin=f=>{if(done)return;done=true;removeEventListener("focus",onFocus);setTimeout(()=>i.remove(),0);r(f)};
+  /* Older browsers have no "cancel" event. When the window regains focus with no file chosen, treat it as cancelled. */
+  const onFocus=()=>setTimeout(()=>{if(!done&&!(i.files&&i.files.length))fin([])},2000);
+  i.addEventListener("change",()=>fin([...i.files]));
+  i.addEventListener("cancel",()=>fin([]));
+  addEventListener("focus",onFocus);
+  document.body.appendChild(i);
+  i.click();
+})}
+/* Redraws the picture smaller as a JPEG, lowering quality (then size) until it fits under "cap" characters. Redrawing also removes hidden camera data such as location. */
+function shrink(img,edge,q,cap){
+  const w=img.naturalWidth,h=img.naturalHeight;let k=Math.min(1,edge/Math.max(w,h));
+  for(let t=0;t<6;t++){
+    const c=document.createElement("canvas");c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));
+    const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.imageSmoothingQuality="high";x.drawImage(img,0,0,c.width,c.height);
+    let qq=q,u=c.toDataURL("image/jpeg",qq);
+    while(u.length>cap&&qq>.45){qq-=.1;u=c.toDataURL("image/jpeg",qq)}
+    if(u.length<=cap)return u;
+    k*=.8;
+  }
+  return"";
+}
+async function sheetFull(sid){
+  if(sheetCache.has(sid))return sheetCache.get(sid);
+  try{const s=await withTimeout(getDoc(doc(db,"activityPhotos",sid)),15000);const u=s.exists()?(s.data().full||""):"";
+    if(okImg(u)){sheetCache.set(sid,u);return u}return""}
+  catch(e){console.warn("Attendance photo could not be loaded:",e&&e.code,e&&e.message);return""}
+}
+async function addSheets(id,camera){
+  const a=acts.find(x=>x.id===id);if(!a)return;
+  const room=MAX_SHEETS-(a.sheets||[]).length;
+  if(room<1){toast(`The maximum is ${MAX_SHEETS} attendance photos.`);return}
+  let files=await pickSheets(camera,room);
+  if(!files.length)return;
+  if(files.length>room){toast(`Only ${room===1?"the first photo was":"the first "+room+" photos were"} added. The maximum is ${MAX_SHEETS}.`);files=files.slice(0,room)}
+  busy("Preparing photo…");
+  const add=[];
+  for(const f of files){
+    try{const img=await loadImg(f),full=shrink(img,1600,.8,7e5),thumb=shrink(img,200,.65,25e3);
+      if(!full||!thumb)throw new Error("decode");
+      add.push({id:doc(collection(db,"activityPhotos")).id,full,thumb})}
+    catch(e){busyEnd();await showErr(imgReadErr(e&&e.message));busy("Preparing photo…")}
+  }
+  if(!add.length){busyEnd();return}
+  busy(`Saving ${add.length===1?"photo":add.length+" photos"}…`);
+  try{const b=writeBatch(db),at=Date.now();
+    b.update(doc(db,"activities",id),{sheets:arrayUnion(...add.map(s=>({id:s.id,thumb:s.thumb,at})))});
+    add.forEach(s=>b.set(doc(db,"activityPhotos",s.id),{aid:id,full:s.full,at:serverTimestamp()}));
+    logH(b,add.length===1?"Attendance photo added":add.length+" attendance photos added","",id,a.title,[]);
+    await withTimeout(b.commit(),30000);
+    add.forEach(s=>sheetCache.set(s.id,s.full));
+    busyEnd();toast(add.length===1?"Photo saved.":add.length+" photos saved.");openAct(id)}
+  catch(x){busyEnd();console.error("Attendance photo save failed:",x.code,x.message);showErr(errInfo(x,"save the attendance photo"))}
+}
+async function delSheet(id,sid){
+  const a=acts.find(x=>x.id===id),s=a&&(a.sheets||[]).find(x=>x.id===sid);if(!s)return;
+  const ok=await ask({icon:"trash",danger:1,title:"Remove This Photo?",ok:"Remove Photo",
+    body:`<p>This permanently removes the attendance photo from <b>${esc(a.title)}</b>. This cannot be undone.</p>`});
+  if(!ok)return;
+  busy("Removing photo…");
+  try{const b=writeBatch(db);
+    b.update(doc(db,"activities",id),{sheets:arrayRemove(s)});
+    b.delete(doc(db,"activityPhotos",sid));
+    logH(b,"Attendance photo removed","",id,a.title,[]);
+    await withTimeout(b.commit(),20000);
+    sheetCache.delete(sid);busyEnd();toast("Photo removed.");openAct(id)}
+  catch(x){busyEnd();console.error("Attendance photo remove failed:",x.code,x.message);showErr(errInfo(x,"remove the attendance photo"))}
+}
+/* Full-size viewer: opens the large copy, tap the photo to zoom, with Previous / Next and a Download link. */
+function viewSheet(id,start){
+  const a=acts.find(x=>x.id===id);if(!a||!(a.sheets||[]).length)return;
+  const list=a.sheets;let n=Math.min(Math.max(start,0),list.length-1);
+  const d=document.createElement("dialog");d.className="vwr";d.setAttribute("aria-label","Attendance photo");
+  document.body.appendChild(d);
+  d.addEventListener("close",()=>d.remove());
+  d.addEventListener("click",e=>{if(e.target===d)d.close()});
+  const show=async()=>{
+    const s=list[n];
+    d.innerHTML=`<div class="vwh"><b>${esc(a.title)}</b><small>Attendance photo ${n+1} of ${list.length}${a.date?" · "+esc(fmtS(a.date)):""}</small></div>
+    <div class="vwb" id="vwb"><img id="vwi" src="${s.thumb}" alt="Attendance sheet photo ${n+1}"></div>
+    <div class="vwf"><small id="vwm">Loading full-size photo…</small>
+    <a class="btn" id="vwd" hidden download="attendance-${esc(key(a.title).slice(0,30)||"activity")}-${esc(a.date||"")}-${n+1}.jpg">${ic("down",16)}Download</a>
+    ${list.length>1?`<button type="button" id="vwp" aria-label="Previous photo">${ic("back",16)}</button><button type="button" id="vwn" aria-label="Next photo">${ic("next",16)}</button>`:""}
+    <button type="button" class="pri" id="vwc">Close</button></div>
+    <button type="button" class="x" id="vwx" aria-label="Close">${ic("x",18)}</button>`;
+    $("#vwc").onclick=$("#vwx").onclick=()=>d.close();
+    if($("#vwp")){$("#vwp").onclick=()=>{n=(n-1+list.length)%list.length;show()};$("#vwn").onclick=()=>{n=(n+1)%list.length;show()}}
+    $("#vwi").onclick=()=>{const z=$("#vwb").classList.toggle("zm");$("#vwm").textContent=z?"Scroll to move around. Tap the photo again to zoom out.":"Tap the photo to zoom in."};
+    const u=await sheetFull(s.id);
+    if(!d.isConnected||list[n]!==s)return;
+    if(u){$("#vwi").src=u;$("#vwd").href=u;$("#vwd").hidden=false;$("#vwm").textContent="Tap the photo to zoom in."}
+    else $("#vwm").textContent="Could not load the full-size photo. Showing the small copy.";
+  };
+  d.showModal();show();
 }
 
 function openAct(id){
@@ -896,12 +1002,20 @@ function openAct(id){
   const k=a.date?dd(a.date):0;
   const res=a.status==="Done"?f("Remarks / Outcome",a.remarks,"note")+(a.attendees?f("Attendees",a.attendees,"users"):""):a.status==="Not Done"?f("Reason Not Done",a.reason,"alert"):"";
   const fin=a.status!=="Scheduled";
+  const sh=a.sheets||[],room=MAX_SHEETS-sh.length;
+  const shHtml=`<div class="sh2" style="margin-top:.9rem">Attendance Sheet Photos (${sh.length}/${MAX_SHEETS})</div>
+  ${sh.length?`<div class="shg" id="shgrid">${sh.map((s,i)=>`<div class="sht"><button type="button" class="shv" data-sv="${i}" aria-label="View attendance photo ${i+1}"><img src="${s.thumb}" alt="Attendance sheet photo ${i+1}"></button><button type="button" class="shx" data-sx="${esc(s.id)}" aria-label="Remove attendance photo ${i+1}">${ic("x",14)}</button></div>`).join("")}</div>`:`<p class="none">No attendance sheet photo uploaded yet.</p>`}
+  ${room>0?`<div class="shb"><button type="button" id="shcam">${ic("cam",16)}Take Photo</button><button type="button" id="shpick">${ic("img",16)}Choose Photo${room>1?"s":""}</button></div><p class="cps">You can add ${room} more photo${room>1?"s":""}. Photos are resized automatically.</p>`:`<p class="cps">The maximum of ${MAX_SHEETS} photos is reached. Remove one to add another.</p>`}`;
   $("#dlg").innerHTML=`<div class="fm"><div class="dh"><h2>${esc(a.title)}</h2><small class="hint">${esc(a.type||"Activity")}</small></div>
   <div class="bd"><div style="margin-bottom:.4rem">${apill(a)}${a.status==="Scheduled"&&a.date?`<span class="st" style="margin-left:.5rem">${late(a)?"Past due: "+whenA(k):whenA(k)}</span>`:""}</div>
-  ${f("Date",fmtL(a.date),"cal")}${f("Time",fmtT(a.time),"clock")}${f("Venue",a.venue,"pin")}${f("Description / Notes",a.description,"note")}${res}</div>
+  ${f("Date",fmtL(a.date),"cal")}${f("Time",fmtT(a.time),"clock")}${f("Venue",a.venue,"pin")}${f("Description / Notes",a.description,"note")}${res}${shHtml}</div>
   <div class="foot"><button type="button" class="lft" id="ae">${ic("edit",18)}Edit</button><button type="button" id="ac">Close</button>${fin?`<button type="button" id="ar">Reopen</button>`:`<button type="button" id="an">Mark Not Done</button><button type="button" class="pri" id="ad">Mark Done</button>`}</div></div>`;
   $("#ac").onclick=()=>$("#dlg").close();
   $("#ae").onclick=()=>openActForm(id);
+  if($("#shcam")){$("#shcam").onclick=()=>addSheets(id,true);$("#shpick").onclick=()=>addSheets(id,false)}
+  if($("#shgrid"))$("#shgrid").onclick=e=>{
+    const x=e.target.closest("[data-sx]");if(x){delSheet(id,x.dataset.sx);return}
+    const v=e.target.closest("[data-sv]");if(v)viewSheet(id,+v.dataset.sv)};
   if(fin)$("#ar").onclick=async()=>{
     const ok=await ask({icon:"alert",title:"Reopen This Activity?",ok:"Reopen",body:`<p><b>${esc(a.title)}</b> will go back to Scheduled and its ${a.status==="Done"?"remarks":"reason"} will be cleared.</p>`});
     if(ok)saveAct(id,{status:"Scheduled",reason:"",remarks:"",attendees:""},"Activity reopened.")};
@@ -955,7 +1069,7 @@ function openActForm(id){
       body:`<div class="cfn"><span class="av">${ic("cal",20)}</span><span><b>${esc(a.title)}</b><br><small>${esc([fmtS(a.date),a.status].filter(Boolean).join(" · "))}</small></span></div><p>This permanently removes the activity and its record. This cannot be undone.</p>`});
     if(!ok||!await reauth())return;
     busy("Deleting activity…");
-    try{const b=writeBatch(db);b.delete(doc(db,"activities",id));logH(b,"Deleted","activity",id,a.title,diff(a,{},["title","type","status","date","time","venue","description"]));await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast("Activity deleted.")}
+    try{const b=writeBatch(db);b.delete(doc(db,"activities",id));(a.sheets||[]).forEach(s=>b.delete(doc(db,"activityPhotos",s.id)));logH(b,"Deleted","activity",id,a.title,diff(a,{},["title","type","status","date","time","venue","description"]));await withTimeout(b.commit(),20000);busyEnd();$("#dlg").close();toast("Activity deleted.")}
     catch(x){busyEnd();console.error("Activity delete failed:",x.code,x.message);showErr(errInfo(x,"delete this activity"))}};
   f.onsubmit=async e=>{e.preventDefault();
     const s=el.status.value;
