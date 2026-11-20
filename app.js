@@ -1,6 +1,7 @@
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,setPersistence,browserSessionPersistence,reauthenticateWithCredential,EmailAuthProvider,sendPasswordResetEmail,updatePassword}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import{getFirestore,collection,onSnapshot,doc,deleteDoc,writeBatch,serverTimestamp,query,orderBy,limit,getDoc,arrayUnion,arrayRemove}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{initFinance}from"./finance.js";
 
 const cfg={apiKey:"AIzaSyDqtjhvtmAea9S9TKf94CIdd5BpbdpiZeA",authDomain:"moas-system.firebaseapp.com",projectId:"moas-system",appId:"1:302631045782:web:89769532d1cd1f4c0810b7"};
 
@@ -199,8 +200,8 @@ function runAnim(root){
 }
 const photoCache=new Map();
 /* Pagination: items per page for Members (m), Activities (a), History (h), and a member's own history (p). */
-const PS={m:10,a:8,h:8,p:5};
-const pg={m:1,a:1,h:1,p:1};
+const PS={m:10,a:8,h:8,p:5,f:10};
+const pg={m:1,a:1,h:1,p:1,f:1};
 function pager(k,total){
   const pages=Math.max(1,Math.ceil(total/PS[k]));
   if(pg[k]>pages)pg[k]=pages;
@@ -369,7 +370,7 @@ ERR["auth/wrong-password"]=ERR["auth/user-not-found"]=ERR["auth/invalid-credenti
 
 function showLogin(){
   /* Wipe everything held in memory so nothing is left behind after sign-out. */
-  members=[];acts=[];hist=[];mLoaded=false;photoCache.clear();sheetCache.clear();;actErr=false;notified=false;pid=null;view="dash";bdFull="";
+  members=[];acts=[];hist=[];mLoaded=false;photoCache.clear();sheetCache.clear();FIN.reset();actErr=false;notified=false;pid=null;view="dash";bdFull="";
   $("#pr").innerHTML="";closeAll();
   const msg=ss.get("moas_msg")||"";ss.del("moas_msg");
   $("#app").innerHTML=`<div class="top"><div class="in">${brand}</div></div>
@@ -403,7 +404,7 @@ function showLogin(){
 
 function showApp(){
   $("#app").innerHTML=`<div class="top"><div class="in">${brand}<button id="cp" aria-label="Change Password" title="Change Password">${ic("key",18)}<span>Password</span></button><button id="so" aria-label="Sign Out">${ic("out",18)}<span>Sign Out</span></button></div></div>
-  <nav><button data-v="dash">${ic("dash")}Dashboard</button><button data-v="members">${ic("users")}Members</button><button data-v="acts">${ic("cal")}Activities</button><button data-v="hist">${ic("clock")}History</button></nav>
+  <nav><button data-v="dash">${ic("dash")}Dashboard</button><button data-v="members">${ic("users")}Members</button><button data-v="acts">${ic("cal")}Activities</button><button data-v="fin">${ic("wallet")}Finance</button><button data-v="hist">${ic("clock")}History</button></nav>
   <main id="v"></main>`;
   $("#so").onclick=()=>signOut(auth);
   $("#cp").onclick=openPw;
@@ -425,7 +426,8 @@ function showApp(){
     ()=>{actErr=true;acts=[];fill()});
   /* History only redraws when you are looking at it, so the dashboard does not rebuild on every logged action. */
   const u3=onSnapshot(query(collection(db,"history"),orderBy("at","desc"),limit(300)),s=>{hist=s.docs.map(d=>({id:d.id,...d.data()}));if(view==="hist"||view==="profile")fill()},()=>{});
-  unsub=()=>{u1();u2();u3()};
+  const u4=FIN.start();
+  unsub=()=>{u1();u2();u3();u4()};
   go("dash");
 }
 
@@ -566,11 +568,12 @@ function openPw(){
 
 function go(v,id){
   animUntil=0;if(v==="dash")animNext=true;
-  view=v;pid=id||null;Object.assign(st,{q:"",g:"",s:"",r:"",sort:"name"});Object.assign(sa,{q:"",f:"all"});Object.assign(pg,{m:1,a:1,h:1,p:1});
+  view=v;pid=id||null;Object.assign(st,{q:"",g:"",s:"",r:"",sort:"name"});Object.assign(sa,{q:"",f:"all"});Object.assign(pg,{m:1,a:1,h:1,p:1,f:1});
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===(v==="profile"?"members":v)));
   if(v==="members")shell();
   if(v==="acts")shellA();
   if(v==="hist")shellH();
+  if(v==="fin")FIN.shell();
   if(v==="profile")history.pushState(null,"");
   fill();scrollTo(0,0);
   const vv=$("#v");vv.classList.remove("vin");void vv.offsetWidth;vv.classList.add("vin");
@@ -578,7 +581,7 @@ function go(v,id){
 }
 const fill=()=>{
   if(view==="dash"&&Date.now()<animUntil){clearTimeout(fill.t);fill.t=setTimeout(()=>{if(view==="dash")dash()},animUntil-Date.now()+50);return}
-  view==="dash"?dash():view==="profile"?prof():view==="acts"?drawActs():view==="hist"?drawHist():draw();
+  view==="dash"?dash():view==="profile"?prof():view==="acts"?drawActs():view==="hist"?drawHist():view==="fin"?FIN.draw():draw();
 };
 function dash(){
   if(!mLoaded){
@@ -1518,3 +1521,7 @@ function exportCsv(a){
   l.href=URL.createObjectURL(new Blob(["\ufeff"+rows.join("\r\n")],{type:"text/csv"}));
   l.download="members-"+today+".csv";l.click();
 }
+
+/* ---------- Finance tab (see finance.js) ---------- */
+const FIN=initFinance({db,auth,$,ic,esc,busy,busyEnd,toast,ask,showErr,errInfo,reauth,withTimeout,logH,hrow,pager,slice,pgClick,pg,fmtS,fmtL,today,phead,printDoc,redraw:()=>fill(),isActive:()=>view==="fin"});
+
